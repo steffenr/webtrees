@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -51,20 +51,6 @@ class Individual extends GedcomRecord
     private $estimated_death_date;
 
     /**
-     * A closure which will create a record from a database row.
-     *
-     * @deprecated since 2.0.4.  Will be removed in 2.1.0 - Use Factory::individual()
-     *
-     * @param Tree $tree
-     *
-     * @return Closure
-     */
-    public static function rowMapper(Tree $tree): Closure
-    {
-        return Registry::individualFactory()->mapper($tree);
-    }
-
-    /**
      * A closure which will compare individuals by birth date.
      *
      * @return Closure
@@ -86,24 +72,6 @@ class Individual extends GedcomRecord
         return static function (Individual $x, Individual $y): int {
             return Date::compare($x->getEstimatedDeathDate(), $y->getEstimatedDeathDate());
         };
-    }
-
-    /**
-     * Get an instance of an individual object. For single records,
-     * we just receive the XREF. For bulk records (such as lists
-     * and search results) we can receive the GEDCOM data as well.
-     *
-     * @deprecated since 2.0.4.  Will be removed in 2.1.0 - Use Factory::individual()
-     *
-     * @param string      $xref
-     * @param Tree        $tree
-     * @param string|null $gedcom
-     *
-     * @return Individual|null
-     */
-    public static function getInstance(string $xref, Tree $tree, string $gedcom = null): ?Individual
-    {
-        return Registry::individualFactory()->make($xref, $tree, $gedcom);
     }
 
     /**
@@ -200,7 +168,7 @@ class Individual extends GedcomRecord
      *
      * @return bool
      */
-    private static function isRelated(Individual $target, $distance): bool
+    private static function isRelated(Individual $target, int $distance): bool
     {
         static $cache = null;
 
@@ -432,7 +400,7 @@ class Individual extends GedcomRecord
      *
      * @return string
      */
-    public function displayImage($width, $height, $fit, $attributes): string
+    public function displayImage(int $width, int $height, string $fit, array $attributes): string
     {
         $media_file = $this->findHighlightedMediaFile();
 
@@ -478,16 +446,6 @@ class Individual extends GedcomRecord
     }
 
     /**
-     * Get the year of birth
-     *
-     * @return string the year of birth
-     */
-    public function getBirthYear(): string
-    {
-        return $this->getBirthDate()->minimumDate()->format('%Y');
-    }
-
-    /**
      * Get the date of death
      *
      * @return Date
@@ -518,16 +476,6 @@ class Individual extends GedcomRecord
     }
 
     /**
-     * get the death year
-     *
-     * @return string the year of death
-     */
-    public function getDeathYear(): string
-    {
-        return $this->getDeathDate()->minimumDate()->format('%Y');
-    }
-
-    /**
      * Get the range of years in which a individual lived. e.g. “1870–”, “1870–1920”, “–1920”.
      * Provide the place and full date using a tooltip.
      * For consistent layout in charts, etc., show just a “–” when no dates are known.
@@ -537,18 +485,23 @@ class Individual extends GedcomRecord
      */
     public function lifespan(): string
     {
-        // Just the first part of the place name
+        // Just the first part of the place name.
         $birth_place = strip_tags($this->getBirthPlace()->shortName());
         $death_place = strip_tags($this->getDeathPlace()->shortName());
-        // Remove markup from dates
+
+        // Remove markup from dates.
         $birth_date = strip_tags($this->getBirthDate()->display());
         $death_date = strip_tags($this->getDeathDate()->display());
+
+        // Use minimum and maximum dates - to agree with the age calculations.
+        $birth_year = $this->getBirthDate()->minimumDate()->format('%Y');
+        $death_year = $this->getDeathDate()->maximumDate()->format('%Y');
 
         /* I18N: A range of years, e.g. “1870–”, “1870–1920”, “–1920” */
         return I18N::translate(
             '%1$s–%2$s',
-            '<span title="' . $birth_place . ' ' . $birth_date . '">' . $this->getBirthYear() . '</span>',
-            '<span title="' . $death_place . ' ' . $death_date . '">' . $this->getDeathYear() . '</span>'
+            '<span title="' . $birth_place . ' ' . $birth_date . '">' . $birth_year . '</span>',
+            '<span title="' . $death_place . ' ' . $death_date . '">' . $death_year . '</span>'
         );
     }
 
@@ -560,9 +513,10 @@ class Individual extends GedcomRecord
     public function getAllBirthDates(): array
     {
         foreach (Gedcom::BIRTH_EVENTS as $event) {
-            $tmp = $this->getAllEventDates([$event]);
-            if ($tmp) {
-                return $tmp;
+            $dates = $this->getAllEventDates([$event]);
+
+            if ($dates !== []) {
+                return $dates;
             }
         }
 
@@ -578,6 +532,7 @@ class Individual extends GedcomRecord
     {
         foreach (Gedcom::BIRTH_EVENTS as $event) {
             $places = $this->getAllEventPlaces([$event]);
+
             if ($places !== []) {
                 return $places;
             }
@@ -594,9 +549,10 @@ class Individual extends GedcomRecord
     public function getAllDeathDates(): array
     {
         foreach (Gedcom::DEATH_EVENTS as $event) {
-            $tmp = $this->getAllEventDates([$event]);
-            if ($tmp) {
-                return $tmp;
+            $dates = $this->getAllEventDates([$event]);
+
+            if ($dates !== []) {
+                return $dates;
             }
         }
 
@@ -612,6 +568,7 @@ class Individual extends GedcomRecord
     {
         foreach (Gedcom::DEATH_EVENTS as $event) {
             $places = $this->getAllEventPlaces([$event]);
+
             if ($places !== []) {
                 return $places;
             }
@@ -749,22 +706,6 @@ class Individual extends GedcomRecord
         }
 
         return 'U';
-    }
-
-    /**
-     * Generate the CSS class to be used for drawing this individual
-     *
-     * @return string
-     */
-    public function getBoxStyle(): string
-    {
-        $tmp = [
-            'M' => '',
-            'F' => 'F',
-            'U' => 'NN',
-        ];
-
-        return 'person_box' . $tmp[$this->sex()];
     }
 
     /**
@@ -1034,12 +975,12 @@ class Individual extends GedcomRecord
      * 2 SURN Vasquez,Sante
      *
      * @param string $type
-     * @param string $full
+     * @param string $value
      * @param string $gedcom
      *
      * @return void
      */
-    protected function addName(string $type, string $full, string $gedcom): void
+    protected function addName(string $type, string $value, string $gedcom): void
     {
         ////////////////////////////////////////////////////////////////////////////
         // Extract the structured name parts - use for "sortable" names and indexes
@@ -1064,12 +1005,12 @@ class Individual extends GedcomRecord
         ////////////////////////////////////////////////////////////////////////////
 
         // Fix bad slashes. e.g. 'John/Smith' => 'John/Smith/'
-        if (substr_count($full, '/') % 2 === 1) {
-            $full .= '/';
+        if (substr_count($value, '/') % 2 === 1) {
+            $value .= '/';
         }
 
         // GEDCOM uses "//" to indicate an unknown surname
-        $full = preg_replace('/\/\//', '/@N.N./', $full);
+        $full = preg_replace('/\/\//', '/@N.N./', $value);
 
         // Extract the surname.
         // Note, there may be multiple surnames, e.g. Jean /Vasquez/ y /Cortes/

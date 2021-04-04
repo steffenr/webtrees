@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2020 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -22,6 +22,7 @@ namespace Fisharebest\Webtrees\Services;
 use Closure;
 use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Contracts\UserInterface;
+use Fisharebest\Webtrees\Module\LocationListModule;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\FlashMessages;
 use Fisharebest\Webtrees\I18N;
@@ -413,6 +414,7 @@ class ModuleService
         'lifespans_chart'         => LifespansChartModule::class,
         'lightbox'                => AlbumModule::class,
         'lists-menu'              => ListsMenuModule::class,
+        'location_list'           => LocationListModule::class,
         'logged_in'               => LoggedInUsersModule::class,
         'login_block'             => LoginBlockModule::class,
         'marriage_report'         => MarriageReportModule::class,
@@ -513,20 +515,20 @@ class ModuleService
 
         switch ($interface) {
             case ModuleFooterInterface::class:
-                return $modules->sort($this->footerSorter());
+                return $modules->sort($this->footerComparator());
 
             case ModuleMenuInterface::class:
-                return $modules->sort($this->menuSorter());
+                return $modules->sort($this->menuComparator());
 
             case ModuleSidebarInterface::class:
-                return $modules->sort($this->sidebarSorter());
+                return $modules->sort($this->sidebarComparator());
 
             case ModuleTabInterface::class:
-                return $modules->sort($this->tabSorter());
+                return $modules->sort($this->tabComparator());
 
             default:
                 if ($sort) {
-                    return $modules->sort($this->moduleSorter());
+                    return $modules->sort($this->moduleComparator());
                 }
 
                 return $modules;
@@ -723,7 +725,7 @@ class ModuleService
      *
      * @return Closure
      */
-    private function footerSorter(): Closure
+    private function footerComparator(): Closure
     {
         return static function (ModuleFooterInterface $x, ModuleFooterInterface $y): int {
             return $x->getFooterOrder() <=> $y->getFooterOrder();
@@ -735,7 +737,7 @@ class ModuleService
      *
      * @return Closure
      */
-    private function menuSorter(): Closure
+    private function menuComparator(): Closure
     {
         return static function (ModuleMenuInterface $x, ModuleMenuInterface $y): int {
             return $x->getMenuOrder() <=> $y->getMenuOrder();
@@ -747,7 +749,7 @@ class ModuleService
      *
      * @return Closure
      */
-    private function sidebarSorter(): Closure
+    private function sidebarComparator(): Closure
     {
         return static function (ModuleSidebarInterface $x, ModuleSidebarInterface $y): int {
             return $x->getSidebarOrder() <=> $y->getSidebarOrder();
@@ -759,7 +761,7 @@ class ModuleService
      *
      * @return Closure
      */
-    private function tabSorter(): Closure
+    private function tabComparator(): Closure
     {
         return static function (ModuleTabInterface $x, ModuleTabInterface $y): int {
             return $x->getTabOrder() <=> $y->getTabOrder();
@@ -774,13 +776,13 @@ class ModuleService
      *
      * @return Closure
      */
-    private function moduleSorter(): Closure
+    private function moduleComparator(): Closure
     {
         return static function (ModuleInterface $x, ModuleInterface $y): int {
             $title1 = $x instanceof ModuleLanguageInterface ? $x->locale()->endonymSortable() : $x->title();
             $title2 = $y instanceof ModuleLanguageInterface ? $y->locale()->endonymSortable() : $y->title();
 
-            return I18N::strcasecmp($title1, $title2);
+            return I18N::comparator()($title1, $title2);
         };
     }
 
@@ -846,9 +848,6 @@ class ModuleService
      */
     public function bootModules(ModuleThemeInterface $current_theme): void
     {
-        // @deprecated since 2.0.8 - will be removed in 2.1.0
-        app()->instance('cache.array', Registry::cache()->array());
-
         foreach ($this->all() as $module) {
             // Only bootstrap the current theme.
             if ($module instanceof ModuleThemeInterface && $module !== $current_theme) {

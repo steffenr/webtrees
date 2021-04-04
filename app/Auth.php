@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -304,6 +304,33 @@ class Auth
         }
 
         throw new IndividualAccessDeniedException();
+    }
+
+    /**
+     * @param Location|null $location
+     * @param bool       $edit
+     *
+     * @return Location
+     * @throws RecordNotFoundException
+     * @throws RecordAccessDeniedException
+     */
+    public static function checkLocationAccess(?Location $location, bool $edit = false): Location
+    {
+        if ($location === null) {
+            throw new RecordNotFoundException();
+        }
+
+        if ($edit && $location->canEdit()) {
+            $location->lock();
+
+            return $location;
+        }
+
+        if ($location->canShow()) {
+            return $location;
+        }
+
+        throw new RecordAccessDeniedException();
     }
 
     /**

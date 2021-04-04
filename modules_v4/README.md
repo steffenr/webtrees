@@ -23,7 +23,7 @@ modules containing `.` are ignored.
 
 ## Writing modules
 
-To write a module, you need to understand the PHP programming langauge.
+To write a module, you need to understand the PHP programming language.
 
 The rest of this document is aimed at PHP developers.
 
@@ -113,7 +113,7 @@ use Fisharebest\Webtrees\Module\PedigreeChartModule;
 use Fisharebest\Webtrees\Services\ChartService;
 
 /**
- * Creating an anoymous class will prevent conflicts with other custom modules.
+ * Creating an anonymous class will prevent conflicts with other custom modules.
  */
 return new class extends PedigreeChartModule implements ModuleCustomInterface {
     use ModuleCustomTrait;

@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -86,11 +86,13 @@ class EditMediaFileModal implements RequestHandlerInterface
 
         foreach ($media->mediaFiles() as $media_file) {
             if ($media_file->factId() === $fact_id) {
+                $media_types = Registry::elementFactory()->make('OBJE:FILE:FORM:TYPE')->values();
+
                 return response(view('modals/edit-media-file', [
                     'media_file'      => $media_file,
                     'max_upload_size' => $this->media_file_service->maxUploadFilesize(),
                     'media'           => $media,
-                    'media_types'     => $this->media_file_service->mediaTypes(),
+                    'media_types'     => $media_types,
                     'unused_files'    => $this->media_file_service->unusedFiles($tree, $data_filesystem),
                     'tree'            => $tree,
                 ]));

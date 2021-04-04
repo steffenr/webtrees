@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2019 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -65,6 +65,8 @@ use Fisharebest\Webtrees\Http\RequestHandlers\ContactAction;
 use Fisharebest\Webtrees\Http\RequestHandlers\ContactPage;
 use Fisharebest\Webtrees\Http\RequestHandlers\ControlPanel;
 use Fisharebest\Webtrees\Http\RequestHandlers\CopyFact;
+use Fisharebest\Webtrees\Http\RequestHandlers\CreateLocationAction;
+use Fisharebest\Webtrees\Http\RequestHandlers\CreateLocationModal;
 use Fisharebest\Webtrees\Http\RequestHandlers\CreateMediaObjectAction;
 use Fisharebest\Webtrees\Http\RequestHandlers\CreateMediaObjectFromFile;
 use Fisharebest\Webtrees\Http\RequestHandlers\CreateMediaObjectModal;
@@ -74,6 +76,8 @@ use Fisharebest\Webtrees\Http\RequestHandlers\CreateRepositoryAction;
 use Fisharebest\Webtrees\Http\RequestHandlers\CreateRepositoryModal;
 use Fisharebest\Webtrees\Http\RequestHandlers\CreateSourceAction;
 use Fisharebest\Webtrees\Http\RequestHandlers\CreateSourceModal;
+use Fisharebest\Webtrees\Http\RequestHandlers\CreateSubmissionAction;
+use Fisharebest\Webtrees\Http\RequestHandlers\CreateSubmissionModal;
 use Fisharebest\Webtrees\Http\RequestHandlers\CreateSubmitterAction;
 use Fisharebest\Webtrees\Http\RequestHandlers\CreateSubmitterModal;
 use Fisharebest\Webtrees\Http\RequestHandlers\CreateTreeAction;
@@ -101,6 +105,8 @@ use Fisharebest\Webtrees\Http\RequestHandlers\EditRawFactAction;
 use Fisharebest\Webtrees\Http\RequestHandlers\EditRawFactPage;
 use Fisharebest\Webtrees\Http\RequestHandlers\EditRawRecordAction;
 use Fisharebest\Webtrees\Http\RequestHandlers\EditRawRecordPage;
+use Fisharebest\Webtrees\Http\RequestHandlers\EditRecordAction;
+use Fisharebest\Webtrees\Http\RequestHandlers\EditRecordPage;
 use Fisharebest\Webtrees\Http\RequestHandlers\EmailPreferencesAction;
 use Fisharebest\Webtrees\Http\RequestHandlers\EmailPreferencesPage;
 use Fisharebest\Webtrees\Http\RequestHandlers\ExportGedcomClient;
@@ -109,6 +115,9 @@ use Fisharebest\Webtrees\Http\RequestHandlers\ExportGedcomServer;
 use Fisharebest\Webtrees\Http\RequestHandlers\FamilyPage;
 use Fisharebest\Webtrees\Http\RequestHandlers\FaviconIco;
 use Fisharebest\Webtrees\Http\RequestHandlers\FindDuplicateRecords;
+use Fisharebest\Webtrees\Http\RequestHandlers\FixLevel0MediaAction;
+use Fisharebest\Webtrees\Http\RequestHandlers\FixLevel0MediaData;
+use Fisharebest\Webtrees\Http\RequestHandlers\FixLevel0MediaPage;
 use Fisharebest\Webtrees\Http\RequestHandlers\GedcomLoad;
 use Fisharebest\Webtrees\Http\RequestHandlers\GedcomRecordPage;
 use Fisharebest\Webtrees\Http\RequestHandlers\HeaderPage;
@@ -116,6 +125,9 @@ use Fisharebest\Webtrees\Http\RequestHandlers\HelpText;
 use Fisharebest\Webtrees\Http\RequestHandlers\HomePage;
 use Fisharebest\Webtrees\Http\RequestHandlers\ImportGedcomAction;
 use Fisharebest\Webtrees\Http\RequestHandlers\ImportGedcomPage;
+use Fisharebest\Webtrees\Http\RequestHandlers\ImportThumbnailsAction;
+use Fisharebest\Webtrees\Http\RequestHandlers\ImportThumbnailsData;
+use Fisharebest\Webtrees\Http\RequestHandlers\ImportThumbnailsPage;
 use Fisharebest\Webtrees\Http\RequestHandlers\IndividualPage;
 use Fisharebest\Webtrees\Http\RequestHandlers\LinkChildToFamilyAction;
 use Fisharebest\Webtrees\Http\RequestHandlers\LinkChildToFamilyPage;
@@ -125,6 +137,7 @@ use Fisharebest\Webtrees\Http\RequestHandlers\LinkMediaToRecordAction;
 use Fisharebest\Webtrees\Http\RequestHandlers\LinkMediaToSourceModal;
 use Fisharebest\Webtrees\Http\RequestHandlers\LinkSpouseToIndividualAction;
 use Fisharebest\Webtrees\Http\RequestHandlers\LinkSpouseToIndividualPage;
+use Fisharebest\Webtrees\Http\RequestHandlers\LocationPage;
 use Fisharebest\Webtrees\Http\RequestHandlers\LoginAction;
 use Fisharebest\Webtrees\Http\RequestHandlers\LoginPage;
 use Fisharebest\Webtrees\Http\RequestHandlers\Logout;
@@ -132,8 +145,15 @@ use Fisharebest\Webtrees\Http\RequestHandlers\ManageMediaAction;
 use Fisharebest\Webtrees\Http\RequestHandlers\ManageMediaData;
 use Fisharebest\Webtrees\Http\RequestHandlers\ManageMediaPage;
 use Fisharebest\Webtrees\Http\RequestHandlers\ManageTrees;
+use Fisharebest\Webtrees\Http\RequestHandlers\MapDataAdd;
 use Fisharebest\Webtrees\Http\RequestHandlers\MapDataDelete;
+use Fisharebest\Webtrees\Http\RequestHandlers\MapDataEdit;
+use Fisharebest\Webtrees\Http\RequestHandlers\MapDataExportCSV;
+use Fisharebest\Webtrees\Http\RequestHandlers\MapDataExportGeoJson;
+use Fisharebest\Webtrees\Http\RequestHandlers\MapDataImportAction;
+use Fisharebest\Webtrees\Http\RequestHandlers\MapDataImportPage;
 use Fisharebest\Webtrees\Http\RequestHandlers\MapDataList;
+use Fisharebest\Webtrees\Http\RequestHandlers\MapDataSave;
 use Fisharebest\Webtrees\Http\RequestHandlers\MapProviderAction;
 use Fisharebest\Webtrees\Http\RequestHandlers\MapProviderPage;
 use Fisharebest\Webtrees\Http\RequestHandlers\Masquerade;
@@ -229,11 +249,13 @@ use Fisharebest\Webtrees\Http\RequestHandlers\SearchReplaceAction;
 use Fisharebest\Webtrees\Http\RequestHandlers\SearchReplacePage;
 use Fisharebest\Webtrees\Http\RequestHandlers\Select2Family;
 use Fisharebest\Webtrees\Http\RequestHandlers\Select2Individual;
+use Fisharebest\Webtrees\Http\RequestHandlers\Select2Location;
 use Fisharebest\Webtrees\Http\RequestHandlers\Select2MediaObject;
 use Fisharebest\Webtrees\Http\RequestHandlers\Select2Note;
 use Fisharebest\Webtrees\Http\RequestHandlers\Select2Place;
 use Fisharebest\Webtrees\Http\RequestHandlers\Select2Repository;
 use Fisharebest\Webtrees\Http\RequestHandlers\Select2Source;
+use Fisharebest\Webtrees\Http\RequestHandlers\Select2Submission;
 use Fisharebest\Webtrees\Http\RequestHandlers\Select2Submitter;
 use Fisharebest\Webtrees\Http\RequestHandlers\SelectDefaultTree;
 use Fisharebest\Webtrees\Http\RequestHandlers\SelectLanguage;
@@ -266,6 +288,9 @@ use Fisharebest\Webtrees\Http\RequestHandlers\TreePrivacyAction;
 use Fisharebest\Webtrees\Http\RequestHandlers\TreePrivacyPage;
 use Fisharebest\Webtrees\Http\RequestHandlers\UnconnectedAction;
 use Fisharebest\Webtrees\Http\RequestHandlers\UnconnectedPage;
+use Fisharebest\Webtrees\Http\RequestHandlers\UpgradeWizardConfirm;
+use Fisharebest\Webtrees\Http\RequestHandlers\UpgradeWizardPage;
+use Fisharebest\Webtrees\Http\RequestHandlers\UpgradeWizardStep;
 use Fisharebest\Webtrees\Http\RequestHandlers\UploadMediaAction;
 use Fisharebest\Webtrees\Http\RequestHandlers\UploadMediaPage;
 use Fisharebest\Webtrees\Http\RequestHandlers\UserAddAction;
@@ -309,6 +334,9 @@ class WebRoutes
                 $router->post(DeletePath::class, '/delete-path');
                 $router->get(EmailPreferencesPage::class, '/email');
                 $router->post(EmailPreferencesAction::class, '/email');
+                $router->get(FixLevel0MediaPage::class, '/fix-level-0-media');
+                $router->post(FixLevel0MediaAction::class, '/fix-level-0-media');
+                $router->get(FixLevel0MediaData::class, '/fix-level-0-media-data');
                 $router->get(PhpInformation::class, '/information');
                 $router->get(SiteLogsPage::class, '/logs');
                 $router->post(SiteLogsAction::class, '/logs');
@@ -327,21 +355,20 @@ class WebRoutes
                 $router->post(CreateTreeAction::class, '/trees/create');
                 $router->post(SelectDefaultTree::class, '/trees/default/{tree}');
                 $router->post(DeleteTreeAction::class, '/trees/delete/{tree}');
-                $router->get('admin-fix-level-0-media', '/fix-level-0-media', 'Admin\FixLevel0MediaController::fixLevel0Media');
-                $router->post('admin-fix-level-0-media-action', '/fix-level-0-media', 'Admin\FixLevel0MediaController::fixLevel0MediaAction');
-                $router->get('admin-fix-level-0-media-data', '/fix-level-0-media-data', 'Admin\FixLevel0MediaController::fixLevel0MediaData');
-                $router->get('admin-webtrees1-thumbs', '/webtrees1-thumbs', 'Admin\ImportThumbnailsController::webtrees1Thumbnails');
-                $router->post('admin-webtrees1-thumbs-action', '/webtrees1-thumbs', 'Admin\ImportThumbnailsController::webtrees1ThumbnailsAction');
-                $router->get('admin-webtrees1-thumbs-data', '/webtrees1-thumbs-data', 'Admin\ImportThumbnailsController::webtrees1ThumbnailsData');
+                $router->get(ImportThumbnailsPage::class, '/webtrees1-thumbs');
+                $router->post(ImportThumbnailsAction::class, '/webtrees1-thumbs');
+                $router->get(ImportThumbnailsData::class, '/webtrees1-thumbs-data');
                 $router->get(UsersCleanupPage::class, '/users-cleanup');
                 $router->post(UsersCleanupAction::class, '/users-cleanup');
-                $router->get(MapDataList::class, '/map-data');
-                $router->get('map-data-edit', '/map-data-edit', 'Admin\LocationController::mapDataEdit');
-                $router->post('map-data-update', '/map-data-edit', 'Admin\LocationController::mapDataSave');
-                $router->post(MapDataDelete::class, '/map-data-delete');
-                $router->get('locations-export', '/locations-export', 'Admin\LocationController::exportLocations');
-                $router->get('locations-import', '/locations-import', 'Admin\LocationController::importLocations');
-                $router->post('locations-import-action', '/locations-import', 'Admin\LocationController::importLocationsAction');
+                $router->get(MapDataAdd::class, '/map-data-add{/parent_id}');
+                $router->post(MapDataDelete::class, '/map-data-delete/{place_id}');
+                $router->get(MapDataEdit::class, '/map-data-edit/{place_id}');
+                $router->get(MapDataExportCSV::class, '/map-data-csv{/parent_id}');
+                $router->get(MapDataExportGeoJson::class, '/map-data-geojson{/parent_id}');
+                $router->get(MapDataImportPage::class, '/locations-import');
+                $router->post(MapDataImportAction::class, '/locations-import');
+                $router->get(MapDataList::class, '/map-data{/parent_id}');
+                $router->post(MapDataSave::class, '/map-data-update');
                 $router->get(MapProviderPage::class, '/map-provider');
                 $router->post(MapProviderAction::class, '/map-provider');
                 $router->post(ModuleDeleteSettings::class, '/module-delete-settings');
@@ -373,9 +400,9 @@ class WebRoutes
                 $router->post(ModulesTabsAction::class, '/tabs');
                 $router->get(ModulesThemesPage::class, '/themes');
                 $router->post(ModulesThemesAction::class, '/themes');
-                $router->get('upgrade', '/upgrade', 'Admin\UpgradeController::wizard');
-                $router->post('upgrade-confirm', '/upgrade-confirm', 'Admin\UpgradeController::confirm');
-                $router->post('upgrade-action', '/upgrade', 'Admin\UpgradeController::step');
+                $router->get(UpgradeWizardPage::class, '/upgrade');
+                $router->post(UpgradeWizardConfirm::class, '/upgrade-confirm');
+                $router->post(UpgradeWizardStep::class, '/upgrade-action');
                 $router->get(UserListPage::class, '/admin-users');
                 $router->get(UserListData::class, '/admin-users-data');
                 $router->get(UserAddPage::class, '/admin-users-create');
@@ -394,9 +421,6 @@ class WebRoutes
                 $router->post(DeleteUser::class, '/users/delete/{user_id}');
                 $router->get(UserPageDefaultEdit::class, '/user-page-default-edit');
                 $router->post(UserPageDefaultUpdate::class, '/user-page-default-update');
-
-                // @deprecated since 2.0.8 - will be removed in 2.1.0
-                $router->get('modules', '/modules', ModulesAllPage::class);
             });
 
             // Manager routes (multiple trees).
@@ -495,6 +519,8 @@ class WebRoutes
                 $router->post(AddSpouseToFamilyAction::class, '/add-spouse-to-family');
                 $router->get(ChangeFamilyMembersPage::class, '/change-family-members');
                 $router->post(ChangeFamilyMembersAction::class, '/change-family-members');
+                $router->get(CreateLocationModal::class, '/create-location');
+                $router->post(CreateLocationAction::class, '/create-location');
                 $router->get(CreateMediaObjectModal::class, '/create-media-object');
                 $router->post(CreateMediaObjectAction::class, '/create-media-object');
                 $router->post(CreateMediaObjectFromFile::class, '/create-media-from-file');
@@ -507,6 +533,8 @@ class WebRoutes
                 $router->post(CreateSourceAction::class, '/create-source');
                 $router->get(CreateSubmitterModal::class, '/create-submitter');
                 $router->post(CreateSubmitterAction::class, '/create-submitter');
+                $router->get(CreateSubmissionModal::class, '/create-submission');
+                $router->post(CreateSubmissionAction::class, '/create-submission');
                 $router->post(DeleteRecord::class, '/delete/{xref}');
                 $router->post(DeleteFact::class, '/delete/{xref}/{fact_id}');
                 $router->get(EditFactPage::class, '/edit-fact/{xref}/{fact_id}');
@@ -523,6 +551,8 @@ class WebRoutes
                 $router->get(LinkMediaToIndividualModal::class, '/link-media-to-individual/{xref}');
                 $router->get(LinkMediaToSourceModal::class, '/link-media-to-source/{xref}');
                 $router->post(LinkMediaToRecordAction::class, '/link-media-to-record/{xref}');
+                $router->get(EditRecordPage::class, '/edit-record/{xref}');
+                $router->post(EditRecordAction::class, '/update-record/{xref}');
                 $router->post(PasteFact::class, '/paste-fact/{xref}');
                 $router->get(ReorderChildrenPage::class, '/reorder-children/{xref}');
                 $router->post(ReorderChildrenAction::class, '/reorder-children/{xref}');
@@ -605,6 +635,7 @@ class WebRoutes
                 $router->get(FamilyPage::class, '/family/{xref}{/slug}');
                 $router->get(HeaderPage::class, '/header/{xref}{/slug}');
                 $router->get(IndividualPage::class, '/individual/{xref}{/slug}');
+                $router->get(LocationPage::class, '/location/{xref}{/slug}');
                 $router->get(MediaFileThumbnail::class, '/media-thumbnail');
                 $router->get(MediaFileDownload::class, '/media-download');
                 $router->get(MediaPage::class, '/media/{xref}{/slug}');
@@ -625,10 +656,12 @@ class WebRoutes
                 $router->post(SearchQuickAction::class, '/search-quick');
                 $router->post(Select2Family::class, '/select2-family');
                 $router->post(Select2Individual::class, '/select2-individual');
+                $router->post(Select2Location::class, '/select2-location');
                 $router->post(Select2MediaObject::class, '/select2-media');
                 $router->post(Select2Note::class, '/select2-note');
                 $router->post(Select2Place::class, '/select2-place');
                 $router->post(Select2Source::class, '/select2-source');
+                $router->post(Select2Submission::class, '/select2-submission');
                 $router->post(Select2Submitter::class, '/select2-submitter');
                 $router->post(Select2Repository::class, '/select2-repository');
                 $router->get(SourcePage::class, '/source/{xref}{/slug}');

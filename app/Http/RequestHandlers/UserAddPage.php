@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -41,7 +41,7 @@ class UserAddPage implements RequestHandlerInterface
     {
         $this->layout = 'layouts/administration';
 
-        $params    = (array) $request->getQueryParams();
+        $params    = $request->getQueryParams();
         $email     = $params['email'] ?? '';
         $real_name = $params['real_name'] ?? '';
         $username  = $params['username'] ?? '';

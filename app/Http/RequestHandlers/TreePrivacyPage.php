@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2020 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -124,7 +124,7 @@ class TreePrivacyPage implements RequestHandlerInterface
                 return $row;
             })
             ->sort(static function (stdClass $x, stdClass $y): int {
-                return I18N::strcasecmp($x->tag_label, $y->tag_label);
+                return I18N::comparator()($x->tag_label, $y->tag_label);
             })
             ->all();
     }
@@ -134,7 +134,7 @@ class TreePrivacyPage implements RequestHandlerInterface
      *
      * @param Tree $tree
      *
-     * @return string[]
+     * @return array<string>
      */
     private function tagsForPrivacy(Tree $tree): array
     {
@@ -170,7 +170,7 @@ class TreePrivacyPage implements RequestHandlerInterface
             }
         }
 
-        uasort($all_tags, '\Fisharebest\Webtrees\I18N::strcasecmp');
+        uasort($all_tags, I18N::comparator());
 
         return array_merge(
             ['' => I18N::translate('All facts and events')],

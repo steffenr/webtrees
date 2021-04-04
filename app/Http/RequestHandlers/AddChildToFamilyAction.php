@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2020 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -21,7 +21,6 @@ namespace Fisharebest\Webtrees\Http\RequestHandlers;
 
 use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Date;
-use Fisharebest\Webtrees\GedcomCode\GedcomCodePedi;
 use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Services\GedcomEditService;
@@ -86,7 +85,25 @@ class AddChildToFamilyAction implements RequestHandlerInterface
                 $gedrec .= $this->gedcom_edit_service->addNewFact($request, $tree, $match);
             }
         }
-        $gedrec .= "\n" . GedcomCodePedi::createNewFamcPedi($PEDI, $xref);
+
+        switch ($PEDI) {
+            case '':
+                $gedrec .= "\n1 FAMC @$xref@";
+                break;
+            case 'adopted':
+                $gedrec .= "\n1 FAMC @$xref@\n2 PEDI $PEDI\n1 ADOP\n2 FAMC @$xref@\n3 ADOP BOTH";
+                break;
+            case 'sealing':
+                $gedrec .= "\n1 FAMC @$xref@\n2 PEDI $PEDI\n1 SLGC\n2 FAMC @$xref@";
+                break;
+            case 'foster':
+                $gedrec .= "\n1 FAMC @$xref@\n2 PEDI $PEDI\n1 EVEN\n2 TYPE $PEDI";
+                break;
+            default:
+                $gedrec .= "\n1 FAMC @$xref@\n2 PEDI $PEDI";
+                break;
+        }
+
         if ($params['SOUR_INDI'] ?? false) {
             $gedrec = $this->gedcom_edit_service->handleUpdates($gedrec);
         } else {

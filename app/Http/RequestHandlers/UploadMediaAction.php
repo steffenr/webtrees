@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2020 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -26,11 +26,13 @@ use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Log;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Services\MediaFileService;
+use League\Flysystem\FilesystemException;
+use League\Flysystem\UnableToCheckFileExistence;
+use League\Flysystem\UnableToWriteFile;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UploadedFileInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Throwable;
 
 use function assert;
 use function e;
@@ -116,7 +118,13 @@ class UploadMediaAction implements RequestHandlerInterface
 
             $path = $folder . $filename;
 
-            if ($data_filesystem->has($path)) {
+            try {
+                $file_exists = $data_filesystem->fileExists($path);
+            } catch (FilesystemException | UnableToCheckFileExistence $ex) {
+                $file_exists = false;
+            }
+
+            if ($file_exists) {
                 FlashMessages::addMessage(I18N::translate('The file %s already exists. Use another filename.', $path, 'error'));
                 continue;
             }
@@ -126,7 +134,7 @@ class UploadMediaAction implements RequestHandlerInterface
                 $data_filesystem->writeStream($path, $uploaded_file->getStream()->detach());
                 FlashMessages::addMessage(I18N::translate('The file %s has been uploaded.', Html::filename($path)), 'success');
                 Log::addMediaLog('Media file ' . $path . ' uploaded');
-            } catch (Throwable $ex) {
+            } catch (FilesystemException | UnableToWriteFile $ex) {
                 FlashMessages::addMessage(I18N::translate('There was an error uploading your file.') . '<br>' . e($ex->getMessage()), 'danger');
             }
         }

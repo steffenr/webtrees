@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -63,6 +63,7 @@ class ManageMediaPage implements RequestHandlerInterface
         $subfolders    = $request->getQueryParams()['subfolders'] ?? 'include'; // include|exclude
         $media_folders = $this->media_file_service->allMediaFolders($data_filesystem);
         $media_folder  = $request->getQueryParams()['media_folder'] ?? $media_folders->first() ?? '';
+        $media_types   = Registry::elementFactory()->make('OBJE:FILE:FORM:TYPE')->values();
 
         $title = I18N::translate('Manage media');
 
@@ -71,6 +72,7 @@ class ManageMediaPage implements RequestHandlerInterface
             'files'         => $files,
             'media_folder'  => $media_folder,
             'media_folders' => $media_folders,
+            'media_types'   => $media_types,
             'subfolders'    => $subfolders,
             'title'         => $title,
         ]);

@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2020 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -46,7 +46,7 @@ class ModuleServiceTest extends TestCase
      * @covers \Fisharebest\Webtrees\Services\ModuleService::all
      * @covers \Fisharebest\Webtrees\Services\ModuleService::coreModules
      * @covers \Fisharebest\Webtrees\Services\ModuleService::customModules
-     * @covers \Fisharebest\Webtrees\Services\ModuleService::moduleSorter
+     * @covers \Fisharebest\Webtrees\Services\ModuleService::moduleComparator
      * @return void
      */
     public function testAll(): void
@@ -58,9 +58,9 @@ class ModuleServiceTest extends TestCase
 
     /**
      * @covers \Fisharebest\Webtrees\Services\ModuleService::findByComponent
-     * @covers \Fisharebest\Webtrees\Services\ModuleService::menuSorter
-     * @covers \Fisharebest\Webtrees\Services\ModuleService::sidebarSorter
-     * @covers \Fisharebest\Webtrees\Services\ModuleService::tabSorter
+     * @covers \Fisharebest\Webtrees\Services\ModuleService::menuComparator
+     * @covers \Fisharebest\Webtrees\Services\ModuleService::sidebarComparator
+     * @covers \Fisharebest\Webtrees\Services\ModuleService::tabComparator
      * @return void
      */
     public function testFindByComponent(): void

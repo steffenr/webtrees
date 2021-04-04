@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2020 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -159,7 +159,7 @@ class GedcomExportService
         $gedcom .= "\n1 DEST DISKETTE";
         $gedcom .= "\n1 DATE " . strtoupper(date('d M Y'));
         $gedcom .= "\n2 TIME " . date('H:i:s');
-        $gedcom .= "\n1 GEDC\n2 VERS 5.5.1\n2 FORM Lineage-Linked";
+        $gedcom .= "\n1 GEDC\n2 VERS 5.5.1\n2 FORM LINEAGE-LINKED";
         $gedcom .= "\n1 CHAR " . $encoding;
         $gedcom .= "\n1 FILE " . $filename;
 

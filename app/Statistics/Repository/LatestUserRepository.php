@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -82,6 +82,10 @@ class LatestUserRepository implements LatestUserRepositoryInterface
             })
             ->orderByDesc('us.setting_value')
             ->value('user_id');
+
+        if ($user_id !== null) {
+            $user_id = (int) $user_id;
+        }
 
         $user = $this->user_service->find($user_id) ?? Auth::user();
 

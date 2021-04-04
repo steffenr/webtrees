@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -120,7 +120,6 @@ class ChartsBlockModule extends AbstractModule implements ModuleBlockInterface
                         $content   = view('modules/charts/chart', [
                             'block_id'  => $block_id,
                             'chart_url' => $chart_url,
-                            'class'     => 'wt-chart-pedigree',
                         ]);
                     } else {
                         $title   = I18N::translate('Pedigree');
@@ -141,7 +140,6 @@ class ChartsBlockModule extends AbstractModule implements ModuleBlockInterface
                         $content   = view('modules/charts/chart', [
                             'block_id'  => $block_id,
                             'chart_url' => $chart_url,
-                            'class'     => 'wt-chart-descendants',
                         ]);
                     } else {
                         $title   = I18N::translate('Descendants');
@@ -162,7 +160,6 @@ class ChartsBlockModule extends AbstractModule implements ModuleBlockInterface
                         $content   = view('modules/charts/chart', [
                             'block_id'  => $block_id,
                             'chart_url' => $chart_url,
-                            'class'     => 'wt-chart-hourglass',
                         ]);
                     } else {
                         $title   = I18N::translate('Hourglass chart');
@@ -273,7 +270,7 @@ class ChartsBlockModule extends AbstractModule implements ModuleBlockInterface
             'hourglass'   => I18N::translate('Hourglass chart'),
             'treenav'     => I18N::translate('Interactive tree'),
         ];
-        uasort($charts, 'Fisharebest\Webtrees\I18N::strcasecmp');
+        uasort($charts, I18N::comparator());
 
         $individual = Registry::individualFactory()->make($xref, $tree);
 

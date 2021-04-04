@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2020 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -50,7 +50,7 @@ class XrefParser implements InlineParserInterface
     /**
      * We are only interested in text that begins with '@'.
      *
-     * @return string[]
+     * @return array<string>
      */
     public function getCharacters(): array
     {
@@ -58,14 +58,14 @@ class XrefParser implements InlineParserInterface
     }
 
     /**
-     * @param InlineParserContext $context
+     * @param InlineParserContext $inlineContext
      *
      * @return bool
      */
-    public function parse(InlineParserContext $context): bool
+    public function parse(InlineParserContext $inlineContext): bool
     {
         // The cursor should be positioned on the opening '@'.
-        $cursor = $context->getCursor();
+        $cursor = $inlineContext->getCursor();
 
         // If this isn't the start of an XREF, we'll need to rewind to here.
         $previous_state = $cursor->saveState();
@@ -77,7 +77,7 @@ class XrefParser implements InlineParserInterface
             $record = Registry::gedcomRecordFactory()->make($xref, $this->tree);
 
             if ($record instanceof GedcomRecord) {
-                $context->getContainer()->appendChild(new XrefNode($record));
+                $inlineContext->getContainer()->appendChild(new XrefNode($record));
 
                 return true;
             }

@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2020 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,13 +12,14 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
 
 namespace Fisharebest\Webtrees;
 
+use Closure;
 use Collator;
 use Exception;
 use Fisharebest\Localization\Locale;
@@ -541,21 +542,24 @@ class I18N
     }
 
     /**
-     * Perform a case-insensitive comparison of two strings.
+     * A closure which will compare strings using local collation rules.
      *
-     * @param string $string1
-     * @param string $string2
-     *
-     * @return int
+     * @return Closure
      */
-    public static function strcasecmp(string $string1, string $string2): int
+    public static function comparator(): Closure
     {
         if (self::$collator instanceof Collator) {
-            return self::$collator->compare($string1, $string2);
+            return static function (string $x, string $y): int {
+                return (int) self::$collator->compare($x, $y);
+            };
         }
 
-        return strcmp(self::strtolower($string1), self::strtolower($string2));
+        return static function (string $x, string $y): int {
+            return strcmp(self::strtolower($x), self::strtolower($y));
+        };
     }
+
+
 
     /**
      * Convert a string to lower case.

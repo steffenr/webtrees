@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2020 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -20,10 +20,10 @@ declare(strict_types=1);
 namespace Fisharebest\Webtrees\Functions;
 
 use Fisharebest\Webtrees\Date;
+use Fisharebest\Webtrees\Elements\UnknownElement;
 use Fisharebest\Webtrees\Exceptions\GedcomErrorException;
 use Fisharebest\Webtrees\Family;
 use Fisharebest\Webtrees\Gedcom;
-use Fisharebest\Webtrees\GedcomTag;
 use Fisharebest\Webtrees\Header;
 use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\Location;
@@ -283,15 +283,19 @@ class FunctionsImport
         // import different types of records
         if (preg_match('/^0 @(' . Gedcom::REGEX_XREF . ')@ (' . Gedcom::REGEX_TAG . ')/', $gedrec, $match)) {
             [, $xref, $type] = $match;
-            // check for a _UID, if the record doesn't have one, add one
-            if ($tree->getPreference('GENERATE_UIDS') === '1' && !str_contains($gedrec, "\n1 _UID ")) {
-                $gedrec .= "\n1 _UID " . GedcomTag::createUid();
-            }
         } elseif (preg_match('/0 (HEAD|TRLR|_PLAC |_PLAC_DEFN)/', $gedrec, $match)) {
             $type = $match[1];
             $xref = $type; // For records without an XREF, use the type as a pseudo XREF.
         } else {
             throw new GedcomErrorException($gedrec);
+        }
+
+        // Add a _UID
+        if ($tree->getPreference('GENERATE_UIDS') === '1' && !str_contains($gedrec, "\n1 _UID ")) {
+            $element = Registry::elementFactory()->make($type . ':_UID');
+            if (!$element instanceof UnknownElement) {
+                $gedrec .= "\n1 _UID " . $element->default($tree);
+            }
         }
 
         // If the user has downloaded their GEDCOM data (containing media objects) and edited it
@@ -491,12 +495,12 @@ class FunctionsImport
 
         $location = new PlaceLocation($place_name);
 
-        if ($location->latitude() === 0.0 && $location->longitude() === 0.0) {
-            DB::table('placelocation')
-                ->where('pl_id', '=', $location->id())
+        if ($location->latitude() === null && $location->longitude() === null) {
+            DB::table('place_location')
+                ->where('id', '=', $location->id())
                 ->update([
-                    'pl_lati' => $latitude,
-                    'pl_long' => $longitude,
+                    'latitude'  => $latitude,
+                    'longitude' => $longitude,
                 ]);
         }
     }
@@ -528,12 +532,12 @@ class FunctionsImport
 
         $location = new PlaceLocation($place_name);
 
-        if ($location->latitude() === 0.0 && $location->longitude() === 0.0) {
-            DB::table('placelocation')
-                ->where('pl_id', '=', $location->id())
+        if ($location->latitude() === null && $location->longitude() === null) {
+            DB::table('place_location')
+                ->where('id', '=', $location->id())
                 ->update([
-                    'pl_lati' => $latitude,
-                    'pl_long' => $longitude,
+                    'latitude'  => $latitude,
+                    'longitude' => $longitude,
                 ]);
         }
     }

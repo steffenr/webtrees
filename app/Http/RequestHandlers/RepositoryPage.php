@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2020 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -94,7 +94,7 @@ class RepositoryPage implements RequestHandlerInterface
         }
 
         return $this->viewResponse('repository-page', [
-            'clipboard_facts'  => $this->clipboard_service->pastableFacts($repository, new Collection()),
+            'clipboard_facts'  => $this->clipboard_service->pastableFacts($repository),
             'facts'            => $this->facts($repository),
             'meta_description' => '',
             'meta_robots'      => 'index,follow',

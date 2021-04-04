@@ -2,11 +2,11 @@
 
 use Fisharebest\Webtrees\Family;
 use Fisharebest\Webtrees\GedcomRecord;
-use Fisharebest\Webtrees\GedcomTag;
 use Fisharebest\Webtrees\Http\RequestHandlers\AddNewFact;
 use Fisharebest\Webtrees\Http\RequestHandlers\SelectNewFact;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
+use Fisharebest\Webtrees\Registry;
 
 /**
  * @var array<string,string> $add_facts
@@ -56,9 +56,9 @@ use Fisharebest\Webtrees\Individual;
                 <a class="btn btn-link btn-sm wt-quick-fact" href="<?= e(route(AddNewFact::class, [
                     'fact' => $fact,
                     'xref' => $record->xref(),
-                    'tree' => $tree->name(),
+                    'tree' => $record->tree()->name(),
                 ])) ?>">
-                    <?= GedcomTag::getLabel($record->tag() . ':' . $fact) ?>
+                    <?= Registry::elementFactory()->make($record->tag() . ':' . $fact)->label() ?>
                 </a>
             <?php endforeach ?>
         </div>

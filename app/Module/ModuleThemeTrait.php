@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -152,7 +152,7 @@ trait ModuleThemeTrait
         }
 
         usort($menus, static function (Menu $x, Menu $y): int {
-            return I18N::strcasecmp($x->getLabel(), $y->getLabel());
+            return I18N::comparator()($x->getLabel(), $y->getLabel());
         });
 
         return $menus;
@@ -523,7 +523,7 @@ trait ModuleThemeTrait
     /**
      * A list of CSS files to include for this page.
      *
-     * @return string[]
+     * @return array<string>
      */
     public function stylesheets(): array
     {

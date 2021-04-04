@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -128,7 +128,7 @@ class UserListData implements RequestHandlerInterface
         $sort_columns   = [];
 
         $callback = function (stdClass $row) use ($languages, $user): array {
-            $row_user = $this->user_service->find($row->user_id);
+            $row_user = $this->user_service->find((int) $row->user_id);
             $datum = [
                 view('admin/users-table-options', ['row' => $row, 'self' => $user, 'user' => $row_user]),
                 $row->user_id,

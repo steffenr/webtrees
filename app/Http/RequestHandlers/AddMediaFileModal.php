@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -80,12 +80,16 @@ class AddMediaFileModal implements RequestHandlerInterface
             ]));
         }
 
+        $max_upload_size = $this->media_file_service->maxUploadFilesize();
+        $media_types     = Registry::elementFactory()->make('OBJE:FILE:FORM:TYPE')->values();
+        $unused_files    = $this->media_file_service->unusedFiles($tree, $data_filesystem);
+
         return response(view('modals/add-media-file', [
-            'max_upload_size' => $this->media_file_service->maxUploadFilesize(),
+            'max_upload_size' => $max_upload_size,
             'media'           => $media,
-            'media_types'     => $this->media_file_service->mediaTypes(),
+            'media_types'     => $media_types,
             'tree'            => $tree,
-            'unused_files'    => $this->media_file_service->unusedFiles($tree, $data_filesystem),
+            'unused_files'    => $unused_files,
         ]));
     }
 }

@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2020 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -51,8 +51,8 @@ class MediaFileThumbnail implements RequestHandlerInterface
         assert($user instanceof UserInterface);
 
         $params  = $request->getQueryParams();
-        $xref    = $params['xref'];
-        $fact_id = $params['fact_id'];
+        $xref    = $params['xref'] ?? '';
+        $fact_id = $params['fact_id'] ?? '';
         $media   = Registry::mediaFactory()->make($xref, $tree);
 
         if ($media === null) {
@@ -80,13 +80,15 @@ class MediaFileThumbnail implements RequestHandlerInterface
 
                 $image_factory = Registry::imageFactory();
 
-                return $image_factory->mediaFileThumbnailResponse(
+                $response = $image_factory->mediaFileThumbnailResponse(
                     $media_file,
                     (int) $params['w'],
                     (int) $params['h'],
                     $params['fit'],
                     $image_factory->fileNeedsWatermark($media_file, $user)
                 );
+
+                return $response->withHeader('Cache-Control', 'public,max-age=31536000');
             }
         }
 

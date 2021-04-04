@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2020 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -25,11 +25,7 @@ use Fisharebest\Webtrees\Fact;
 use Fisharebest\Webtrees\Family;
 use Fisharebest\Webtrees\Filter;
 use Fisharebest\Webtrees\Gedcom;
-use Fisharebest\Webtrees\GedcomCode\GedcomCodeStat;
-use Fisharebest\Webtrees\GedcomCode\GedcomCodeTemp;
 use Fisharebest\Webtrees\GedcomRecord;
-use Fisharebest\Webtrees\GedcomTag;
-use Fisharebest\Webtrees\Header;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\Media;
@@ -38,8 +34,6 @@ use Fisharebest\Webtrees\Place;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Repository;
 use Fisharebest\Webtrees\Source;
-use Fisharebest\Webtrees\Submission;
-use Fisharebest\Webtrees\Submitter;
 use Fisharebest\Webtrees\Tree;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -87,7 +81,7 @@ class FunctionsPrint
      *
      * @return string
      */
-    private static function printNoteRecord(Tree $tree, $text, $nlevel, $nrec): string
+    private static function printNoteRecord(Tree $tree, string $text, int $nlevel, string $nrec): string
     {
         $text .= Functions::getCont($nlevel, $nrec);
 
@@ -147,7 +141,7 @@ class FunctionsPrint
      *
      * @return string HTML
      */
-    public static function printFactNotes(Tree $tree, $factrec, $level): string
+    public static function printFactNotes(Tree $tree, string $factrec, int $level): string
     {
         $data          = '';
         $previous_spos = 0;
@@ -448,17 +442,17 @@ class FunctionsPrint
                     $map_lati = trim(strtr($map_lati, 'NSEW,�', ' - -. ')); // S5,6789 ==> -5.6789
                     $map_long = trim(strtr($map_long, 'NSEW,�', ' - -. ')); // E3.456� ==> 3.456
 
-                    $html .= '<a href="https://maps.google.com/maps?q=' . e($map_lati) . ',' . e($map_long) . '" rel="nofollow" title="' . I18N::translate('Google Maps™') . '">' .
+                    $html .= '<a href="https://maps.google.com/maps?q=' . e($map_lati) . ',' . e($map_long) . '" rel="nofollow" target="_top" title="' . I18N::translate('Google Maps™') . '">' .
                         view('icons/google-maps') .
                         '<span class="sr-only">' . I18N::translate('Google Maps™') . '</span>' .
                         '</a>';
 
-                    $html .= '<a href="https://www.bing.com/maps/?lvl=15&cp=' . e($map_lati) . '~' . e($map_long) . '" rel="nofollow" title="' . I18N::translate('Bing Maps™') . '">' .
+                    $html .= '<a href="https://www.bing.com/maps/?lvl=15&cp=' . e($map_lati) . '~' . e($map_long) . '" rel="nofollow" target="_top" title="' . I18N::translate('Bing Maps™') . '">' .
                         view('icons/bing-maps') .
                         '<span class="sr-only">' . I18N::translate('Bing Maps™') . '</span>' .
                         '</a>';
 
-                    $html .= '<a href="https://www.openstreetmap.org/#map=15/' . e($map_lati) . '/' . e($map_long) . '" rel="nofollow" title="' . I18N::translate('OpenStreetMap™') . '">' .
+                    $html .= '<a href="https://www.openstreetmap.org/#map=15/' . e($map_lati) . '/' . e($map_long) . '" rel="nofollow" target="_top" title="' . I18N::translate('OpenStreetMap™') . '">' .
                         view('icons/openstreetmap') .
                         '<span class="sr-only">' . I18N::translate('OpenStreetMap™') . '</span>' .
                         '</a>';
@@ -470,13 +464,16 @@ class FunctionsPrint
         }
         if ($lds) {
             if (preg_match('/2 TEMP (.*)/', $event->gedcom(), $match)) {
-                $html .= '<br>' . I18N::translate('LDS temple') . ': ' . GedcomCodeTemp::templeName($match[1]);
+                $element = Registry::elementFactory()->make($event->tag() . ':TEMP');
+                $html .= $element->labelValue($match[1], $tree);
             }
             if (preg_match('/2 STAT (.*)/', $event->gedcom(), $match)) {
-                $html .= '<br>' . I18N::translate('Status') . ': ' . GedcomCodeStat::statusName($match[1]);
+                $element = Registry::elementFactory()->make($event->tag() . ':STAT');
+                $html .= $element->labelValue($match[1], $tree);
                 if (preg_match('/3 DATE (.*)/', $event->gedcom(), $match)) {
                     $date = new Date($match[1]);
-                    $html .= ', ' . GedcomTag::getLabel('STAT:DATE') . ': ' . $date->display();
+                    $element = Registry::elementFactory()->make($event->tag() . ':STAT:DATE');
+                    $html .= $element->labelValue($date->display(), $tree);
                 }
             }
         }
@@ -516,7 +513,7 @@ class FunctionsPrint
      *
      * @return void
      */
-    public static function printAddNewFact(GedcomRecord $record, Collection $usedfacts, $type): void
+    public static function printAddNewFact(GedcomRecord $record, Collection $usedfacts, string $type): void
     {
         $tree = $record->tree();
 
@@ -557,36 +554,17 @@ class FunctionsPrint
                 $uniquefacts = [];
                 $quickfacts  = [];
                 break;
-
-            case Submitter::RECORD_TYPE:
-                $addfacts    = ['LANG', 'OBJE', 'NOTE', 'SHARED_NOTE'];
-                $uniquefacts = ['ADDR', 'EMAIL', 'NAME', 'PHON', 'WWW'];
-                $quickfacts  = [];
-                break;
-
-            case Submission::RECORD_TYPE:
-                $addfacts    = ['NOTE', 'SHARED_NOTE'];
-                $uniquefacts = ['FAMF', 'TEMP', 'ANCE', 'DESC', 'ORDI', 'SUBM'];
-                $quickfacts  = [];
-                break;
-
-            case Header::RECORD_TYPE:
-                $addfacts    = [];
-                $uniquefacts = ['COPR', 'LANG', 'SUBM'];
-                $quickfacts  = [];
-                break;
             default:
                 return;
         }
         $addfacts            = array_merge(self::checkFactUnique($uniquefacts, $usedfacts), $addfacts);
         $quickfacts          = array_intersect($quickfacts, $addfacts);
         $translated_addfacts = [];
+
         foreach ($addfacts as $addfact) {
-            $translated_addfacts[$addfact] = GedcomTag::getLabel($record->tag() . ':' . $addfact);
+            $translated_addfacts[$addfact] = Registry::elementFactory()->make($record->tag() . ':' . $addfact)->label();
         }
-        uasort($translated_addfacts, static function (string $x, string $y): int {
-            return I18N::strcasecmp(I18N::translate($x), I18N::translate($y));
-        });
+        uasort($translated_addfacts, I18N::comparator());
 
         echo view('edit/add-fact-row', [
             'add_facts'   => $translated_addfacts,

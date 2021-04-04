@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -28,8 +28,8 @@ use Fisharebest\Webtrees\Report\PdfRenderer;
 use Fisharebest\Webtrees\Services\ModuleService;
 use Fisharebest\Webtrees\Services\UserService;
 use Fisharebest\Webtrees\TestCase;
-use League\Flysystem\Adapter\NullAdapter;
 use League\Flysystem\Filesystem;
+use League\Flysystem\InMemory\InMemoryFilesystemAdapter;
 
 /**
  * Test harness for the class CemeteryReportModule
@@ -73,7 +73,7 @@ class CemeteryReportModuleTest extends TestCase
      */
     public function testReportRunsWithoutError(): void
     {
-        $data_filesystem = new Filesystem(new NullAdapter());
+        $data_filesystem = new Filesystem(new InMemoryFilesystemAdapter());
         $module_service  = new ModuleService();
 
         $user = (new UserService())->create('user', 'User', 'user@example.com', 'secret');
