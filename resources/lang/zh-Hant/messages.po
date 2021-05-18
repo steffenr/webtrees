@@ -2861,7 +2861,7 @@ msgid "Binary data object"
 msgstr "數碼資料"
 
 #: app/Functions/FunctionsPrint.php:454 app/Functions/FunctionsPrint.php:456
-msgid "Bing Maps™"
+msgid "Bing™ maps"
 msgstr "㣲軟地圖服務"
 
 #: app/Module/BingWebmasterToolsModule.php:41
@@ -7690,7 +7690,7 @@ msgid "Godson"
 msgstr "教子"
 
 #: app/Functions/FunctionsPrint.php:449 app/Functions/FunctionsPrint.php:451
-msgid "Google Maps™"
+msgid "Google™ maps"
 msgstr "谷歌地圖™"
 
 #: app/Module/GoogleAnalyticsModule.php:44
@@ -14623,7 +14623,7 @@ msgstr "一些家譜軟體創建 GEDCOM 文件，其中包含多媒體文件名�
 
 #. I18N: Description of a “Data fix” module
 #: app/Module/FixNameTags.php:95
-msgid "Some genelealogy applications store all names in a single name record, using custom tags such as _MARNM and _AKA. An alternative is to create a new name record for each name."
+msgid "Some genealogy software stores all names in a single name record, using custom tags such as _MARNM and _AKA. An alternative is to create a new name record for each name."
 msgstr ""
 
 # I18N: Help text for the “Hit counters” configuration setting

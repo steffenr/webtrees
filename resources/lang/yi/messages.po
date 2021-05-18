@@ -2658,7 +2658,7 @@ msgid "Binary data object"
 msgstr ""
 
 #: app/Functions/FunctionsPrint.php:454 app/Functions/FunctionsPrint.php:456
-msgid "Bing Maps™"
+msgid "Bing™ maps"
 msgstr ""
 
 #: app/Module/BingWebmasterToolsModule.php:41
@@ -7180,7 +7180,7 @@ msgid "Godson"
 msgstr ""
 
 #: app/Functions/FunctionsPrint.php:449 app/Functions/FunctionsPrint.php:451
-msgid "Google Maps™"
+msgid "Google™ maps"
 msgstr "גוגל מאַפּס ™"
 
 #: app/Module/GoogleAnalyticsModule.php:44
@@ -13546,7 +13546,7 @@ msgstr ""
 
 #. I18N: Description of a “Data fix” module
 #: app/Module/FixNameTags.php:95
-msgid "Some genelealogy applications store all names in a single name record, using custom tags such as _MARNM and _AKA. An alternative is to create a new name record for each name."
+msgid "Some genealogy software stores all names in a single name record, using custom tags such as _MARNM and _AKA. An alternative is to create a new name record for each name."
 msgstr ""
 
 #. I18N: Help text for the “Hit counters” configuration setting
@@ -21439,7 +21439,7 @@ msgstr "…"
 #~ msgid "Gives users the option of selecting their own theme."
 #~ msgstr "גיט ניצערס די אָפּציע צו סעלעקטירן זייער אייגן טעמע."
 
-#~ msgid "Google Maps™ preferences"
+#~ msgid "Google™ maps preferences"
 #~ msgstr "גוגל מאפע פּרעפֿערענצן"
 
 #~ msgid "Google Street View™"

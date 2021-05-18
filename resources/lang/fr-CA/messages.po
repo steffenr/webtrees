@@ -2657,8 +2657,8 @@ msgid "Binary data object"
 msgstr "Objet binaire"
 
 #: app/Functions/FunctionsPrint.php:454 app/Functions/FunctionsPrint.php:456
-msgid "Bing Maps™"
-msgstr "Bing Maps™"
+msgid "Bing™ maps"
+msgstr "Bing™ maps"
 
 #: app/Module/BingWebmasterToolsModule.php:41
 msgid "Bing™ webmaster tools"
@@ -7176,8 +7176,8 @@ msgid "Godson"
 msgstr "Filleul"
 
 #: app/Functions/FunctionsPrint.php:449 app/Functions/FunctionsPrint.php:451
-msgid "Google Maps™"
-msgstr "Google Maps™"
+msgid "Google™ maps"
+msgstr "Google™ maps"
 
 #: app/Module/GoogleAnalyticsModule.php:44
 msgid "Google™ analytics"
@@ -13539,7 +13539,7 @@ msgstr "Certains logiciels de généalogie créent des fichiers GEDCOM contenant
 
 #. I18N: Description of a “Data fix” module
 #: app/Module/FixNameTags.php:95
-msgid "Some genelealogy applications store all names in a single name record, using custom tags such as _MARNM and _AKA. An alternative is to create a new name record for each name."
+msgid "Some genealogy software stores all names in a single name record, using custom tags such as _MARNM and _AKA. An alternative is to create a new name record for each name."
 msgstr ""
 
 #. I18N: Help text for the “Hit counters” configuration setting
@@ -21691,7 +21691,7 @@ msgstr "…"
 #~ msgid "Gives users the option of selecting their own theme."
 #~ msgstr "Autoriser les utilisateurs à choisir leur propre thème."
 
-#~ msgid "Google Maps™ preferences"
+#~ msgid "Google™ maps preferences"
 #~ msgstr "Préférences GoogleMaps™"
 
 #~ msgid "Google Street View™"
@@ -22287,7 +22287,7 @@ msgstr "…"
 #~ msgid "Show related individuals/families"
 #~ msgstr "Afficher les individus/familles reliées (ou apparentées)"
 
-#~ msgid "Show the location of places and events using the Google Maps™ mapping service."
+#~ msgid "Show the location of places and events using the Google™ maps mapping service."
 #~ msgstr "Afficher les cartes des lieux et des événements en utilisant le service de cartographie Google Maps ™."
 
 #~ msgid "Sicily"
@@ -22666,7 +22666,7 @@ msgstr "…"
 #~ msgid "Upload geographic data"
 #~ msgstr "Téléverser les données géographiques"
 
-#~ msgid "Use Google Maps™ for the place hierarchy"
+#~ msgid "Use Google™ maps for the place hierarchy"
 #~ msgstr "Utiliser Google Maps ™ pour la hiérarchie des lieux"
 
 #~ msgid "Use PHP mail to send messages"

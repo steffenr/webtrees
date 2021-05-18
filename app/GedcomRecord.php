@@ -30,8 +30,6 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Collection;
-use Throwable;
-use Transliterator;
 
 use function addcslashes;
 use function app;
@@ -43,6 +41,7 @@ use function e;
 use function explode;
 use function implode;
 use function in_array;
+use function max;
 use function md5;
 use function preg_match;
 use function preg_match_all;
@@ -53,7 +52,6 @@ use function route;
 use function str_contains;
 use function str_pad;
 use function str_starts_with;
-use function strip_tags;
 use function strtoupper;
 use function substr_count;
 use function trim;
@@ -227,28 +225,6 @@ class GedcomRecord
     }
 
     /**
-     * Generate a "slug" to use in pretty URLs.
-     *
-     * @return string
-     */
-    public function slug(): string
-    {
-        $slug = strip_tags($this->fullName());
-
-        try {
-            $transliterator = Transliterator::create('Any-Latin;Latin-ASCII');
-            $slug           = $transliterator->transliterate($slug);
-        } catch (Throwable $ex) {
-            // ext-intl not installed?
-            // Transliteration algorithms not present in lib-icu?
-        }
-
-        $slug = preg_replace('/[^A-Za-z0-9]+/', '-', $slug);
-
-        return trim($slug, '-') ?: '-';
-    }
-
-    /**
      * Generate a URL to this record.
      *
      * @return string
@@ -258,7 +234,7 @@ class GedcomRecord
         return route(static::ROUTE_NAME, [
             'xref' => $this->xref(),
             'tree' => $this->tree->name(),
-            'slug' => $this->slug(),
+            'slug' => Registry::slugFactory()->make($this),
         ]);
     }
 
@@ -1320,6 +1296,11 @@ class GedcomRecord
     {
         $gedcom = $this->insertMissingLevels($this->tag(), $this->gedcom());
 
+        // NOTE records have data at level 0.  Move it to 1 CONC.
+        if (static::RECORD_TYPE === 'NOTE') {
+            return preg_replace('/^0 @[^@]+@ NOTE/', '1 CONC', $gedcom);
+        }
+
         return preg_replace('/^0.*\n/', '', $gedcom);
     }
 
@@ -1335,12 +1316,21 @@ class GedcomRecord
         $factory    = Registry::elementFactory();
         $subtags    = $factory->make($tag)->subtags();
 
-        // The first part is level N (includes CONT records).  The remainder are level N+1.
+        // Merge CONT records onto their parent line.
+        $gedcom = strtr($gedcom, [
+            "\n" . $next_level . ' CONT ' => "\r",
+            "\n" . $next_level . ' CONT' => "\r",
+        ]);
+
+        // The first part is level N.  The remainder are level N+1.
         $parts  = preg_split('/\n(?=' . $next_level . ')/', $gedcom);
         $return = array_shift($parts);
 
         foreach ($subtags as $subtag => $occurrences) {
             [$min, $max] = explode(':', $occurrences);
+
+            $min = (int) $min;
+
             if ($max === 'M') {
                 $max = PHP_INT_MAX;
             } else {
@@ -1366,7 +1356,11 @@ class GedcomRecord
                 if ($default !== '') {
                     $gedcom .= ' ' . $default;
                 }
-                $return .= "\n" . $this->insertMissingLevels($tag . ':' . $subtag, $gedcom);
+
+                $number_to_add = max(1, $min - $count);
+                $gedcom_to_add = "\n" . $this->insertMissingLevels($tag . ':' . $subtag, $gedcom);
+
+                $return .= \str_repeat($gedcom_to_add, $number_to_add);
             }
         }
 

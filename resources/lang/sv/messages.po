@@ -1,5 +1,5 @@
 msgid ""
-msgstr "Project-Id-Version: webtrees\nReport-Msgid-Bugs-To: i18n@webtrees.net\nPOT-Creation-Date: 2021-02-27 08:59+0000\nPO-Revision-Date: 2021-03-18 13:38+0000\nLast-Translator: Meliza Amity <meliza@amitys.com>\nLanguage-Team: Swedish <https://translate.webtrees.net/projects/webtrees/webtrees/sv/>\nLanguage: sv\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=n != 1;\nX-Generator: Weblate 3.9.1\nX-Poedit-SourceCharset: utf-8\nX-Poedit-Basepath: ..\nX-Poedit-KeywordsList: translate;noop;plural:1,2\nX-Poedit-SearchPath-0: .\n"
+msgstr "Project-Id-Version: webtrees\nReport-Msgid-Bugs-To: i18n@webtrees.net\nPOT-Creation-Date: 2021-02-27 08:59+0000\nPO-Revision-Date: 2021-04-10 21:29+0000\nLast-Translator: Fredrik Ekdahl <fekdahl@gmail.com>\nLanguage-Team: Swedish <https://translate.webtrees.net/projects/webtrees/webtrees/sv/>\nLanguage: sv\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=n != 1;\nX-Generator: Weblate 3.9.1\nX-Poedit-SourceCharset: utf-8\nX-Poedit-Basepath: ..\nX-Poedit-KeywordsList: translate;noop;plural:1,2\nX-Poedit-SearchPath-0: .\n"
 
 #: resources/xml/reports/ahnentafel_report.xml:161
 #: resources/xml/reports/ahnentafel_report.xml:189
@@ -2643,8 +2643,8 @@ msgid "Binary data object"
 msgstr "Binär data objekt"
 
 #: app/Functions/FunctionsPrint.php:454 app/Functions/FunctionsPrint.php:456
-msgid "Bing Maps™"
-msgstr "Bing Maps™"
+msgid "Bing™ maps"
+msgstr "Bing™ maps"
 
 #: app/Module/BingWebmasterToolsModule.php:41
 msgid "Bing™ webmaster tools"
@@ -5453,7 +5453,7 @@ msgstr "Visa och kontrollera en användares favoritsidor."
 #: resources/views/calendar-page.phtml:191
 #: resources/views/lists/families-table.phtml:203
 msgid "Divorce"
-msgstr "Skillsmässa"
+msgstr "Skilsmässa"
 
 #. I18N: gedcom tag DIVF
 #: app/Factories/ElementFactory.php:299 app/GedcomTag.php:643
@@ -7162,8 +7162,8 @@ msgid "Godson"
 msgstr "Gudson"
 
 #: app/Functions/FunctionsPrint.php:449 app/Functions/FunctionsPrint.php:451
-msgid "Google Maps™"
-msgstr "Google Maps™"
+msgid "Google™ maps"
+msgstr "Google™ maps"
 
 #: app/Module/GoogleAnalyticsModule.php:44
 msgid "Google™ analytics"
@@ -13525,7 +13525,7 @@ msgstr "Vissa släktforskningsprogram skapar GEDCOM-filer som innehåller media 
 
 #. I18N: Description of a “Data fix” module
 #: app/Module/FixNameTags.php:95
-msgid "Some genelealogy applications store all names in a single name record, using custom tags such as _MARNM and _AKA. An alternative is to create a new name record for each name."
+msgid "Some genealogy software stores all names in a single name record, using custom tags such as _MARNM and _AKA. An alternative is to create a new name record for each name."
 msgstr "Vissa släktforskningsprogram lagrar alla namn i en enda post, med anpassade taggar som _MARNM och _AKA. Ett alternativ är att skapa en ny namnpost för varje namn."
 
 #. I18N: Help text for the “Hit counters” configuration setting
@@ -16052,7 +16052,7 @@ msgstr "Uppdatera ortnamn"
 #. I18N: Description of a “Data fix” module
 #: app/Module/FixPlaceNames.php:73
 msgid "Update the higher-level parts of place names, while keeping the lower-level parts."
-msgstr "Uppdatera de högre nivåerna av ortnamn samtidigt som du håller kvar de lägre delarna."
+msgstr "Uppdatera de högre nivåerna av ortnamn samtidigt som du behåller de lägre nivåerna."
 
 #. I18N: %s is a version number, such as 1.2.3
 #. I18N: %s is a version number
@@ -19550,7 +19550,7 @@ msgstr "lista"
 #: app/Http/RequestHandlers/MapDataImportAction.php:186
 #, php-format
 msgid "locations updated: %s, locations added: %s"
-msgstr "platser uppdaterade: %s, platser tillläggda: %s"
+msgstr "platser uppdaterade: %s, platser tillagda: %s"
 
 #. I18N: A woman’s name, before she marries (in cultures where women take their new husband’s name on marriage)
 #: app/Elements/NameType.php:59 app/GedcomCode/GedcomCodeName.php:148
@@ -21687,8 +21687,8 @@ msgstr "…"
 #~ msgid "Gives users the option of selecting their own theme."
 #~ msgstr "Ger användaren möjligheten att välja sitt eget tema."
 
-#~ msgid "Google Maps™ preferences"
-#~ msgstr "Google Maps™-inställningar"
+#~ msgid "Google™ maps preferences"
+#~ msgstr "Google™ maps-inställningar"
 
 #~ msgid "Google Street View™"
 #~ msgstr "Google Street View™"
@@ -22283,8 +22283,8 @@ msgstr "…"
 #~ msgid "Show related individuals/families"
 #~ msgstr "Visa relaterade personer/familjer"
 
-#~ msgid "Show the location of places and events using the Google Maps™ mapping service."
-#~ msgstr "Visa platsers och händelsers läge med hjälp av Google Maps™ kartservice."
+#~ msgid "Show the location of places and events using the Google™ maps mapping service."
+#~ msgstr "Visa platsers och händelsers läge med hjälp av Google™ maps kartservice."
 
 #~ msgid "Sicily"
 #~ msgstr "Sicilien"
@@ -22664,8 +22664,8 @@ msgstr "…"
 #~ msgid "Upload geographic data"
 #~ msgstr "Ladda upp geografisk data"
 
-#~ msgid "Use Google Maps™ for the place hierarchy"
-#~ msgstr "Använd Google Maps™ till platshierarkin"
+#~ msgid "Use Google™ maps for the place hierarchy"
+#~ msgstr "Använd Google™ maps till platshierarkin"
 
 #~ msgid "Use PHP mail to send messages"
 #~ msgstr "Använd PHP e-post för att sända meddelanden"

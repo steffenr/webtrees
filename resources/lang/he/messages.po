@@ -1,5 +1,5 @@
 msgid ""
-msgstr "Project-Id-Version: webtrees\nReport-Msgid-Bugs-To: i18n@webtrees.net\nPOT-Creation-Date: 2021-02-27 08:59+0000\nPO-Revision-Date: 2021-03-18 13:37+0000\nLast-Translator: Meliza Amity <meliza@amitys.com>\nLanguage-Team: Hebrew <https://translate.webtrees.net/projects/webtrees/webtrees/he/>\nLanguage: he\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n != 1);\nX-Generator: Weblate 3.9.1\nX-Poedit-SourceCharset: utf-8\nX-Poedit-Basepath: ..\nX-Poedit-KeywordsList: translate;noop;plural:1,2\nX-Poedit-SearchPath-0: .\n"
+msgstr "Project-Id-Version: webtrees\nReport-Msgid-Bugs-To: i18n@webtrees.net\nPOT-Creation-Date: 2021-02-27 08:59+0000\nPO-Revision-Date: 2021-04-07 19:59+0000\nLast-Translator: Greg Roach <greg@subaqua.co.uk>\nLanguage-Team: Hebrew <https://translate.webtrees.net/projects/webtrees/webtrees/he/>\nLanguage: he\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n != 1);\nX-Generator: Weblate 3.9.1\nX-Poedit-SourceCharset: utf-8\nX-Poedit-Basepath: ..\nX-Poedit-KeywordsList: translate;noop;plural:1,2\nX-Poedit-SearchPath-0: .\n"
 
 #: resources/xml/reports/ahnentafel_report.xml:161
 #: resources/xml/reports/ahnentafel_report.xml:189
@@ -2643,7 +2643,7 @@ msgid "Binary data object"
 msgstr "אובייקט נתונים בינארי"
 
 #: app/Functions/FunctionsPrint.php:454 app/Functions/FunctionsPrint.php:456
-msgid "Bing Maps™"
+msgid "Bing™ maps"
 msgstr "בינג מפות™"
 
 #: app/Module/BingWebmasterToolsModule.php:41
@@ -7162,7 +7162,7 @@ msgid "Godson"
 msgstr "בן-סנדקאות‬"
 
 #: app/Functions/FunctionsPrint.php:449 app/Functions/FunctionsPrint.php:451
-msgid "Google Maps™"
+msgid "Google™ maps"
 msgstr "מפות ™Google"
 
 #: app/Module/GoogleAnalyticsModule.php:44
@@ -13525,7 +13525,7 @@ msgstr "חלק מתוכנות חקר שושלת יוחסין יוצרות קבצ
 
 #. I18N: Description of a “Data fix” module
 #: app/Module/FixNameTags.php:95
-msgid "Some genelealogy applications store all names in a single name record, using custom tags such as _MARNM and _AKA. An alternative is to create a new name record for each name."
+msgid "Some genealogy software stores all names in a single name record, using custom tags such as _MARNM and _AKA. An alternative is to create a new name record for each name."
 msgstr "יישומים גנאלוגיים מסוימים מאחסנים את כל השמות ברשומת שמות יחידה, תוך שימוש בתגים מותאמים אישית כגון _MARNM ו- _AKA. חלופה היא יצירת רשומת שמות חדשה לכל שם."
 
 #. I18N: Help text for the “Hit counters” configuration setting
@@ -13774,7 +13774,7 @@ msgstr "תחילת התחום של תאריכי שינוי"
 
 #: app/Module/StatcounterModule.php:41
 msgid "Statcounter™"
-msgstr "Statcounter™ &lrm;"
+msgstr "Statcounter™ ‎"
 
 #. I18N: gedcom tag STAE
 #: app/Factories/ElementFactory.php:254 app/Factories/ElementFactory.php:367
@@ -21687,7 +21687,7 @@ msgstr "…"
 #~ msgid "Gives users the option of selecting their own theme."
 #~ msgstr "מאפשר למשתמשים לבחור עיצוב משלהם."
 
-#~ msgid "Google Maps™ preferences"
+#~ msgid "Google™ maps preferences"
 #~ msgstr "העדפות של מפות ™Google"
 
 #~ msgid "Google Street View™"
@@ -22283,7 +22283,7 @@ msgstr "…"
 #~ msgid "Show related individuals/families"
 #~ msgstr "הראה אנשים קרובים/משפחות קרובות"
 
-#~ msgid "Show the location of places and events using the Google Maps™ mapping service."
+#~ msgid "Show the location of places and events using the Google™ maps mapping service."
 #~ msgstr "מיקום האירועים והמקומות בעזרת מיפוי מפות ™Google."
 
 #~ msgid "Sicily"
@@ -22664,7 +22664,7 @@ msgstr "…"
 #~ msgid "Upload geographic data"
 #~ msgstr "העלאת נתונים גיאוגרפיים"
 
-#~ msgid "Use Google Maps™ for the place hierarchy"
+#~ msgid "Use Google™ maps for the place hierarchy"
 #~ msgstr "השתמש במפות ™Google עבור היררכית המקומות"
 
 #~ msgid "Use PHP mail to send messages"
