@@ -23,7 +23,6 @@ use Fisharebest\Flysystem\Adapter\ChrootAdapter;
 use Fisharebest\Webtrees\Contracts\FilesystemFactoryInterface;
 use Fisharebest\Webtrees\Site;
 use Fisharebest\Webtrees\Tree;
-use Fisharebest\Webtrees\Webtrees;
 use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemOperator;
 use League\Flysystem\Local\LocalFilesystemAdapter;
@@ -44,7 +43,7 @@ class FilesystemFactory implements FilesystemFactoryInterface
      */
     public function data(): FilesystemOperator
     {
-        $data_dir = Site::getPreference('INDEX_DIRECTORY', Webtrees::DATA_DIR);
+        $data_dir = Site::getPreference('INDEX_DIRECTORY');
 
         return new Filesystem(new LocalFilesystemAdapter($data_dir));
     }
@@ -56,7 +55,7 @@ class FilesystemFactory implements FilesystemFactoryInterface
      */
     public function dataName(): string
     {
-        return Site::getPreference('INDEX_DIRECTORY', Webtrees::DATA_DIR);
+        return Site::getPreference('INDEX_DIRECTORY');
     }
 
     /**
@@ -68,7 +67,7 @@ class FilesystemFactory implements FilesystemFactoryInterface
      */
     public function media(Tree $tree): FilesystemOperator
     {
-        $media_dir = $tree->getPreference('MEDIA_DIRECTORY', 'media/');
+        $media_dir = $tree->getPreference('MEDIA_DIRECTORY');
         $adapter   = new ChrootAdapter($this->data(), $media_dir);
 
         return new Filesystem($adapter);

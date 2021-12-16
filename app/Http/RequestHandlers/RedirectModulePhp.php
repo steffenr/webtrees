@@ -20,7 +20,7 @@ declare(strict_types=1);
 namespace Fisharebest\Webtrees\Http\RequestHandlers;
 
 use Fig\Http\Message\StatusCodeInterface;
-use Fisharebest\Webtrees\Exceptions\HttpNotFoundException;
+use Fisharebest\Webtrees\Http\Exceptions\HttpNotFoundException;
 use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\Module\PedigreeMapModule;
 use Fisharebest\Webtrees\Registry;
@@ -38,11 +38,9 @@ use function redirect;
  */
 class RedirectModulePhp implements RequestHandlerInterface
 {
-    /** @var TreeService */
-    private $tree_service;
+    private TreeService $tree_service;
 
-    /** @var PedigreeMapModule */
-    private $pedigree_map_module;
+    private PedigreeMapModule $pedigree_map_module;
 
     /**
      * @param PedigreeMapModule $pedigree_map_module

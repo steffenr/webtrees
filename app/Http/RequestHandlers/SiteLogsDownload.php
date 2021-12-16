@@ -24,7 +24,6 @@ use Fisharebest\Webtrees\Services\SiteLogsService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use stdClass;
 
 use function response;
 use function str_replace;
@@ -34,8 +33,7 @@ use function str_replace;
  */
 class SiteLogsDownload implements RequestHandlerInterface
 {
-    /** @var SiteLogsService */
-    private $site_logs_service;
+    private SiteLogsService $site_logs_service;
 
     /**
      * @param SiteLogsService $site_logs_service
@@ -55,7 +53,7 @@ class SiteLogsDownload implements RequestHandlerInterface
         $content = $this->site_logs_service->logsQuery($request->getQueryParams())
             ->orderBy('log_id')
             ->get()
-            ->map(static function (stdClass $row): string {
+            ->map(static function (object $row): string {
                 return
                     '"' . $row->log_time . '",' .
                     '"' . $row->log_type . '",' .

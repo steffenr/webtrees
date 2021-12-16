@@ -19,7 +19,6 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Report;
 
-use function str_replace;
 use function strip_tags;
 use function trim;
 
@@ -31,8 +30,7 @@ class ReportBaseElement
     // Special value for X or Y position, to indicate the current position.
     public const CURRENT_POSITION = -1.0;
 
-    /** @var string Text */
-    public $text = '';
+    public string $text = '';
 
     /**
      * Element renderer
@@ -41,7 +39,7 @@ class ReportBaseElement
      *
      * @return void
      */
-    public function render($renderer)
+    public function render($renderer): void
     {
         //-- to be implemented in inherited classes
     }
@@ -63,11 +61,11 @@ class ReportBaseElement
      *
      * @param HtmlRenderer|PdfRenderer $renderer
      *
-     * @return float|array
+     * @return array{0:float,1:int,2:float}
      */
-    public function getWidth($renderer)
+    public function getWidth($renderer): array
     {
-        return 0.0;
+        return [0.0, 1, 0.0];
     }
 
     /**
@@ -79,16 +77,10 @@ class ReportBaseElement
      */
     public function addText(string $t): void
     {
-        $t          = trim($t, "\r\n\t");
-        $t          = str_replace([
-            '<br>',
-            '&nbsp;',
-        ], [
-            "\n",
-            ' ',
-        ], $t);
-        $t          = strip_tags($t);
-        $this->text .= $t;
+        $t = trim($t, "\r\n\t");
+        $t = strtr($t, ['<br>' => "\n", '&nbsp;' => ' ']);
+
+        $this->text .= strip_tags($t);
     }
 
     /**

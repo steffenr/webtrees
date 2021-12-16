@@ -21,7 +21,7 @@ namespace Fisharebest\Webtrees\Http\RequestHandlers;
 
 use Fig\Http\Message\StatusCodeInterface;
 use Fisharebest\Webtrees\Auth;
-use Fisharebest\Webtrees\Exceptions\HttpNotFoundException;
+use Fisharebest\Webtrees\Http\Exceptions\HttpNotFoundException;
 use Fisharebest\Webtrees\Module\AncestorsChartModule;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Services\TreeService;
@@ -45,11 +45,9 @@ class RedirectAncestryPhp implements RequestHandlerInterface
         3 => 'families',
     ];
 
-    /** @var TreeService */
-    private $tree_service;
+    private AncestorsChartModule $chart;
 
-    /** @var AncestorsChartModule */
-    private $chart;
+    private TreeService $tree_service;
 
     /**
      * @param AncestorsChartModule $chart

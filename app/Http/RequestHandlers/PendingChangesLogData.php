@@ -30,7 +30,6 @@ use Fisharebest\Webtrees\Tree;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use stdClass;
 
 use function e;
 use function explode;
@@ -42,14 +41,11 @@ use function preg_replace_callback;
  */
 class PendingChangesLogData implements RequestHandlerInterface
 {
-    /** @var DatatablesService */
-    private $datatables_service;
+    private DatatablesService $datatables_service;
 
-    /** @var MyersDiff */
-    private $myers_diff;
+    private MyersDiff $myers_diff;
 
-    /** @var PendingChangesService */
-    private $pending_changes_service;
+    private PendingChangesService $pending_changes_service;
 
     /**
      * @param DatatablesService     $datatables_service
@@ -81,7 +77,7 @@ class PendingChangesLogData implements RequestHandlerInterface
 
         $query = $this->pending_changes_service->changesQuery($params);
 
-        $callback = function (stdClass $row) use ($tree): array {
+        $callback = function (object $row) use ($tree): array {
             $old_lines = $row->old_gedcom === '' ? [] : explode("\n", $row->old_gedcom);
             $new_lines = $row->new_gedcom === '' ? [] : explode("\n", $row->new_gedcom);
 

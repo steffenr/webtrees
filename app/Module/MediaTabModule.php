@@ -36,8 +36,7 @@ class MediaTabModule extends AbstractModule implements ModuleTabInterface
 {
     use ModuleTabTrait;
 
-    /** @var ClipboardService */
-    private $clipboard_service;
+    private ClipboardService $clipboard_service;
 
     /**
      * NotesTabModule constructor.
@@ -166,6 +165,6 @@ class MediaTabModule extends AbstractModule implements ModuleTabInterface
      */
     public function supportedFacts(): Collection
     {
-        return new Collection(['OBJE']);
+        return new Collection(['INDI:OBJE', 'FAM:OBJE']);
     }
 }

@@ -37,7 +37,7 @@ class CensusOfCanada1881 extends CensusOfCanada implements CensusInterface
     /**
      * The columns of the census.
      *
-     * @return CensusColumnInterface[]
+     * @return array<CensusColumnInterface>
      */
     public function columns(): array
     {
@@ -50,7 +50,7 @@ class CensusOfCanada1881 extends CensusOfCanada implements CensusInterface
             new CensusColumnNull($this, 'Religion', 'Religion'),
             new CensusColumnNationality($this, 'Origin', 'Origin'),
             new CensusColumnOccupation($this, 'Occupation', 'Profession, Occupation, or Trade'),
-            new CensusColumnConditionUs($this, 'M/W', 'Married or Widowed'),
+            new CensusColumnConditionCanadaMarriedWidowed($this, 'M/W', 'Married or Widowed'),
             new CensusColumnNull($this, 'School', 'Instruction - Going to School'),
             new CensusColumnNull($this, 'Deaf', 'Infirmities - Deaf and Dumb'),
             new CensusColumnNull($this, 'Blind', 'Infirmities - Blind'),

@@ -25,7 +25,6 @@ use Fisharebest\Webtrees\Tree;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use stdClass;
 
 use function assert;
 use function response;
@@ -35,8 +34,7 @@ use function response;
  */
 class PendingChangesLogDownload implements RequestHandlerInterface
 {
-    /** @var PendingChangesService */
-    private $pending_changes_service;
+    private PendingChangesService $pending_changes_service;
 
     /**
      * @param PendingChangesService $pending_changes_service
@@ -61,7 +59,7 @@ class PendingChangesLogDownload implements RequestHandlerInterface
 
         $content = $this->pending_changes_service->changesQuery($params)
             ->get()
-            ->map(static function (stdClass $row): string {
+            ->map(static function (object $row): string {
                 // Convert to CSV
                 return implode(',', [
                     '"' . $row->change_time . '"',

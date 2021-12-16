@@ -33,7 +33,6 @@ use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Collection;
 use Psr\Http\Message\StreamInterface;
 use RuntimeException;
-use stdClass;
 
 use function assert;
 use function strlen;
@@ -81,15 +80,18 @@ class TreeService
             if (!Auth::isAdmin()) {
                 $query
                     ->join('gedcom_setting AS gs2', static function (JoinClause $join): void {
-                        $join->on('gs2.gedcom_id', '=', 'gedcom.gedcom_id')
+                        $join
+                            ->on('gs2.gedcom_id', '=', 'gedcom.gedcom_id')
                             ->where('gs2.setting_name', '=', 'imported');
                     })
                     ->join('gedcom_setting AS gs3', static function (JoinClause $join): void {
-                        $join->on('gs3.gedcom_id', '=', 'gedcom.gedcom_id')
+                        $join
+                            ->on('gs3.gedcom_id', '=', 'gedcom.gedcom_id')
                             ->where('gs3.setting_name', '=', 'REQUIRE_AUTHENTICATION');
                     })
                     ->leftJoin('user_gedcom_setting', static function (JoinClause $join): void {
-                        $join->on('user_gedcom_setting.gedcom_id', '=', 'gedcom.gedcom_id')
+                        $join
+                            ->on('user_gedcom_setting.gedcom_id', '=', 'gedcom.gedcom_id')
                             ->where('user_gedcom_setting.user_id', '=', Auth::id())
                             ->where('user_gedcom_setting.setting_name', '=', UserInterface::PREF_TREE_ROLE);
                     })
@@ -115,7 +117,7 @@ class TreeService
 
             return $query
                 ->get()
-                ->mapWithKeys(static function (stdClass $row): array {
+                ->mapWithKeys(static function (object $row): array {
                     return [$row->tree_name => Tree::rowMapper()($row)];
                 });
         });
@@ -192,6 +194,7 @@ class TreeService
         );
 
         // Gedcom and privacy settings
+        $tree->setPreference('REQUIRE_AUTHENTICATION', '');
         $tree->setPreference('CONTACT_USER_ID', (string) Auth::id());
         $tree->setPreference('WEBMASTER_USER_ID', (string) Auth::id());
         $tree->setPreference('LANGUAGE', I18N::languageTag()); // Default to the current admin’s language

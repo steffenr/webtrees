@@ -2,7 +2,6 @@
 
 use Fisharebest\Webtrees\Date;
 use Fisharebest\Webtrees\Family;
-use Fisharebest\Webtrees\Functions\Functions;
 use Fisharebest\Webtrees\Gedcom;
 use Fisharebest\Webtrees\Http\RequestHandlers\AddChildToFamilyPage;
 use Fisharebest\Webtrees\Http\RequestHandlers\AddNewFact;
@@ -121,7 +120,7 @@ use Fisharebest\Webtrees\Services\RelationshipService;
 
             <tr class="<?= $row_class ?>">
                 <th scope="row">
-                    <span class="sr-only"><?= $fact->label() ?></span>
+                    <span class="visually-hidden"><?= $fact->label() ?></span>
                 </th>
 
                 <td>
@@ -141,7 +140,7 @@ use Fisharebest\Webtrees\Services\RelationshipService;
             ?>
             <tr>
                 <th scope="row">
-                    <span class="sr-only"><?= I18N::translate('Marriage') ?></span>
+                    <span class="visually-hidden"><?= I18N::translate('Marriage') ?></span>
                 </th>
 
                 <td>
@@ -212,7 +211,7 @@ use Fisharebest\Webtrees\Services\RelationshipService;
         <?php if ($family->canEdit()) : ?>
             <tr>
                 <th scope="row">
-                    <span class="sr-only"><?= I18N::translate('Children') ?></span>
+                    <span class="visually-hidden"><?= I18N::translate('Children') ?></span>
                 </th>
 
                 <td>

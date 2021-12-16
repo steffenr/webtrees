@@ -25,7 +25,6 @@ use Fisharebest\Webtrees\Services\SiteLogsService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use stdClass;
 
 use function e;
 
@@ -34,11 +33,9 @@ use function e;
  */
 class SiteLogsData implements RequestHandlerInterface
 {
-    /** @var DatatablesService */
-    private $datatables_service;
+    private DatatablesService $datatables_service;
 
-    /** @var SiteLogsService */
-    private $site_logs_service;
+    private SiteLogsService $site_logs_service;
 
     /**
      * @param DatatablesService $datatables_service
@@ -61,15 +58,15 @@ class SiteLogsData implements RequestHandlerInterface
     {
         $query = $this->site_logs_service->logsQuery($request->getQueryParams());
 
-        return $this->datatables_service->handleQuery($request, $query, [], [], static function (stdClass $row): array {
+        return $this->datatables_service->handleQuery($request, $query, [], [], static function (object $row): array {
             return [
                 $row->log_id,
                 Carbon::make($row->log_time)->local()->format('Y-m-d H:i:s'),
                 $row->log_type,
-                '<span dir="auto">' . e($row->log_message) . '</span>',
-                '<span dir="auto">' . e($row->ip_address) . '</span>',
-                '<span dir="auto">' . e($row->user_name) . '</span>',
-                '<span dir="auto">' . e($row->gedcom_name) . '</span>',
+                '<bdi>' . e($row->log_message) . '</bdi>',
+                '<bdi>' . e($row->ip_address) . '</bdi>',
+                '<bdi>' . e($row->user_name) . '</bdi>',
+                '<bdi>' . e($row->gedcom_name) . '</bdi>',
             ];
         });
     }

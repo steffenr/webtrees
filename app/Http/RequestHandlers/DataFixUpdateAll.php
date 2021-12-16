@@ -29,7 +29,6 @@ use Illuminate\Support\Collection;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use stdClass;
 
 use function assert;
 use function json_encode;
@@ -45,11 +44,9 @@ class DataFixUpdateAll implements RequestHandlerInterface
     // Process this number of records in each HTTP request
     private const CHUNK_SIZE = 250;
 
-    /** @var DataFixService */
-    private $data_fix_service;
+    private DataFixService $data_fix_service;
 
-    /** @var ModuleService */
-    private $module_service;
+    private ModuleService $module_service;
 
     /**
      * DataFix constructor.
@@ -94,7 +91,7 @@ class DataFixUpdateAll implements RequestHandlerInterface
         }
 
         /** @var Collection<GedcomRecord> $records */
-        $records = $rows->map(function (stdClass $row) use ($tree): ?GedcomRecord {
+        $records = $rows->map(function (object $row) use ($tree): ?GedcomRecord {
             return $this->data_fix_service->getRecordByType($row->xref, $tree, $row->type);
         })->filter(static function (?GedcomRecord $record) use ($module, $params): bool {
             return $record instanceof GedcomRecord && !$record->isPendingDeletion() && $module->doesRecordNeedUpdate($record, $params);
@@ -110,7 +107,7 @@ class DataFixUpdateAll implements RequestHandlerInterface
     /**
      * @param Tree                   $tree
      * @param ModuleDataFixInterface $module
-     * @param Collection<stdClass>   $rows
+     * @param Collection<object>     $rows
      * @param array<string>          $params
      *
      * @return ResponseInterface
@@ -125,7 +122,7 @@ class DataFixUpdateAll implements RequestHandlerInterface
 
         $updates = $rows
             ->chunk(self::CHUNK_SIZE)
-            ->map(static function (Collection $chunk) use ($module, $params, $tree, $total): stdClass {
+            ->map(static function (Collection $chunk) use ($module, $params, $tree, $total): object {
                 static $count = 0;
 
                 $count += $chunk->count();

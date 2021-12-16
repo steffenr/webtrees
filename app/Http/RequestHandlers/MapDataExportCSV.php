@@ -26,7 +26,6 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use RuntimeException;
-use stdClass;
 
 use function addcslashes;
 use function array_map;
@@ -49,8 +48,7 @@ use function stream_get_contents;
  */
 class MapDataExportCSV implements RequestHandlerInterface
 {
-    /** @var MapDataService */
-    private $map_data_service;
+    private MapDataService $map_data_service;
 
     /**
      * Dependency injection.
@@ -129,7 +127,7 @@ class MapDataExportCSV implements RequestHandlerInterface
             $max_level = max($max_level, count($place->hierarchy));
         }
 
-        $places = array_map(function (stdClass $place) use ($max_level): array {
+        $places = array_map(function (object $place) use ($max_level): array {
             return array_merge(
                 [
                     count($place->hierarchy) - 1,
@@ -158,7 +156,7 @@ class MapDataExportCSV implements RequestHandlerInterface
         $header[] = 'Zoom';
         $header[] = 'Icon';
 
-        $resource = fopen('php://temp', 'wb+');
+        $resource = fopen('php://memory', 'wb+');
 
         if ($resource === false) {
             throw new RuntimeException('Failed to create temporary stream');

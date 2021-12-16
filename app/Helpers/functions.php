@@ -106,9 +106,9 @@ function redirect(string $url, int $code = StatusCodeInterface::STATUS_FOUND): R
 /**
  * Create a response.
  *
- * @param mixed    $content
- * @param int      $code
- * @param string[] $headers
+ * @param mixed         $content
+ * @param int           $code
+ * @param array<string> $headers
  *
  * @return ResponseInterface
  */
@@ -121,14 +121,12 @@ function response($content = '', int $code = StatusCodeInterface::STATUS_OK, arr
     if ($headers === []) {
         if (is_string($content)) {
             $headers = [
-                'Content-Type'   => 'text/html; charset=UTF-8',
-                'Content-Length' => (string) strlen($content),
+                'Content-Type' => 'text/html; charset=UTF-8',
             ];
         } else {
             $content = json_encode($content, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE);
             $headers = [
-                'Content-Type'   => 'application/json',
-                'Content-Length' => (string) strlen($content),
+                'Content-Type' => 'application/json',
             ];
         }
     }
@@ -155,8 +153,8 @@ function response($content = '', int $code = StatusCodeInterface::STATUS_OK, arr
 /**
  * Generate a URL for a named route.
  *
- * @param string       $route_name
- * @param array<mixed> $parameters
+ * @param string                            $route_name
+ * @param array<bool|int|string|array|null> $parameters
  *
  * @return string
  */

@@ -45,20 +45,20 @@ use function app;
  */
 class Date
 {
-    /** @var string Optional qualifier, such as BEF, FROM, ABT */
-    public $qual1 = '';
+    // Optional qualifier, such as BEF, FROM, ABT
+    public string $qual1 = '';
 
-    /** @var AbstractCalendarDate  The first (or only) date */
-    private $date1;
+    // The first (or only) date
+    private AbstractCalendarDate $date1;
 
-    /** @var string  Optional qualifier, such as TO, AND */
-    public $qual2 = '';
+    // Optional qualifier, such as TO, AND
+    public string $qual2 = '';
 
-    /** @var AbstractCalendarDate|null Optional second date */
-    private $date2;
+    // Optional second date
+    private ?AbstractCalendarDate $date2 = null;
 
-    /** @var string Optional text, as included with an INTerpreted date */
-    private $text = '';
+    // Optional text, as included with an INTerpreted date
+    private string $text = '';
 
     /**
      * Create a date, from GEDCOM data.
@@ -160,7 +160,7 @@ class Date
         // Ambiguous dates - don't override calendar escape
         if ($cal === '') {
             if (preg_match('/^(JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)$/', $m)) {
-                $cal =  GregorianDate::ESCAPE;
+                $cal = GregorianDate::ESCAPE;
             } elseif (preg_match('/^[345]\d\d\d$/', $y)) {
                 // Year 3000-5999
                 $cal = JewishDate::ESCAPE;
@@ -243,13 +243,13 @@ class Date
     /**
      * Convert a date to the preferred format and calendar(s) display.
      *
-     * @param bool|null   $url               Wrap the date in a link to calendar.php
+     * @param bool        $url               Wrap the date in a link to calendar.php
      * @param string|null $date_format       Override the default date format
-     * @param bool|null   $convert_calendars Convert the date into other calendars
+     * @param bool        $convert_calendars Convert the date into other calendars
      *
      * @return string
      */
-    public function display($url = false, $date_format = null, $convert_calendars = true): string
+    public function display(bool $url = false, string $date_format = null, bool $convert_calendars = true): string
     {
         // Do we need a new DateFormatterService class?
         if (app()->has(Tree::class)) {

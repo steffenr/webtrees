@@ -26,7 +26,6 @@ use Fisharebest\Algorithm\Dijkstra;
 use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Contracts\UserInterface;
 use Fisharebest\Webtrees\FlashMessages;
-use Fisharebest\Webtrees\Functions\Functions;
 use Fisharebest\Webtrees\GedcomRecord;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
@@ -185,8 +184,8 @@ class RelationshipsChartModule extends AbstractModule implements ModuleChartInte
     /**
      * The URL for a page showing chart options.
      *
-     * @param Individual $individual
-     * @param mixed[]    $parameters
+     * @param Individual                        $individual
+     * @param array<bool|int|string|array|null> $parameters
      *
      * @return string
      */
@@ -670,8 +669,8 @@ class RelationshipsChartModule extends AbstractModule implements ModuleChartInte
      * Convert a path (list of XREFs) to an "old-style" string of relationships.
      * Return an empty array, if privacy rules prevent us viewing any node.
      *
-     * @param Tree     $tree
-     * @param string[] $path Alternately Individual / Family
+     * @param Tree          $tree
+     * @param array<string> $path Alternately Individual / Family
      *
      * @return array<string>
      */

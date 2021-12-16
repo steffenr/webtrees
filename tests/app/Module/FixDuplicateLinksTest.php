@@ -35,22 +35,13 @@ use Illuminate\Support\Collection;
  */
 class FixDuplicateLinksTest extends TestCase
 {
-    protected static $uses_database = true;
+    protected static bool $uses_database = true;
 
-    /**
-     * @var FixDuplicateLinks $fixDuplicateLinks
-     */
-    protected $fixDuplicateLinks;
+    protected FixDuplicateLinks $fixDuplicateLinks;
 
-    /**
-     * @var Tree $tree
-     */
-    protected $tree;
+    protected Tree $tree;
 
-    /**
-     * @var bool $restore_session_user
-     */
-    protected $restore_session_user = false;
+    protected bool $restore_session_user = false;
 
     /**
      * {@inheritdoc}
@@ -81,8 +72,7 @@ class FixDuplicateLinksTest extends TestCase
             Session::forget('wt_user');
         }
 
-        unset($this->fixDuplicateLinks);
-        unset($this->tree);
+        unset($this->fixDuplicateLinks, $this->tree);
     }
 
     /**

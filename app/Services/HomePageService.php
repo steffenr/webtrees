@@ -21,26 +21,24 @@ namespace Fisharebest\Webtrees\Services;
 
 use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Contracts\UserInterface;
-use Fisharebest\Webtrees\Exceptions\HttpAccessDeniedException;
-use Fisharebest\Webtrees\Exceptions\HttpNotFoundException;
+use Fisharebest\Webtrees\Http\Exceptions\HttpNotFoundException;
 use Fisharebest\Webtrees\Module\ModuleBlockInterface;
 use Fisharebest\Webtrees\Module\ModuleInterface;
 use Fisharebest\Webtrees\Tree;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Support\Collection;
 use Psr\Http\Message\ServerRequestInterface;
-use stdClass;
 
 use function assert;
 use function is_numeric;
+use function is_object;
 
 /**
  * Logic and content for the home-page blocks.
  */
 class HomePageService
 {
-    /** @var ModuleService */
-    private $module_service;
+    private ModuleService $module_service;
 
     /**
      * HomePageController constructor.
@@ -72,7 +70,7 @@ class HomePageService
             ->whereNull('user_id')
             ->first();
 
-        if ($block instanceof stdClass) {
+        if (is_object($block)) {
             $module = $this->module_service->findByName($block->module_name);
 
             if ($module instanceof ModuleBlockInterface) {
@@ -101,7 +99,7 @@ class HomePageService
             ->whereNull('gedcom_id')
             ->first();
 
-        if ($block instanceof stdClass) {
+        if (is_object($block)) {
             $module = $this->module_service->findByName($block->module_name);
 
             if ($module instanceof ModuleBlockInterface) {

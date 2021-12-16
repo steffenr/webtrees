@@ -20,7 +20,7 @@ declare(strict_types=1);
 namespace Fisharebest\Webtrees\Module;
 
 use Fisharebest\Webtrees\Auth;
-use Fisharebest\Webtrees\Exceptions\HttpAccessDeniedException;
+use Fisharebest\Webtrees\Http\Exceptions\HttpAccessDeniedException;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Tree;
 use Illuminate\Support\Collection;
@@ -36,8 +36,8 @@ use function view;
  */
 trait ModuleTabTrait
 {
-    /** @var int The default position for this tab.  It can be changed in the control panel. */
-    protected $tab_order;
+    // The default position for this tab.  It can be changed in the control panel.
+    protected int $tab_order;
 
     /**
      * The text that appears on the tab.

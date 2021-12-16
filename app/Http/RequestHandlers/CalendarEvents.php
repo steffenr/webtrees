@@ -54,8 +54,7 @@ use function view;
  */
 class CalendarEvents implements RequestHandlerInterface
 {
-    /** @var CalendarService */
-    private $calendar_service;
+    private CalendarService $calendar_service;
 
     /**
      * CalendarPage constructor.
@@ -90,7 +89,7 @@ class CalendarEvents implements RequestHandlerInterface
         $filterof = $request->getQueryParams()['filterof'] ?? 'all';
         $filtersx = $request->getQueryParams()['filtersx'] ?? '';
 
-        $ged_date = new Date("{$cal} {$day} {$month} {$year}");
+        $ged_date = new Date($cal . ' ' . $day . ' ' . $month . ' ' . $year);
         $cal_date = $ged_date->minimumDate();
         $today    = $cal_date->today();
 
@@ -157,7 +156,7 @@ class CalendarEvents implements RequestHandlerInterface
             $cal_facts[$d] = [];
             foreach ($facts as $fact) {
                 $xref = $fact->record()->xref();
-                $text = $text = $fact->label() . ' — ' . $fact->date()->display(true, null, false);
+                $text = $fact->label() . ' — ' . $fact->date()->display(true, null, false);
                 if ($fact->anniv > 0) {
                     $text .= ' (' . I18N::translate('%s year anniversary', $fact->anniv) . ')';
                 }
@@ -185,9 +184,9 @@ class CalendarEvents implements RequestHandlerInterface
         for ($week_day = 0; $week_day < $days_in_week; ++$week_day) {
             $day_name = $cal_date->dayNames(($week_day + $week_start) % $days_in_week);
             if ($week_day === $weekend_start || $week_day === $weekend_end) {
-                echo '<th class="wt-page-options-label weekend" width="' . (100 / $days_in_week) . '%">', $day_name, '</th>';
+                echo '<th class="wt-page-options-label weekend" width="', 100 / $days_in_week, '%">', $day_name, '</th>';
             } else {
-                echo '<th class="wt-page-options-label" width="' . (100 / $days_in_week) . '%">', $day_name, '</th>';
+                echo '<th class="wt-page-options-label" width="', 100 / $days_in_week, '%">', $day_name, '</th>';
             }
         }
         echo '</tr>';
@@ -216,7 +215,7 @@ class CalendarEvents implements RequestHandlerInterface
                 }
             } else {
                 // Format the day number using the calendar
-                $tmp   = new Date($cal_date->format("%@ {$d} %O %E"));
+                $tmp   = new Date($cal_date->format('%@ ' . $d . ' %O %E'));
                 $d_fmt = $tmp->minimumDate()->format('%j');
                 echo '<div class="d-flex d-flex justify-content-between">';
                 if ($d === $today->day && $cal_date->month === $today->month) {
@@ -275,10 +274,10 @@ class CalendarEvents implements RequestHandlerInterface
     /**
      * Format a list of facts for display
      *
-     * @param string[] $list
-     * @param string   $tag1
-     * @param string   $tag2
-     * @param Tree     $tree
+     * @param array<string> $list
+     * @param string        $tag1
+     * @param string        $tag2
+     * @param Tree          $tree
      *
      * @return string
      */

@@ -19,7 +19,7 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Http\RequestHandlers;
 
-use Fisharebest\Webtrees\Exceptions\HttpAccessDeniedException;
+use Fisharebest\Webtrees\Http\Exceptions\HttpAccessDeniedException;
 use Fisharebest\Webtrees\Http\ViewResponseTrait;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Services\CaptchaService;
@@ -41,14 +41,11 @@ class ContactPage implements RequestHandlerInterface
 {
     use ViewResponseTrait;
 
-    /** @var CaptchaService */
-    private $captcha_service;
+    private CaptchaService $captcha_service;
 
-    /** @var MessageService */
-    private $message_service;
+    private MessageService $message_service;
 
-    /** @var UserService */
-    private $user_service;
+    private UserService $user_service;
 
     /**
      * MessagePage constructor.

@@ -19,8 +19,6 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Report;
 
-use Fisharebest\Webtrees\Functions\FunctionsRtl;
-
 use function count;
 use function explode;
 use function hexdec;
@@ -40,7 +38,7 @@ class ReportPdfText extends ReportBaseText
      *
      * @return void
      */
-    public function render($renderer)
+    public function render($renderer): void
     {
         // Set up the style
         if ($renderer->getCurrentStyle() !== $this->styleName) {
@@ -66,7 +64,7 @@ class ReportPdfText extends ReportBaseText
         } else {
             $renderer->tcpdf->SetTextColor(0, 0, 0);
         }
-        $temptext = FunctionsRtl::spanLtrRtl($temptext);
+        $temptext = RightToLeftSupport::spanLtrRtl($temptext);
         $temptext = str_replace(
             [
                 '<br><span dir="rtl">',
@@ -112,9 +110,9 @@ class ReportPdfText extends ReportBaseText
      *
      * @param PdfRenderer $renderer
      *
-     * @return float|array
+     * @return array{0:float,1:int,2:float}
      */
-    public function getWidth($renderer)
+    public function getWidth($renderer): array
     {
         // Setup the style name, a font must be selected to calculate the width
         if ($renderer->getCurrentStyle() !== $this->styleName) {

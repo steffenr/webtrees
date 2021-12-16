@@ -21,9 +21,7 @@ namespace Fisharebest\Webtrees\Http\RequestHandlers;
 
 use Fig\Http\Message\StatusCodeInterface;
 use Fisharebest\Webtrees\Auth;
-use Fisharebest\Webtrees\Fact;
 use Fisharebest\Webtrees\Http\ViewResponseTrait;
-use Fisharebest\Webtrees\Location;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Tree;
 use Illuminate\Support\Collection;
@@ -31,12 +29,9 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-use function array_search;
 use function assert;
 use function is_string;
 use function redirect;
-
-use const PHP_INT_MAX;
 
 /**
  * Show a location's page.
@@ -44,21 +39,6 @@ use const PHP_INT_MAX;
 class LocationPage implements RequestHandlerInterface
 {
     use ViewResponseTrait;
-
-    // Show the repository's facts in this order:
-    private const FACT_ORDER = [
-        1 => '_LOC:NAME',
-        '_LOC:TYPE',
-        '_LOC:_POST',
-        '_LOC:_GOV',
-        '_LOC:MAP',
-        '_LOC:_MAIDENHEAD',
-        '_LOC:RELI',
-        '_LOC:EVEN',
-        '_LOC:_LOC',
-        '_LOC:_DMGD',
-        '_LOC:_AIDN',
-    ];
 
     /**
      * @param ServerRequestInterface $request
@@ -73,42 +53,26 @@ class LocationPage implements RequestHandlerInterface
         $xref = $request->getAttribute('xref');
         assert(is_string($xref));
 
-        $location = Registry::locationFactory()->make($xref, $tree);
-        $location = Auth::checkLocationAccess($location, false);
+        $record = Registry::locationFactory()->make($xref, $tree);
+        $record = Auth::checkLocationAccess($record, false);
 
         // Redirect to correct xref/slug
-        $slug = Registry::slugFactory()->make($location);
+        $slug = Registry::slugFactory()->make($record);
 
-        if ($location->xref() !== $xref || $request->getAttribute('slug') !== $slug) {
-            return redirect($location->url(), StatusCodeInterface::STATUS_MOVED_PERMANENTLY);
+        if ($record->xref() !== $xref || $request->getAttribute('slug') !== $slug) {
+            return redirect($record->url(), StatusCodeInterface::STATUS_MOVED_PERMANENTLY);
         }
 
-        return $this->viewResponse('gedcom-record-page', [
-            'facts'         => $this->facts($location),
-            'families'      => $location->linkedFamilies('_LOC'),
-            'individuals'   => $location->linkedIndividuals('_LOC'),
-            'notes'         => new Collection(),
-            'media_objects' => new Collection(),
-            'record'        => $location,
-            'sources'       => new Collection(),
-            'title'         => $location->fullName(),
-            'tree'          => $tree,
+        return $this->viewResponse('record-page', [
+            'clipboard_facts'      => new Collection(),
+            'linked_families'      => $record->linkedFamilies($record->tag()),
+            'linked_individuals'   => $record->linkedIndividuals($record->tag()),
+            'linked_media_objects' => null,
+            'linked_notes'         => null,
+            'linked_sources'       => null,
+            'record'               => $record,
+            'title'                => $record->fullName(),
+            'tree'                 => $tree,
         ]);
-    }
-
-    /**
-     * @param Location $location
-     *
-     * @return Collection<Fact>
-     */
-    private function facts(Location $location): Collection
-    {
-        return $location->facts()
-            ->sort(static function (Fact $x, Fact $y): int {
-                $sort_x = array_search($x->tag(), self::FACT_ORDER, true) ?: PHP_INT_MAX;
-                $sort_y = array_search($y->tag(), self::FACT_ORDER, true) ?: PHP_INT_MAX;
-
-                return $sort_x <=> $sort_y;
-            });
     }
 }

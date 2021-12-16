@@ -22,22 +22,7 @@ namespace Fisharebest\Webtrees;
 use Aura\Router\Route;
 use Aura\Router\RouterContainer;
 use Fig\Http\Message\RequestMethodInterface;
-use Fisharebest\Webtrees\Factories\CacheFactory;
-use Fisharebest\Webtrees\Factories\FamilyFactory;
-use Fisharebest\Webtrees\Factories\FilesystemFactory;
-use Fisharebest\Webtrees\Factories\ElementFactory;
-use Fisharebest\Webtrees\Factories\GedcomRecordFactory;
-use Fisharebest\Webtrees\Factories\HeaderFactory;
-use Fisharebest\Webtrees\Factories\IndividualFactory;
-use Fisharebest\Webtrees\Factories\LocationFactory;
-use Fisharebest\Webtrees\Factories\MediaFactory;
-use Fisharebest\Webtrees\Factories\NoteFactory;
-use Fisharebest\Webtrees\Factories\RepositoryFactory;
-use Fisharebest\Webtrees\Factories\SlugFactory;
-use Fisharebest\Webtrees\Factories\SourceFactory;
-use Fisharebest\Webtrees\Factories\SubmissionFactory;
-use Fisharebest\Webtrees\Factories\SubmitterFactory;
-use Fisharebest\Webtrees\Factories\XrefFactory;
+use Fig\Http\Message\StatusCodeInterface;
 use Fisharebest\Webtrees\Http\RequestHandlers\GedcomLoad;
 use Fisharebest\Webtrees\Http\Routes\WebRoutes;
 use Fisharebest\Webtrees\Module\ModuleThemeInterface;
@@ -49,6 +34,7 @@ use Fisharebest\Webtrees\Services\TreeService;
 use Illuminate\Database\Capsule\Manager as DB;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Psr\Http\Message\ResponseFactoryInterface;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestFactoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamFactoryInterface;
@@ -60,7 +46,13 @@ use function app;
 use function basename;
 use function filesize;
 use function http_build_query;
-use function microtime;
+use function implode;
+use function preg_match;
+use function str_starts_with;
+use function strcspn;
+use function strlen;
+use function strpos;
+use function substr;
 
 use const UPLOAD_ERR_OK;
 
@@ -69,10 +61,9 @@ use const UPLOAD_ERR_OK;
  */
 class TestCase extends \PHPUnit\Framework\TestCase
 {
-    /** @var object */
-    public static $mock_functions;
-    /** @var bool */
-    protected static $uses_database = false;
+    public static ?object $mock_functions = null;
+
+    protected static bool $uses_database = false;
 
     /**
      * Things to run once, before all the tests.
@@ -148,11 +139,11 @@ class TestCase extends \PHPUnit\Framework\TestCase
     /**
      * Create a request and bind it into the container.
      *
-     * @param string                  $method
-     * @param string[]                $query
-     * @param string[]                $params
-     * @param UploadedFileInterface[] $files
-     * @param string[]                $attributes
+     * @param string                       $method
+     * @param array<string>                $query
+     * @param array<string>                $params
+     * @param array<UploadedFileInterface> $files
+     * @param array<string>                $attributes
      *
      * @return ServerRequestInterface
      */
@@ -233,7 +224,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
 
         $tree_service->importGedcomFile($tree, $stream, $gedcom_file);
 
-        $timeout_service = new TimeoutService(microtime(true));
+        $timeout_service = new TimeoutService();
         $controller      = new GedcomLoad($timeout_service, $tree_service);
         $request         = self::createRequest()->withAttribute('tree', $tree);
 
@@ -268,5 +259,82 @@ class TestCase extends \PHPUnit\Framework\TestCase
         $client_name = basename($filename);
 
         return $uploaded_file_factory->createUploadedFile($stream, $size, $status, $client_name, $mime_type);
+    }
+
+    /**
+     * Assert that a response contains valid HTML - either a full page or a fragment.
+     *
+     * @param ResponseInterface $response
+     */
+    protected function validateHtmlResponse(ResponseInterface $response): void
+    {
+        self::assertSame(StatusCodeInterface::STATUS_OK, $response->getStatusCode());
+
+        self::assertEquals('text/html; charset=UTF-8', $response->getHeaderLine('content-type'));
+
+        $html = $response->getBody()->getContents();
+
+        self::assertStringStartsWith('<DOCTYPE html>', $html);
+
+        $this->validateHtml(substr($html, strlen('<DOCTYPE html>')));
+    }
+
+    /**
+     * Assert that a response contains valid HTML - either a full page or a fragment.
+     *
+     * @param string $html
+     */
+    protected function validateHtml(string $html): void
+    {
+        $stack = [];
+
+        do {
+            $html = substr($html, strcspn($html, '<>'));
+
+            if (str_starts_with($html, '>')) {
+                $this->fail('Unescaped > found in HTML');
+            }
+
+            if (str_starts_with($html, '<')) {
+                if (preg_match('~^</([a-z]+)>~', $html, $match)) {
+                    if ($match[1] !== array_pop($stack)) {
+                        $this->fail('Closing tag matches nothing: ' . $match[0] . ' at ' . implode(':', $stack));
+                    }
+                    $html = substr($html, strlen($match[0]));
+                } elseif (preg_match('~^<([a-z]+)(?:\s+[a-z_\-]+="[^">]*")*\s*(/?)>~', $html, $match)) {
+                    $tag = $match[1];
+                    $self_closing = $match[2] === '/';
+
+                    $message = 'Tag ' . $tag . ' is not allowed at ' . implode(':', $stack) . '.';
+
+                    switch ($tag) {
+                        case 'html':
+                            $this->assertSame([], $stack);
+                            break;
+                        case 'head':
+                        case 'body':
+                            $this->assertSame(['head'], $stack);
+                            break;
+                        case 'div':
+                            $this->assertNotContains('span', $stack, $message);
+                            break;
+                    }
+
+                    if (!$self_closing) {
+                        $stack[] = $tag;
+                    }
+
+                    if ($tag === 'script' && !$self_closing) {
+                        $html = substr($html, strpos($html, '</script>'));
+                    } else {
+                        $html = substr($html, strlen($match[0]));
+                    }
+                } else {
+                    $this->fail('Unrecognised tag: ' . substr($html, 0, 40));
+                }
+            }
+        } while ($html !== '');
+
+        $this->assertSame([], $stack);
     }
 }

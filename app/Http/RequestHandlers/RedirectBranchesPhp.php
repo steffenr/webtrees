@@ -20,7 +20,7 @@ declare(strict_types=1);
 namespace Fisharebest\Webtrees\Http\RequestHandlers;
 
 use Fig\Http\Message\StatusCodeInterface;
-use Fisharebest\Webtrees\Exceptions\HttpNotFoundException;
+use Fisharebest\Webtrees\Http\Exceptions\HttpNotFoundException;
 use Fisharebest\Webtrees\Module\BranchesListModule;
 use Fisharebest\Webtrees\Services\TreeService;
 use Fisharebest\Webtrees\Site;
@@ -36,11 +36,9 @@ use function redirect;
  */
 class RedirectBranchesPhp implements RequestHandlerInterface
 {
-    /** @var TreeService */
-    private $tree_service;
+    private BranchesListModule $module;
 
-    /** @var BranchesListModule */
-    private $module;
+    private TreeService $tree_service;
 
     /**
      * @param BranchesListModule $module

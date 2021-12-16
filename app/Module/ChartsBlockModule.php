@@ -43,10 +43,7 @@ class ChartsBlockModule extends AbstractModule implements ModuleBlockInterface
 {
     use ModuleBlockTrait;
 
-    /**
-     * @var ModuleService
-     */
-    private $module_service;
+    private ModuleService $module_service;
 
     /**
      * ChartsBlockModule constructor.
@@ -83,10 +80,10 @@ class ChartsBlockModule extends AbstractModule implements ModuleBlockInterface
     /**
      * Generate the HTML content of this block.
      *
-     * @param Tree     $tree
-     * @param int      $block_id
-     * @param string   $context
-     * @param string[] $config
+     * @param Tree          $tree
+     * @param int           $block_id
+     * @param string        $context
+     * @param array<string> $config
      *
      * @return string
      */
@@ -149,7 +146,7 @@ class ChartsBlockModule extends AbstractModule implements ModuleBlockInterface
                     break;
 
                 case 'hourglass':
-                    $module    = $this->module_service->findByInterface(HourglassChartModule::class)->first();
+                    $module = $this->module_service->findByInterface(HourglassChartModule::class)->first();
 
                     if ($module instanceof HourglassChartModule) {
                         $title     = $module->chartTitle($individual);
@@ -212,16 +209,6 @@ class ChartsBlockModule extends AbstractModule implements ModuleBlockInterface
     }
 
     /**
-     * Can this block be shown on the user’s home page?
-     *
-     * @return bool
-     */
-    public function isUserBlock(): bool
-    {
-        return true;
-    }
-
-    /**
      * Can this block be shown on the tree’s home page?
      *
      * @return bool
@@ -262,7 +249,7 @@ class ChartsBlockModule extends AbstractModule implements ModuleBlockInterface
         $default_xref     = $gedcomid ?: $PEDIGREE_ROOT_ID;
 
         $type = $this->getBlockSetting($block_id, 'type', 'pedigree');
-        $xref  = $this->getBlockSetting($block_id, 'pid', $default_xref);
+        $xref = $this->getBlockSetting($block_id, 'pid', $default_xref);
 
         $charts = [
             'pedigree'    => I18N::translate('Pedigree'),

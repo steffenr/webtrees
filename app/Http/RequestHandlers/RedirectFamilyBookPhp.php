@@ -21,7 +21,7 @@ namespace Fisharebest\Webtrees\Http\RequestHandlers;
 
 use Fig\Http\Message\StatusCodeInterface;
 use Fisharebest\Webtrees\Auth;
-use Fisharebest\Webtrees\Exceptions\HttpNotFoundException;
+use Fisharebest\Webtrees\Http\Exceptions\HttpNotFoundException;
 use Fisharebest\Webtrees\Module\FamilyBookChartModule;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Services\TreeService;
@@ -38,11 +38,9 @@ use function redirect;
  */
 class RedirectFamilyBookPhp implements RequestHandlerInterface
 {
-    /** @var TreeService */
-    private $tree_service;
+    private FamilyBookChartModule $chart;
 
-    /** @var FamilyBookChartModule */
-    private $chart;
+    private TreeService $tree_service;
 
     /**
      * @param FamilyBookChartModule $chart

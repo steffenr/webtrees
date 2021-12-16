@@ -19,7 +19,6 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Elements;
 
-use Fisharebest\Webtrees\Filter;
 use Fisharebest\Webtrees\Tree;
 
 /**
@@ -42,8 +41,7 @@ class TextFromSource extends AbstractElement
      */
     public function canonical(string $value): string
     {
-        // Browsers use MS-DOS line endings in multi-line data.
-        return strtr($value, ["\t" => ' ', "\r\n" => "\n", "\r" => "\n"]);
+        return $this->canonicalText($value);
     }
 
     /**
@@ -71,6 +69,6 @@ class TextFromSource extends AbstractElement
      */
     public function value(string $value, Tree $tree): string
     {
-        return Filter::formatText($value, $tree);
+        return $this->valueFormatted($value, $tree);
     }
 }

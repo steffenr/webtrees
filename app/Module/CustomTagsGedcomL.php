@@ -21,15 +21,16 @@ namespace Fisharebest\Webtrees\Module;
 
 use Fisharebest\Webtrees\Contracts\ElementInterface;
 use Fisharebest\Webtrees\Elements\AddressPostalCode;
+use Fisharebest\Webtrees\Elements\AddressWebPage;
 use Fisharebest\Webtrees\Elements\CertaintyAssessment;
 use Fisharebest\Webtrees\Elements\Change;
 use Fisharebest\Webtrees\Elements\ChangeDate;
 use Fisharebest\Webtrees\Elements\CustomElement;
+use Fisharebest\Webtrees\Elements\CustomEvent;
 use Fisharebest\Webtrees\Elements\DateValue;
 use Fisharebest\Webtrees\Elements\EmptyElement;
 use Fisharebest\Webtrees\Elements\EntryRecordingDate;
 use Fisharebest\Webtrees\Elements\EventAttributeType;
-use Fisharebest\Webtrees\Elements\EventDescriptor;
 use Fisharebest\Webtrees\Elements\EventTypeCitedFrom;
 use Fisharebest\Webtrees\Elements\FamilyStatusText;
 use Fisharebest\Webtrees\Elements\GovIdentifier;
@@ -55,6 +56,7 @@ use Fisharebest\Webtrees\Elements\SourceData;
 use Fisharebest\Webtrees\Elements\SubmitterText;
 use Fisharebest\Webtrees\Elements\TextFromSource;
 use Fisharebest\Webtrees\Elements\TimeValue;
+use Fisharebest\Webtrees\Elements\VersionNumber;
 use Fisharebest\Webtrees\Elements\WhereWithinSource;
 use Fisharebest\Webtrees\Elements\XrefAssociate;
 use Fisharebest\Webtrees\Elements\XrefLocation;
@@ -66,7 +68,7 @@ use Fisharebest\Webtrees\I18N;
 /**
  * Class CustomTagsGedcomL
  *
- * @see https://genealogy.net/GEDCOM/GEDCOM551%20GEDCOM-L%20Addendum-R1.pdf
+ * @see https://genealogy.net/GEDCOM/GEDCOM551%20GEDCOM-L%20Addendum-R2.pdf
  */
 class CustomTagsGedcomL extends AbstractModule implements ModuleConfigInterface, ModuleCustomTagsInterface
 {
@@ -90,7 +92,7 @@ class CustomTagsGedcomL extends AbstractModule implements ModuleConfigInterface,
     {
         return [
             'FAM:*:ADDR:_NAME'               => new CustomElement('Name of addressee'),
-            // I18N: http://gov.genealogy.net
+            // I18N: https://gov.genealogy.net
             'FAM:*:PLAC:_GOV'                => new GovIdentifier(I18N::translate('GOV identifier')),
             'FAM:*:PLAC:_LOC'                => new XrefLocation(I18N::translate('Location')),
             // I18N: https://en.wikipedia.org/wiki/Maidenhead_Locator_System
@@ -125,6 +127,9 @@ class CustomTagsGedcomL extends AbstractModule implements ModuleConfigInterface,
             'FAM:_TODO:_PRTY'                => new ResearchTaskPriority(I18N::translate('Priority')),
             'FAM:_TODO:_RDATE'               => new DateValue(I18N::translate('Reminder date')),
             'FAM:_UID'                       => new PafUid(I18N::translate('Unique identifier')),
+            'HEAD:GEDC:VERS:_ADDENDUM'       => new EmptyElement('GEDCOM-L'),
+            'HEAD:GEDC:VERS:_ADDENDUM:VERS'  => new VersionNumber(I18N::translate('Version')),
+            'HEAD:GEDC:VERS:_ADDENDUM:WWW'   => new AddressWebPage(I18N::translate('URL')),
             'HEAD:SOUR:CORP:ADDR:_NAME'      => new CustomElement('Name of addressee'),
             'HEAD:_SCHEMA'                   => new EmptyElement(I18N::translate('Schema')),
             'HEAD:_SCHEMA:*'                 => new EmptyElement(I18N::translate('Base GEDCOM tag')),
@@ -139,7 +144,7 @@ class CustomTagsGedcomL extends AbstractModule implements ModuleConfigInterface,
             'HEAD:_SCHEMA:*:*:*:_DEFN'       => new EmptyElement(I18N::translate('Definition')),
             'HEAD:_SCHEMA:*:*:_DEFN'         => new EmptyElement(I18N::translate('Definition')),
             'INDI:*:ADDR:_NAME'              => new CustomElement('Name of addressee'),
-            // I18N: http://gov.genealogy.net
+            // I18N: https://gov.genealogy.net
             'INDI:*:PLAC:_GOV'               => new GovIdentifier(I18N::translate('GOV identifier')),
             'INDI:*:PLAC:_LOC'               => new XrefLocation(I18N::translate('Location')),
             // I18N: https://en.wikipedia.org/wiki/Maidenhead_Locator_System
@@ -192,7 +197,7 @@ class CustomTagsGedcomL extends AbstractModule implements ModuleConfigInterface,
             '_LOC:CHAN:DATE'                 => new ChangeDate(I18N::translate('Date of last change')),
             '_LOC:CHAN:DATE:TIME'            => new TimeValue(I18N::translate('Time')),
             '_LOC:CHAN:NOTE'                 => new NoteStructure(I18N::translate('Note')),
-            '_LOC:EVEN'                      => new EventDescriptor(I18N::translate('Event'), ['TYPE' => '0:1']),
+            '_LOC:EVEN'                      => new CustomEvent(I18N::translate('Event')),
             '_LOC:EVEN:TYPE'                 => new EventAttributeType(I18N::translate('Type of event')),
             '_LOC:MAP'                       => new EmptyElement(I18N::translate('Coordinates')),
             '_LOC:MAP:LATI'                  => new PlaceLatitude(I18N::translate('Latitude')),
@@ -228,7 +233,7 @@ class CustomTagsGedcomL extends AbstractModule implements ModuleConfigInterface,
             '_LOC:_DMGD:DATE'                => new DateValue(I18N::translate('Date')),
             '_LOC:_DMGD:SOUR'                => new XrefSource(I18N::translate('Source')),
             '_LOC:_DMGD:TYPE'                => new CustomElement(I18N::translate('Type of demographic data')),
-            // I18N: http://gov.genealogy.net
+            // I18N: https://gov.genealogy.net
             '_LOC:_GOV'                      => new GovIdentifier(I18N::translate('GOV identifier')),
             '_LOC:_LOC'                      => new XrefLocation(I18N::translate('Parent'), ['DATE' => '0:1', 'SOUR' => '0:M', 'TYPE' => '0:1']),
             '_LOC:_LOC:DATE'                 => new DateValue(I18N::translate('Date')),

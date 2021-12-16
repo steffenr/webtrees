@@ -38,11 +38,9 @@ use function view;
  */
 class MessageService
 {
-    /** @var UserService */
-    private $user_service;
+    private EmailService $email_service;
 
-    /** @var EmailService */
-    private $email_service;
+    private UserService $user_service;
 
     /**
      * MessageService constructor.
@@ -61,7 +59,7 @@ class MessageService
      *
      * @param Tree $tree
      *
-     * @return UserInterface[]
+     * @return array<UserInterface>
      */
     public function validContacts(Tree $tree): array
     {

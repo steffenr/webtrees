@@ -33,27 +33,29 @@ use Illuminate\Support\Collection;
 
 use function addcslashes;
 use function app;
+use function array_combine;
+use function array_keys;
+use function array_map;
+use function array_search;
 use function array_shift;
 use function assert;
 use function count;
 use function date;
 use function e;
 use function explode;
-use function implode;
 use function in_array;
-use function max;
 use function md5;
 use function preg_match;
 use function preg_match_all;
 use function preg_replace;
 use function preg_replace_callback;
 use function preg_split;
+use function range;
 use function route;
 use function str_contains;
+use function str_ends_with;
 use function str_pad;
-use function str_starts_with;
 use function strtoupper;
-use function substr_count;
 use function trim;
 
 use const PHP_INT_MAX;
@@ -69,28 +71,27 @@ class GedcomRecord
 
     protected const ROUTE_NAME = GedcomRecordPage::class;
 
-    /** @var string The record identifier */
-    protected $xref;
+    protected string $xref;
 
-    /** @var Tree  The family tree to which this record belongs */
-    protected $tree;
+    protected Tree $tree;
 
-    /** @var string  GEDCOM data (before any pending edits) */
-    protected $gedcom;
+    // GEDCOM data (before any pending edits)
+    protected string $gedcom;
 
-    /** @var string|null  GEDCOM data (after any pending edits) */
-    protected $pending;
+    // GEDCOM data (after any pending edits)
+    protected ?string $pending;
 
-    /** @var Fact[] facts extracted from $gedcom/$pending */
-    protected $facts;
+    /** @var array<Fact> Facts extracted from $gedcom/$pending */
+    protected array $facts;
 
-    /** @var string[][] All the names of this individual */
-    protected $getAllNames;
+    /** @var array<array<string>> All the names of this individual */
+    protected array $getAllNames = [];
 
     /** @var int|null Cached result */
-    protected $getPrimaryName;
+    private ?int $getPrimaryName = null;
+
     /** @var int|null Cached result */
-    protected $getSecondaryName;
+    private ?int $getSecondaryName = null;
 
     /**
      * Create a GedcomRecord object from raw GEDCOM data.
@@ -107,8 +108,7 @@ class GedcomRecord
         $this->gedcom  = $gedcom;
         $this->pending = $pending;
         $this->tree    = $tree;
-
-        $this->parseFacts();
+        $this->facts   = $this->parseFacts();
     }
 
     /**
@@ -343,8 +343,7 @@ class GedcomRecord
      */
     public function getAllNames(): array
     {
-        if ($this->getAllNames === null) {
-            $this->getAllNames = [];
+        if ($this->getAllNames === []) {
             if ($this->canShowName()) {
                 // Ask the record to extract its names
                 $this->extractNames();
@@ -520,8 +519,8 @@ class GedcomRecord
     /**
      * Extract/format the first fact from a list of facts.
      *
-     * @param string[] $facts
-     * @param int      $style
+     * @param array<string> $facts
+     * @param int           $style
      *
      * @return string
      */
@@ -537,9 +536,9 @@ class GedcomRecord
             if ($event->date()->isOK() || $event->place()->gedcomName() !== '') {
                 switch ($style) {
                     case 1:
-                        return '<br><em>' . $event->label() . ' ' . FunctionsPrint::formatFactDate($event, $this, false, false) . $joiner . FunctionsPrint::formatFactPlace($event) . '</em>';
+                        return '<br><em>' . $event->label() . ' ' . FunctionsPrint::formatFactDate($event, $this, false, false) . $joiner . FunctionsPrint::formatFactPlace($event, false, false, false) . '</em>';
                     case 2:
-                        return '<dl><dt class="label">' . $event->label() . '</dt><dd class="field">' . FunctionsPrint::formatFactDate($event, $this, false, false) . $joiner . FunctionsPrint::formatFactPlace($event) . '</dd></dl>';
+                        return '<dl><dt class="label">' . $event->label() . '</dt><dd class="field">' . FunctionsPrint::formatFactDate($event, $this, false, false) . $joiner . FunctionsPrint::formatFactPlace($event, false, false, false) . '</dd></dl>';
                 }
             }
         }
@@ -725,9 +724,9 @@ class GedcomRecord
      * calendars, place-names in both latin and hebrew character sets, etc.
      * It also allows us to combine dates/places from different events in the summaries.
      *
-     * @param string[] $events
+     * @param array<string> $events
      *
-     * @return Date[]
+     * @return array<Date>
      */
     public function getAllEventDates(array $events): array
     {
@@ -744,9 +743,9 @@ class GedcomRecord
     /**
      * Get all the places for a particular type of event
      *
-     * @param string[] $events
+     * @param array<string> $events
      *
-     * @return Place[]
+     * @return array<Place>
      */
     public function getAllEventPlaces(array $events): array
     {
@@ -765,10 +764,10 @@ class GedcomRecord
     /**
      * The facts and events for this record.
      *
-     * @param string[] $filter
-     * @param bool     $sort
-     * @param int|null $access_level
-     * @param bool     $ignore_deleted
+     * @param array<string> $filter
+     * @param bool          $sort
+     * @param int|null      $access_level
+     * @param bool          $ignore_deleted
      *
      * @return Collection<Fact>
      */
@@ -780,17 +779,39 @@ class GedcomRecord
     ): Collection {
         $access_level = $access_level ?? Auth::accessLevel($this->tree);
 
+        // Convert BIRT into INDI:BIRT, etc.
+        $filter = array_map(fn (string $tag): string => $this->tag() . ':' . $tag, $filter);
+
         $facts = new Collection();
         if ($this->canShow($access_level)) {
             foreach ($this->facts as $fact) {
-                if (($filter === [] || in_array($fact->getTag(), $filter, true)) && $fact->canShow($access_level)) {
+                if (($filter === [] || in_array($fact->tag(), $filter, true)) && $fact->canShow($access_level)) {
                     $facts->push($fact);
                 }
             }
         }
 
         if ($sort) {
-            $facts = Fact::sortFacts($facts);
+            switch ($this->tag()) {
+                case Family::RECORD_TYPE:
+                case Individual::RECORD_TYPE:
+                    $facts = Fact::sortFacts($facts);
+                    break;
+
+                default:
+                    $subtags = Registry::elementFactory()->make($this->tag())->subtags();
+                    $subtags = array_map(fn (string $tag): string => $this->tag() . ':' . $tag, array_keys($subtags));
+                    $subtags = array_combine(range(1, count($subtags)), $subtags);
+
+                    $facts = $facts
+                        ->sort(static function (Fact $x, Fact $y) use ($subtags): int {
+                            $sort_x = array_search($x->tag(), $subtags, true) ?: PHP_INT_MAX;
+                            $sort_y = array_search($y->tag(), $subtags, true) ?: PHP_INT_MAX;
+
+                            return $sort_x <=> $sort_y;
+                        });
+                    break;
+            }
         }
 
         if ($ignore_deleted) {
@@ -800,6 +821,35 @@ class GedcomRecord
         }
 
         return new Collection($facts);
+    }
+
+    /**
+     * @return array<string,string>
+     */
+    public function missingFacts(): array
+    {
+        $missing_facts = [];
+
+        foreach (Registry::elementFactory()->make($this->tag())->subtags() as $subtag => $repeat) {
+            [, $max] = explode(':', $repeat);
+            $max = $max === 'M' ? PHP_INT_MAX : (int) $max;
+
+            if ($this->facts([$subtag], false, null, true)->count() < $max) {
+                $missing_facts[$subtag] = $subtag;
+                $missing_facts[$subtag] = Registry::elementFactory()->make($this->tag() . ':' . $subtag)->label();
+            }
+        }
+
+        uasort($missing_facts, I18N::comparator());
+
+        if ((int) $this->tree->getPreference('MEDIA_UPLOAD') < Auth::accessLevel($this->tree)) {
+            unset($missing_facts['OBJE']);
+        }
+
+        // We have special code for this.
+        unset($missing_facts['FILE']);
+
+        return $missing_facts;
     }
 
     /**
@@ -920,7 +970,7 @@ class GedcomRecord
                     $new_gedcom .= "\n" . $gedcom;
                 }
                 $fact_id = 'NOT A VALID FACT ID'; // Only replace/delete one copy of a duplicate fact
-            } elseif ($fact->getTag() !== 'CHAN' || !$update_chan) {
+            } elseif (!str_ends_with($fact->tag(), ':CHAN') || !$update_chan) {
                 $new_gedcom .= "\n" . $fact->gedcom();
             }
         }
@@ -954,7 +1004,8 @@ class GedcomRecord
                 $this->pending = null;
             }
         }
-        $this->parseFacts();
+
+        $this->facts = $this->parseFacts();
     }
 
     /**
@@ -1001,7 +1052,7 @@ class GedcomRecord
             $this->pending = null;
         }
 
-        $this->parseFacts();
+        $this->facts = $this->parseFacts();
 
         Log::addEditLog('Update: ' . static::RECORD_TYPE . ' ' . $this->xref, $this->tree);
     }
@@ -1063,7 +1114,7 @@ class GedcomRecord
      * Fetch XREFs of all records linked to a record - when deleting an object, we must
      * also delete all links to it.
      *
-     * @return GedcomRecord[]
+     * @return array<GedcomRecord>
      */
     public function linkingRecords(): array
     {
@@ -1146,7 +1197,7 @@ class GedcomRecord
             'sort'   => preg_replace_callback('/(\d+)/', static function (array $matches): string {
                 return str_pad($matches[0], 10, '0', STR_PAD_LEFT);
             }, $value),
-            'full'   => '<span dir="auto">' . e($value) . '</span>',
+            'full'   => '<bdi>' . e($value) . '</bdi>',
             // This is used for display
             'fullNN' => $value,
             // This goes into the database
@@ -1173,7 +1224,7 @@ class GedcomRecord
         $sublevel    = $level + 1;
         $subsublevel = $sublevel + 1;
         foreach ($facts as $fact) {
-            if (preg_match_all("/^{$level} ({$fact_type}) (.+)((\n[{$sublevel}-9].+)*)/m", $fact->gedcom(), $matches, PREG_SET_ORDER)) {
+            if (preg_match_all('/^' . $level . ' (' . $fact_type . ') (.+)((\n[' . $sublevel . '-9].+)*)/m', $fact->gedcom(), $matches, PREG_SET_ORDER)) {
                 foreach ($matches as $match) {
                     // Treat 1 NAME / 2 TYPE married the same as _MARNM
                     if ($match[1] === 'NAME' && str_contains($match[3], "\n2 TYPE married")) {
@@ -1181,7 +1232,7 @@ class GedcomRecord
                     } else {
                         $this->addName($match[1], $match[2], $fact->gedcom());
                     }
-                    if ($match[3] && preg_match_all("/^{$sublevel} (ROMN|FONE|_\w+) (.+)((\n[{$subsublevel}-9].+)*)/m", $match[3], $submatches, PREG_SET_ORDER)) {
+                    if ($match[3] && preg_match_all('/^' . $sublevel . ' (ROMN|FONE|_\w+) (.+)((\n[' . $subsublevel . '-9].+)*)/m', $match[3], $submatches, PREG_SET_ORDER)) {
                         foreach ($submatches as $submatch) {
                             $this->addName($submatch[1], $submatch[2], $match[3]);
                         }
@@ -1194,9 +1245,9 @@ class GedcomRecord
     /**
      * Split the record into facts
      *
-     * @return void
+     * @return array<Fact>
      */
-    private function parseFacts(): void
+    private function parseFacts(): array
     {
         // Split the record into facts
         if ($this->gedcom) {
@@ -1212,22 +1263,24 @@ class GedcomRecord
             $pending_facts = [];
         }
 
-        $this->facts = [];
+        $facts = [];
 
         foreach ($gedcom_facts as $gedcom_fact) {
             $fact = new Fact($gedcom_fact, $this, md5($gedcom_fact));
             if ($this->pending !== null && !in_array($gedcom_fact, $pending_facts, true)) {
                 $fact->setPendingDeletion();
             }
-            $this->facts[] = $fact;
+            $facts[] = $fact;
         }
         foreach ($pending_facts as $pending_fact) {
             if (!in_array($pending_fact, $gedcom_facts, true)) {
                 $fact = new Fact($pending_fact, $this, md5($pending_fact));
                 $fact->setPendingAddition();
-                $this->facts[] = $fact;
+                $facts[] = $fact;
             }
         }
+
+        return $facts;
     }
 
     /**
@@ -1285,90 +1338,5 @@ class GedcomRecord
             ->where('o_id', '=', $this->xref())
             ->lockForUpdate()
             ->get();
-    }
-
-    /**
-     * Add blank lines, to allow a user to add/edit new values.
-     *
-     * @return string
-     */
-    public function insertMissingSubtags(): string
-    {
-        $gedcom = $this->insertMissingLevels($this->tag(), $this->gedcom());
-
-        // NOTE records have data at level 0.  Move it to 1 CONC.
-        if (static::RECORD_TYPE === 'NOTE') {
-            return preg_replace('/^0 @[^@]+@ NOTE/', '1 CONC', $gedcom);
-        }
-
-        return preg_replace('/^0.*\n/', '', $gedcom);
-    }
-
-    /**
-     * @param string $tag
-     * @param string $gedcom
-     *
-     * @return string
-     */
-    public function insertMissingLevels(string $tag, string $gedcom): string
-    {
-        $next_level = substr_count($tag, ':') + 1;
-        $factory    = Registry::elementFactory();
-        $subtags    = $factory->make($tag)->subtags();
-
-        // Merge CONT records onto their parent line.
-        $gedcom = strtr($gedcom, [
-            "\n" . $next_level . ' CONT ' => "\r",
-            "\n" . $next_level . ' CONT' => "\r",
-        ]);
-
-        // The first part is level N.  The remainder are level N+1.
-        $parts  = preg_split('/\n(?=' . $next_level . ')/', $gedcom);
-        $return = array_shift($parts);
-
-        foreach ($subtags as $subtag => $occurrences) {
-            [$min, $max] = explode(':', $occurrences);
-
-            $min = (int) $min;
-
-            if ($max === 'M') {
-                $max = PHP_INT_MAX;
-            } else {
-                $max = (int) $max;
-            }
-
-            $count = 0;
-
-            // Add expected subtags in our preferred order.
-            foreach ($parts as $n => $part) {
-                if (str_starts_with($part, $next_level . ' ' . $subtag)) {
-                    $return .= "\n" . $this->insertMissingLevels($tag . ':' . $subtag, $part);
-                    $count++;
-                    unset($parts[$n]);
-                }
-            }
-
-            // Allowed to have more of this subtag?
-            if ($count < $max) {
-                // Create a new one.
-                $gedcom  = $next_level . ' ' . $subtag;
-                $default = $factory->make($tag . ':' . $subtag)->default($this->tree);
-                if ($default !== '') {
-                    $gedcom .= ' ' . $default;
-                }
-
-                $number_to_add = max(1, $min - $count);
-                $gedcom_to_add = "\n" . $this->insertMissingLevels($tag . ':' . $subtag, $gedcom);
-
-                $return .= \str_repeat($gedcom_to_add, $number_to_add);
-            }
-        }
-
-        // Now add any unexpected/existing data.
-        if ($parts !== []) {
-            $return .= "\n" . implode("\n", $parts);
-        }
-
-        return $return;
     }
 }

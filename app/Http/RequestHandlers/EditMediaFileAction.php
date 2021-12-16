@@ -19,6 +19,7 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Http\RequestHandlers;
 
+use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\FlashMessages;
 use Fisharebest\Webtrees\Html;
 use Fisharebest\Webtrees\I18N;
@@ -30,7 +31,6 @@ use Fisharebest\Webtrees\Tree;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\UnableToMoveFile;
 use League\Flysystem\UnableToRetrieveMetadata;
-use League\Flysystem\Util;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -48,11 +48,9 @@ use function trim;
  */
 class EditMediaFileAction implements RequestHandlerInterface
 {
-    /** @var MediaFileService */
-    private $media_file_service;
+    private MediaFileService $media_file_service;
 
-    /** @var PendingChangesService */
-    private $pending_changes_service;
+    private PendingChangesService $pending_changes_service;
 
     /**
      * EditMediaFileAction constructor.
@@ -93,15 +91,11 @@ class EditMediaFileAction implements RequestHandlerInterface
         $title    = $params['title'] ?? '';
         $type     = $params['type'] ?? '';
         $media    = Registry::mediaFactory()->make($xref, $tree);
+        $media    = Auth::checkMediaAccess($media, true);
 
         // Tidy non-printing characters
         $type  = trim(preg_replace('/\s+/', ' ', $type));
         $title = trim(preg_replace('/\s+/', ' ', $title));
-
-        // Media object oes not exist?  Media object is read-only?
-        if ($media === null || $media->isPendingDeletion() || !$media->canEdit()) {
-            return redirect(route(TreePage::class, ['tree' => $tree->name()]));
-        }
 
         // Find the fact to edit
         $media_file = $media->mediaFiles()

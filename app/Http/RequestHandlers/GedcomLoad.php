@@ -55,11 +55,9 @@ class GedcomLoad implements RequestHandlerInterface
     use ViewResponseTrait;
     use DetectsConcurrencyErrors;
 
-    /** @var TimeoutService */
-    private $timeout_service;
+    private TimeoutService $timeout_service;
 
-    /** @var TreeService */
-    private $tree_service;
+    private TreeService $tree_service;
 
     /**
      * GedcomLoad constructor.
@@ -108,7 +106,7 @@ class GedcomLoad implements RequestHandlerInterface
             // Calculate progress so far
             $progress = $import_offset / $import_total;
 
-            $first_time = ($import_offset === 0);
+            $first_time = $import_offset === 0;
 
             // Collect up any errors, and show them later.
             $errors = '';

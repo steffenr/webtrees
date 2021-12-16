@@ -80,10 +80,10 @@ class YahrzeitModule extends AbstractModule implements ModuleBlockInterface
     /**
      * Generate the HTML content of this block.
      *
-     * @param Tree     $tree
-     * @param int      $block_id
-     * @param string   $context
-     * @param string[] $config
+     * @param Tree          $tree
+     * @param int           $block_id
+     * @param string        $context
+     * @param array<string> $config
      *
      * @return string
      */
@@ -118,7 +118,7 @@ class YahrzeitModule extends AbstractModule implements ModuleBlockInterface
                         $hd1       = new JewishDate($hd);
                         ++$hd1->year;
                         $hd1->setJdFromYmd();
-                        // Special rules. See http://www.hebcal.com/help/anniv.html
+                        // Special rules. See https://www.hebcal.com/help/anniv.html
                         // Everything else is taken care of by our standard anniversary rules.
                         if ($hd->day === 30 && $hd->month === 2 && $hd->year !== 0 && $hd1->daysInMonth() < 30) {
                             // 30 CSH - Last day in CSH

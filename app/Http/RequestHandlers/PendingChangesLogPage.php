@@ -37,11 +37,9 @@ class PendingChangesLogPage implements RequestHandlerInterface
 {
     use ViewResponseTrait;
 
-    /** @var TreeService */
-    private $tree_service;
+    private TreeService $tree_service;
 
-    /** @var UserService */
-    private $user_service;
+    private UserService $user_service;
 
     /**
      * @param TreeService $tree_service
@@ -112,7 +110,7 @@ class PendingChangesLogPage implements RequestHandlerInterface
     /**
      * Labels for the various statuses.
      *
-     * @return array
+     * @return array<string,string>
      */
     private function changeStatuses(): array
     {

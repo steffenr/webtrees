@@ -19,11 +19,11 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Module\InteractiveTree;
 
-use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Family;
 use Fisharebest\Webtrees\Gedcom;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
+use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Tree;
 use Illuminate\Support\Collection;
 
@@ -34,8 +34,8 @@ use const JSON_THROW_ON_ERROR;
  */
 class TreeView
 {
-    /** @var string HTML element name */
-    private $name;
+    // HTML element name
+    private string $name;
 
     /**
      * Treeview Constructor
@@ -82,7 +82,8 @@ class TreeView
     public function getIndividuals(Tree $tree, string $request): string
     {
         $json_requests = explode(';', $request);
-        $r    = [];
+        $r             = [];
+
         foreach ($json_requests as $json_request) {
             $firstLetter = substr($json_request, 0, 1);
             $json_request = substr($json_request, 1);
@@ -156,7 +157,7 @@ class TreeView
         ]);
 
         $hmtl = $this->getThumbnail($individual);
-        $hmtl .= '<a class="tv_link" href="' . e($individual->url()) . '">' . $individual->fullName() . '</a> <a href="' . e($chart_url) . '" title="' . I18N::translate('Interactive tree of %s', strip_tags($individual->fullName())) . '" class="wt-icon-individual tv_link tv_treelink"></a>';
+        $hmtl .= '<a class="tv_link" href="' . e($individual->url()) . '">' . $individual->fullName() . '</a> <a href="' . e($chart_url) . '" title="' . I18N::translate('Interactive tree of %s', strip_tags($individual->fullName())) . '" class="tv_link tv_treelink">' . view('icons/individual') . '</a>';
         foreach ($individual->facts(Gedcom::BIRTH_EVENTS, true) as $fact) {
             $hmtl .= $fact->summary();
         }
@@ -175,9 +176,9 @@ class TreeView
     /**
      * Draw the children for some families
      *
-     * @param Collection $familyList array of families to draw the children for
-     * @param int        $gen        number of generations to draw
-     * @param bool       $ajax       true for an ajax call
+     * @param Collection<Family> $familyList array of families to draw the children for
+     * @param int                $gen        number of generations to draw
+     * @param bool               $ajax       true for an ajax call
      *
      * @return string
      */
@@ -234,7 +235,7 @@ class TreeView
      *
      * @return string
      */
-    private function drawPerson(Individual $person, int $gen, int $state, Family $pfamily = null, string $line = '', $isRoot = false): string
+    private function drawPerson(Individual $person, int $gen, int $state, ?Family $pfamily, string $line, bool $isRoot): string
     {
         if ($gen < 0) {
             return '';

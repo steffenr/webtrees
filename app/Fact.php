@@ -141,32 +141,28 @@ class Fact
         '_TODO',
     ];
 
-    /** @var string Unique identifier for this fact (currently implemented as a hash of the raw data). */
-    private $id;
+    // Unique identifier for this fact (currently implemented as a hash of the raw data).
+    private string $id;
 
-    /** @var GedcomRecord The GEDCOM record from which this fact is taken */
-    private $record;
+    // The GEDCOM record from which this fact is taken
+    private GedcomRecord $record;
 
-    /** @var string The raw GEDCOM data for this fact */
-    private $gedcom;
+    // The raw GEDCOM data for this fact
+    private string $gedcom;
 
-    /** @var string The GEDCOM tag for this record */
-    private $tag;
+    // The GEDCOM tag for this record
+    private string $tag;
 
-    /** @var bool Is this a recently deleted fact, pending approval? */
-    private $pending_deletion = false;
+    private bool $pending_deletion = false;
 
-    /** @var bool Is this a recently added fact, pending approval? */
-    private $pending_addition = false;
+    private bool $pending_addition = false;
 
-    /** @var Date The date of this fact, from the “2 DATE …” attribute */
-    private $date;
+    private Date $date;
 
-    /** @var Place The place of this fact, from the “2 PLAC …” attribute */
-    private $place;
+    private Place $place;
 
-    /** @var int Used by Functions::sortFacts() */
-    private $sortOrder;
+    // Used by Functions::sortFacts()
+    public int $sortOrder;
 
     /**
      * Create an event object from a gedcom fragment.
@@ -199,7 +195,7 @@ class Fact
      */
     public function value(): string
     {
-        if (preg_match('/^1 (?:' . $this->tag . ') ?(.*(?:(?:\n2 CONT ?.*)*))/', $this->gedcom, $match)) {
+        if (preg_match('/^1 ' . $this->tag . ' ?(.*(?:\n2 CONT ?.*)*)/', $this->gedcom, $match)) {
             return preg_replace("/\n2 CONT ?/", "\n", $match[1]);
         }
 
@@ -415,23 +411,11 @@ class Fact
     }
 
     /**
-     * What is the tag (type) of this fact, such as BIRT, MARR or DEAT.
+     * The GEDCOM record where this Fact came from
      *
-     * @return string
-     *
-     * @deprecated since 2.0.5.  Will be removed in 2.1.0
+     * @return GedcomRecord
      */
-    public function getTag(): string
-    {
-        return $this->tag;
-    }
-
-    /**
-     * The Person/Family record where this Fact came from
-     *
-     * @return Individual|Family|Source|Repository|Media|Note|Submitter|Submission|Location|Header|GedcomRecord
-     */
-    public function record()
+    public function record(): GedcomRecord
     {
         return $this->record;
     }
@@ -538,7 +522,7 @@ class Fact
     /**
      * Notes (inline and objects) linked to this fact
      *
-     * @return string[]|Note[]
+     * @return array<string|Note>
      */
     public function getNotes(): array
     {
@@ -564,7 +548,7 @@ class Fact
     /**
      * Media objects linked to this fact
      *
-     * @return Media[]
+     * @return array<Media>
      */
     public function getMedia(): array
     {
@@ -595,7 +579,7 @@ class Fact
             // Fact value
             $value = $this->value();
             if ($value !== '' && $value !== 'Y') {
-                $attributes[] = '<span dir="auto">' . e($value) . '</span>';
+                $attributes[] = '<bdi>' . e($value) . '</bdi>';
             }
             // Fact date
             $date = $this->date();
@@ -624,6 +608,39 @@ class Fact
             /* I18N: a label/value pair, such as “Occupation: Farmer”. Some languages may need to change the punctuation. */
             I18N::translate('<span class="label">%1$s:</span> <span class="field" dir="auto">%2$s</span>', $this->label(), implode(' — ', $attributes)) .
             '</div>';
+    }
+
+    /**
+     * A one-line summary of the fact - for the clipboard, etc.
+     *
+     * @return string
+     */
+    public function name(): string
+    {
+        $items  = [$this->label()];
+        $target = $this->target();
+
+        if ($target instanceof GedcomRecord) {
+            $items[] = '<bdi>' . $target->fullName() . '</bdi>';
+        } else {
+            // Fact value
+            $value = $this->value();
+            if ($value !== '' && $value !== 'Y') {
+                $items[] = '<bdi>' . e($value) . '</bdi>';
+            }
+
+            // Fact date
+            if ($this->date()->isOK()) {
+                $items[] = $this->date()->minimumDate()->format('%Y');
+            }
+
+            // Fact place
+            if ($this->place()->gedcomName() !== '') {
+                $items[] = $this->place()->shortName();
+            }
+        }
+
+        return implode(' — ', $items);
     }
 
     /**
@@ -807,15 +824,5 @@ class Fact
     public function __toString(): string
     {
         return $this->id . '@' . $this->record->xref();
-    }
-
-    /**
-     * Add blank lines, to allow a user to add/edit new values.
-     *
-     * @return string
-     */
-    public function insertMissingSubtags(): string
-    {
-        return $this->record()->insertMissingLevels($this->tag(), $this->gedcom());
     }
 }

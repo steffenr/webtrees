@@ -21,15 +21,18 @@ namespace Fisharebest\Webtrees\Http\RequestHandlers;
 
 use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Fact;
+use Fisharebest\Webtrees\Http\Exceptions\HttpAccessDeniedException;
 use Fisharebest\Webtrees\Http\ViewResponseTrait;
 use Fisharebest\Webtrees\Registry;
+use Fisharebest\Webtrees\Services\AuthorizationService;
+use Fisharebest\Webtrees\Services\GedcomEditService;
 use Fisharebest\Webtrees\Tree;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 use function assert;
-use function is_string;
+use function route;
 use function trim;
 
 /**
@@ -38,6 +41,22 @@ use function trim;
 class AddNewFact implements RequestHandlerInterface
 {
     use ViewResponseTrait;
+
+    private AuthorizationService $authorization_service;
+
+    private GedcomEditService $gedcom_edit_service;
+
+    /**
+     * AddNewFact constructor.
+     *
+     * @param AuthorizationService $authorization_service
+     * @param GedcomEditService    $gedcom_edit_service
+     */
+    public function __construct(AuthorizationService $authorization_service, GedcomEditService $gedcom_edit_service)
+    {
+        $this->authorization_service = $authorization_service;
+        $this->gedcom_edit_service   = $gedcom_edit_service;
+    }
 
     /**
      * @param ServerRequestInterface $request
@@ -49,22 +68,43 @@ class AddNewFact implements RequestHandlerInterface
         $tree = $request->getAttribute('tree');
         assert($tree instanceof Tree);
 
-        $xref = $request->getAttribute('xref');
-        assert(is_string($xref));
+        $xref   = (string) $request->getAttribute('xref');
+        $subtag = (string) $request->getAttribute('fact');
 
-        $subtag  = $request->getAttribute('fact');
+        if ($subtag === 'OBJE' && !$this->authorization_service->canUploadMedia($tree, Auth::user())) {
+            throw new HttpAccessDeniedException();
+        }
+
+        $include_hidden = (bool) ($request->getQueryParams()['include_hidden'] ?? false);
+
         $record  = Registry::gedcomRecordFactory()->make($xref, $tree);
         $record  = Auth::checkRecordAccess($record, true);
         $element = Registry::elementFactory()->make($record->tag() . ':' . $subtag);
         $title   = $record->fullName() . ' - ' . $element->label();
         $fact    = new Fact(trim('1 ' . $subtag . ' ' . $element->default($tree)), $record, 'new');
+        $gedcom  = $this->gedcom_edit_service->insertMissingFactSubtags($fact, $include_hidden);
+        $hidden  = $this->gedcom_edit_service->insertMissingFactSubtags($fact, true);
+        $url     = $record->url();
+
+        if ($gedcom === $hidden) {
+            $hidden_url = '';
+        } else {
+            $hidden_url = route(self::class, [
+                'fact'           => $subtag,
+                'include_hidden' => true,
+                'tree'           => $tree->name(),
+                'xref'           => $xref,
+            ]);
+        }
 
         return $this->viewResponse('edit/edit-fact', [
             'can_edit_raw' => false,
             'fact'         => $fact,
+            'gedcom'       => $gedcom,
+            'hidden_url'   => $hidden_url,
             'title'        => $title,
             'tree'         => $tree,
-            'url'          => $record->url(),
+            'url'          => $url,
         ]);
     }
 }

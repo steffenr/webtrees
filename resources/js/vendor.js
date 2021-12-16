@@ -1,6 +1,6 @@
 /**
  * webtrees: online genealogy
- * Copyright (C) 2019 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -15,7 +15,7 @@
 
 import $ from 'jquery';
 
-import 'popper.js';
+import '@popperjs/core';
 import 'bootstrap';
 import 'datatables.net';
 
@@ -40,7 +40,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import 'corejs-typeahead';
 
-import 'datatables.net-bs4';
+import 'datatables.net-bs5';
 
 import Sortable from 'sortablejs';
 
@@ -147,13 +147,3 @@ window.Bloodhound = require('corejs-typeahead/dist/bloodhound.min.js');
 // See https://github.com/RubaXa/Sortable/issues/1229
 // window.Sortable = require('sortablejs');
 window.Sortable = Sortable;
-
-// Add RTL support for dropdown menu - see https://github.com/fisharebest/webtrees/issues/3332
-$('html[dir=rtl] .dropdown').on('shown.bs.dropdown', function (event) {
-  let menu = event.target.querySelector('.dropdown-menu');
-  // Bootstrap sets these *after* the event has fired, so wait before updating them.
-  setTimeout(() => {
-    menu.style.right='0';
-    menu.style.left='';
-  }, 1);
-});

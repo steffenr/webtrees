@@ -25,7 +25,6 @@ use Fisharebest\Webtrees\Html;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Site;
 use GuzzleHttp\Psr7\Request;
-use JsonException;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -53,7 +52,7 @@ class GeonamesAutocomplete extends AbstractModule implements ModuleConfigInterfa
      */
     public function title(): string
     {
-        // I18N: geonames.org
+        // I18N: https://www.geonames.org
         return I18N::translate('GeoNames');
     }
 

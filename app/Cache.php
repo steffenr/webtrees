@@ -29,8 +29,7 @@ use Symfony\Contracts\Cache\ItemInterface;
  */
 class Cache
 {
-    /** @var CacheInterface */
-    private $cache;
+    private CacheInterface $cache;
 
     /**
      * Cache constructor.
@@ -45,11 +44,13 @@ class Cache
     /**
      * Fetch an item from the cache - or create it where it does not exist.
      *
-     * @param string   $key
-     * @param Closure  $closure
-     * @param int|null $ttl
+     * @template T
      *
-     * @return mixed
+     * @param string       $key
+     * @param Closure(): T $closure
+     * @param int|null     $ttl
+     *
+     * @return T
      */
     public function remember(string $key, Closure $closure, int $ttl = null)
     {

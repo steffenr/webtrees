@@ -19,8 +19,9 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Http\RequestHandlers;
 
-use Exception;
 use Fisharebest\Webtrees\Auth;
+use Fisharebest\Webtrees\Http\Exceptions\HttpAccessDeniedException;
+use Fisharebest\Webtrees\Http\Exceptions\HttpNotFoundException;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Services\MediaFileService;
@@ -35,12 +36,11 @@ use function response;
 use function view;
 
 /**
- * dd a new media file to a media object.
+ * Add a new media file to a media object.
  */
 class AddMediaFileModal implements RequestHandlerInterface
 {
-    /** @var MediaFileService */
-    private $media_file_service;
+    private MediaFileService $media_file_service;
 
     /**
      * AddMediaFileModal constructor.
@@ -73,7 +73,7 @@ class AddMediaFileModal implements RequestHandlerInterface
 
         try {
             $media = Auth::checkMediaAccess($media);
-        } catch (Exception $ex) {
+        } catch (HttpNotFoundException | HttpAccessDeniedException $ex) {
             return response(view('modals/error', [
                 'title' => I18N::translate('Add a media file'),
                 'error' => $ex->getMessage(),

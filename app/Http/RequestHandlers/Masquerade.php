@@ -20,7 +20,7 @@ declare(strict_types=1);
 namespace Fisharebest\Webtrees\Http\RequestHandlers;
 
 use Fisharebest\Webtrees\Auth;
-use Fisharebest\Webtrees\Exceptions\HttpNotFoundException;
+use Fisharebest\Webtrees\Http\Exceptions\HttpNotFoundException;
 use Fisharebest\Webtrees\Log;
 use Fisharebest\Webtrees\Services\UserService;
 use Fisharebest\Webtrees\Session;
@@ -35,8 +35,7 @@ use function response;
  */
 class Masquerade implements RequestHandlerInterface
 {
-    /** @var UserService */
-    private $user_service;
+    private UserService $user_service;
 
     /**
      * @param UserService $user_service

@@ -23,12 +23,11 @@ use Aura\Router\RouterContainer;
 use Fisharebest\Localization\Locale\LocaleInterface;
 use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Contracts\UserInterface;
-use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Family;
-use Fisharebest\Webtrees\Functions\FunctionsPrintLists;
 use Fisharebest\Webtrees\GedcomRecord;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
+use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Services\LocalizationService;
 use Fisharebest\Webtrees\Session;
 use Fisharebest\Webtrees\Tree;
@@ -62,8 +61,7 @@ class IndividualListModule extends AbstractModule implements ModuleListInterface
 
     protected const ROUTE_URL = '/tree/{tree}/individual-list';
 
-    /** @var LocalizationService */
-    private $localization_service;
+    private LocalizationService $localization_service;
 
     /**
      * IndividualListModule constructor.
@@ -122,8 +120,8 @@ class IndividualListModule extends AbstractModule implements ModuleListInterface
     }
 
     /**
-     * @param Tree    $tree
-     * @param mixed[] $parameters
+     * @param Tree                              $tree
+     * @param array<bool|int|string|array|null> $parameters
      *
      * @return string
      */
@@ -315,7 +313,7 @@ class IndividualListModule extends AbstractModule implements ModuleListInterface
             ];
             $show     = 'none'; // Don't show lists until something is chosen
         }
-        $legend = '<span dir="auto">' . $legend . '</span>';
+        $legend = '<bdi>' . $legend . '</bdi>';
 
         if ($families) {
             $title = I18N::translate('Families') . ' — ' . $legend;
@@ -387,17 +385,27 @@ class IndividualListModule extends AbstractModule implements ModuleListInterface
                     // Show the surname list
                     switch ($tree->getPreference('SURNAME_LIST_STYLE')) {
                         case 'style1':
-                            echo FunctionsPrintLists::surnameList($surns, 3, true, $this, $tree);
+                            echo view('lists/surnames-column-list', [
+                                'module'   => $this,
+                                'surnames' => $surns,
+                                'totals'   => true,
+                                'tree'     => $tree,
+                            ]);
                             break;
                         case 'style3':
-                            echo FunctionsPrintLists::surnameTagCloud($surns, $this, true, $tree);
+                            echo view('lists/surnames-tag-cloud', [
+                                'module'   => $this,
+                                'surnames' => $surns,
+                                'totals'   => true,
+                                'tree'     => $tree,
+                            ]);
                             break;
                         case 'style2':
                         default:
                             echo view('lists/surnames-table', [
-                                'surnames' => $surns,
                                 'families' => $families,
                                 'module'   => $this,
+                                'surnames' => $surns,
                                 'tree'     => $tree,
                             ]);
                             break;
@@ -441,7 +449,7 @@ class IndividualListModule extends AbstractModule implements ModuleListInterface
                             if (Session::has('initiated')) {
                                 echo '<li class="wt-initials-list-item d-flex">';
                                 if ($show_all_firstnames === 'yes') {
-                                    echo '<span class="wt-initial px-1 warning">' . I18N::translate('All') . '</span>';
+                                    echo '<span class="wt-initial px-1 active">' . I18N::translate('All') . '</span>';
                                 } else {
                                     echo '<a class="wt-initial px-1" href="' . e($this->listUrl($tree, ['show_all_firstnames' => 'yes'] + $params)) . '" title="' . I18N::number($count) . '">' . I18N::translate('All') . '</a>';
                                 }
@@ -554,7 +562,7 @@ class IndividualListModule extends AbstractModule implements ModuleListInterface
      * @param bool            $fams  if set, only consider individuals with FAMS records
      * @param LocaleInterface $locale
      *
-     * @return int[]
+     * @return array<int>
      */
     public function surnameAlpha(Tree $tree, bool $marnm, bool $fams, LocaleInterface $locale): array
     {
@@ -581,7 +589,7 @@ class IndividualListModule extends AbstractModule implements ModuleListInterface
 
         // Now fetch initial letters that are not in our alphabet,
         // including "@" (for "@N.N.") and "" for no surname.
-        foreach ($this->localization_service->alphabet($locale) as $n => $letter) {
+        foreach ($this->localization_service->alphabet($locale) as $letter) {
             $query->where($n_surn, 'NOT LIKE', $letter . '%');
         }
 
@@ -618,7 +626,7 @@ class IndividualListModule extends AbstractModule implements ModuleListInterface
      * @param bool            $fams   if set, only consider individuals with FAMS records
      * @param LocaleInterface $locale
      *
-     * @return int[]
+     * @return array<int>
      */
     public function givenAlpha(Tree $tree, string $surn, string $salpha, bool $marnm, bool $fams, LocaleInterface $locale): array
     {
@@ -685,7 +693,7 @@ class IndividualListModule extends AbstractModule implements ModuleListInterface
      * @param bool            $fams   if set, only consider individuals with FAMS records
      * @param LocaleInterface $locale
      *
-     * @return int[][]
+     * @return array<array<int>>
      */
     public function surnames(
         Tree $tree,
@@ -747,7 +755,7 @@ class IndividualListModule extends AbstractModule implements ModuleListInterface
      * @param bool            $fams   if set, only fetch individuals with FAMS records
      * @param LocaleInterface $locale
      *
-     * @return Individual[]
+     * @return array<Individual>
      */
     public function individuals(
         Tree $tree,
@@ -833,7 +841,7 @@ class IndividualListModule extends AbstractModule implements ModuleListInterface
      * @param bool            $marnm  if set, include married names
      * @param LocaleInterface $locale
      *
-     * @return Family[]
+     * @return array<Family>
      */
     public function families(Tree $tree, string $surn, string $salpha, string $galpha, bool $marnm, LocaleInterface $locale): array
     {

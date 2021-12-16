@@ -40,8 +40,7 @@ class NoteStructure extends AbstractElement
      */
     public function canonical(string $value): string
     {
-        // Browsers use MS-DOS line endings in multi-line data.
-        return strtr($value, ["\t" => ' ', "\r\n" => "\n", "\r" => "\n"]);
+        return $this->canonicalText($value);
     }
 
     /**
@@ -60,7 +59,7 @@ class NoteStructure extends AbstractElement
         $xref_note      = new XrefNote('');
 
         // Existing shared note.
-        if (preg_match('/@' . Gedcom::REGEX_XREF . '@/', $value)) {
+        if (preg_match('/^@' . Gedcom::REGEX_XREF . '@$/', $value)) {
             return $xref_note->edit($id, $name, $value, $tree);
         }
 
@@ -84,7 +83,7 @@ class NoteStructure extends AbstractElement
             $submitter_text->edit($id, $name, $value, $tree) .
             '</div>' .
             '<div id="' . e($id) . '-shared" class="d-none">' .
-            $xref_note->edit($id, $name, $value, $tree) .
+            $xref_note->edit($id . '-select', $name, $value, $tree) .
             '</div>' .
             '</div>' .
             '<script>' .

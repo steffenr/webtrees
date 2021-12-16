@@ -21,8 +21,8 @@ namespace Fisharebest\Webtrees\Http\RequestHandlers;
 
 use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Contracts\UserInterface;
-use Fisharebest\Webtrees\Exceptions\HttpNotFoundException;
 use Fisharebest\Webtrees\FlashMessages;
+use Fisharebest\Webtrees\Http\Exceptions\HttpNotFoundException;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Services\EmailService;
 use Fisharebest\Webtrees\Services\TreeService;
@@ -40,14 +40,11 @@ use function route;
  */
 class UserEditAction implements RequestHandlerInterface
 {
-    /** @var EmailService */
-    private $email_service;
+    private EmailService $email_service;
 
-    /** @var UserService */
-    private $user_service;
+    private UserService $user_service;
 
-    /** @var TreeService */
-    private $tree_service;
+    private TreeService $tree_service;
 
     /**
      * UserEditAction constructor.
@@ -96,7 +93,7 @@ class UserEditAction implements RequestHandlerInterface
         $edit_user = $this->user_service->find($user_id);
 
         if ($edit_user === null) {
-            throw new HttpNotFoundException(I18N::translate('%1$s does not exist', 'user_id:' . $user_id));
+            throw new HttpNotFoundException(I18N::translate('%s does not exist.', 'user_id:' . $user_id));
         }
 
         // We have just approved a user.  Tell them

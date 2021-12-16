@@ -54,7 +54,6 @@ use Fisharebest\Webtrees\Module\CustomTagsBrothersKeeper;
 use Fisharebest\Webtrees\Module\CustomTagsFamilyTreeBuilder;
 use Fisharebest\Webtrees\Module\CustomTagsFamilyTreeMaker;
 use Fisharebest\Webtrees\Module\CustomTagsGedcom53;
-use Fisharebest\Webtrees\Module\CustomTagsGedcom55;
 use Fisharebest\Webtrees\Module\CustomTagsGedcomL;
 use Fisharebest\Webtrees\Module\CustomTagsGenPluswin;
 use Fisharebest\Webtrees\Module\CustomTagsLegacy;
@@ -62,6 +61,7 @@ use Fisharebest\Webtrees\Module\CustomTagsPersonalAncestralFile;
 use Fisharebest\Webtrees\Module\CustomTagsPhpGedView;
 use Fisharebest\Webtrees\Module\CustomTagsReunion;
 use Fisharebest\Webtrees\Module\CustomTagsRootsMagic;
+use Fisharebest\Webtrees\Module\CustomTagsTheMasterGenealogist;
 use Fisharebest\Webtrees\Module\CustomTagsWebtrees;
 use Fisharebest\Webtrees\Module\CzechMonarchsAndPresidents;
 use Fisharebest\Webtrees\Module\DeathReportModule;
@@ -172,6 +172,7 @@ use Fisharebest\Webtrees\Module\LanguageTurkish;
 use Fisharebest\Webtrees\Module\LanguageUkranian;
 use Fisharebest\Webtrees\Module\LanguageUrdu;
 use Fisharebest\Webtrees\Module\LanguageVietnamese;
+use Fisharebest\Webtrees\Module\LanguageWelsh;
 use Fisharebest\Webtrees\Module\LanguageYiddish;
 use Fisharebest\Webtrees\Module\LifespansChartModule;
 use Fisharebest\Webtrees\Module\ListsMenuModule;
@@ -270,12 +271,17 @@ use Fisharebest\Webtrees\Tree;
 use Fisharebest\Webtrees\Webtrees;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Support\Collection;
-use stdClass;
 use Throwable;
 
 use function app;
+use function basename;
+use function dirname;
+use function glob;
+use function is_object;
 use function str_contains;
 use function strlen;
+
+use const GLOB_NOSORT;
 
 /**
  * Functions for managing and maintaining modules.
@@ -355,9 +361,8 @@ class ModuleService
         'custom-tags-aldfaer'     => CustomTagsAldfaer::class,
         'custom-tags-bk'          => CustomTagsBrothersKeeper::class,
         'custom-tags-gedcom-53'   => CustomTagsGedcom53::class,
-        'custom-tags-gedcom-55'   => CustomTagsGedcom55::class,
         'custom-tags-gedcom-l'    => CustomTagsGedcomL::class,
-        'custom-tags-gedpluswin'  => CustomTagsGenPluswin::class,
+        'custom-tags-genpluswin'  => CustomTagsGenPluswin::class,
         'custom-tags-legacy'      => CustomTagsLegacy::class,
         'custom-tags-ftb'         => CustomTagsFamilyTreeBuilder::class,
         'custom-tags-ftm'         => CustomTagsFamilyTreeMaker::class,
@@ -365,6 +370,7 @@ class ModuleService
         'custom-tags-phpgedview'  => CustomTagsPhpGedView::class,
         'custom-tags-reunion'     => CustomTagsReunion::class,
         'custom-tags-roots-magic' => CustomTagsRootsMagic::class,
+        'custom-tags-tmg'         => CustomTagsTheMasterGenealogist::class,
         'custom-tags-webtrees'    => CustomTagsWebtrees::class,
         'death_report'            => DeathReportModule::class,
         'descendancy'             => DescendancyModule::class,
@@ -412,6 +418,7 @@ class ModuleService
         'language-bs'             => LanguageBosnian::class,
         'language-ca'             => LanguageCatalan::class,
         'language-cs'             => LanguageCzech::class,
+        'language-cy'             => LanguageWelsh::class,
         'language-da'             => LanguageDanish::class,
         'language-de'             => LanguageGerman::class,
         'language-dv'             => LanguageDivehi::class,
@@ -586,7 +593,7 @@ class ModuleService
      *
      * @return Collection<ModuleInterface>
      */
-    public function findByInterface(string $interface, $include_disabled = false, $sort = false): Collection
+    public function findByInterface(string $interface, bool $include_disabled = false, bool $sort = false): Collection
     {
         $modules = $this->all($include_disabled)
             ->filter($this->interfaceFilter($interface));
@@ -627,7 +634,7 @@ class ModuleService
             // We can override these from database settings.
             $module_info = DB::table('module')
                 ->get()
-                ->mapWithKeys(static function (stdClass $row): array {
+                ->mapWithKeys(static function (object $row): array {
                     return [$row->module_name => $row];
                 });
 
@@ -636,7 +643,7 @@ class ModuleService
                 ->map(static function (ModuleInterface $module) use ($module_info): ModuleInterface {
                     $info = $module_info->get($module->name());
 
-                    if ($info instanceof stdClass) {
+                    if (is_object($info)) {
                         $module->setEnabled($info->status === 'enabled');
 
                         if ($module instanceof ModuleFooterInterface && $info->footer_order !== null) {
@@ -710,23 +717,15 @@ class ModuleService
                 return strlen($module_name) <= 30;
             })
             ->map(static function (string $filename): ?ModuleCustomInterface {
-                try {
-                    $module = self::load($filename);
+                $module = self::load($filename);
 
-                    if ($module instanceof ModuleCustomInterface) {
-                        $module_name = '_' . basename(dirname($filename)) . '_';
-
-                        $module->setName($module_name);
-                    } else {
-                        return null;
-                    }
+                if ($module instanceof ModuleCustomInterface) {
+                    $module->setName('_' . basename(dirname($filename)) . '_');
 
                     return $module;
-                } catch (Throwable $ex) {
-                    // It would be nice to show this error in a flash-message or similar, but the framework
-                    // has not yet been initialised so we have no themes, languages, sessions, etc.
-                    throw $ex;
                 }
+
+                return null;
             })
             ->filter()
             ->mapWithKeys(static function (ModuleCustomInterface $module): array {
@@ -739,16 +738,15 @@ class ModuleService
      *
      * @param string $filename
      *
-     * @return mixed
+     * @return ModuleInterface|null
      */
-    private static function load(string $filename)
+    private static function load(string $filename): ?ModuleInterface
     {
         try {
             return include $filename;
         } catch (Throwable $exception) {
             $module_name = basename(dirname($filename));
-            $message     = 'Fatal error in module: ' . $module_name;
-            $message     .= '<br>' . $exception;
+            $message     = 'Fatal error in module: ' . $module_name . '<br>' . $exception;
             FlashMessages::addMessage($message, 'danger');
         }
 

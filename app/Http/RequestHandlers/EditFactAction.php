@@ -26,12 +26,12 @@ use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Services\GedcomEditService;
 use Fisharebest\Webtrees\Services\ModuleService;
 use Fisharebest\Webtrees\Tree;
+use Fisharebest\Webtrees\Validator;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 use function assert;
-use function explode;
 use function is_string;
 use function redirect;
 
@@ -40,11 +40,9 @@ use function redirect;
  */
 class EditFactAction implements RequestHandlerInterface
 {
-    /** @var GedcomEditService */
-    private $gedcom_edit_service;
+    private GedcomEditService $gedcom_edit_service;
 
-    /** @var ModuleService */
-    private $module_service;
+    private ModuleService $module_service;
 
     /**
      * EditFactAction constructor.
@@ -88,14 +86,19 @@ class EditFactAction implements RequestHandlerInterface
         $census_assistant = $this->module_service->findByInterface(CensusAssistantModule::class)->first();
 
         if ($census_assistant instanceof CensusAssistantModule && $record instanceof Individual) {
-            $gedcom = $census_assistant->updateCensusAssistant($request, $record, $fact_id, $gedcom, $keep_chan);
-            $pid_array = $params['pid_array'] ?? '';
-            if ($pid_array !== '') {
-                foreach (explode(',', $pid_array) as $pid) {
+            $ca_individuals = $params['ca_individuals']['xref'] ?? [];
+
+            if ($ca_individuals !== []) {
+                $gedcom = $census_assistant->updateCensusAssistant($request, $record, $fact_id, $gedcom, $keep_chan);
+
+                // Don't copy the AGE/OCCU fields to other individuals
+                $gedcom2 = preg_replace('/\n2 (?:AGE|OCCU) .*/', '', $gedcom);
+
+                foreach ($ca_individuals as $pid) {
                     if ($pid !== $xref) {
                         $individual = Registry::individualFactory()->make($pid, $tree);
                         if ($individual instanceof Individual && $individual->canEdit()) {
-                            $individual->updateFact('', $gedcom, !$keep_chan);
+                            $individual->updateFact('', $gedcom2, !$keep_chan);
                         }
                     }
                 }
@@ -115,6 +118,9 @@ class EditFactAction implements RequestHandlerInterface
             }
         }
 
-        return redirect($params['url'] ?? $record->url());
+        $base_url = $request->getAttribute('base_url');
+        $url      = Validator::parsedBody($request)->isLocalUrl($base_url)->string('url') ?? $record->url();
+
+        return redirect($url);
     }
 }

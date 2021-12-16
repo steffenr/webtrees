@@ -21,7 +21,7 @@ namespace Fisharebest\Webtrees\Http\RequestHandlers;
 
 use Fig\Http\Message\StatusCodeInterface;
 use Fisharebest\Flysystem\Adapter\ChrootAdapter;
-use Fisharebest\Webtrees\Exceptions\HttpServerErrorException;
+use Fisharebest\Webtrees\Http\Exceptions\HttpServerErrorException;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Services\GedcomExportService;
@@ -36,15 +36,12 @@ use League\Flysystem\FilesystemOperator;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use RuntimeException;
 use Throwable;
 
 use function assert;
 use function date;
 use function e;
 use function fclose;
-use function fopen;
-use function fseek;
 use function intdiv;
 use function microtime;
 use function response;
@@ -82,14 +79,11 @@ class UpgradeWizardStep implements RequestHandlerInterface
         'vendor',
     ];
 
-    /** @var GedcomExportService */
-    private $gedcom_export_service;
+    private GedcomExportService $gedcom_export_service;
 
-    /** @var UpgradeService */
-    private $upgrade_service;
+    private UpgradeService $upgrade_service;
 
-    /** @var TreeService */
-    private $tree_service;
+    private TreeService $tree_service;
 
     /**
      * UpgradeController constructor.
@@ -227,18 +221,10 @@ class UpgradeWizardStep implements RequestHandlerInterface
      */
     private function wizardStepExport(Tree $tree, FilesystemOperator $data_filesystem): ResponseInterface
     {
-        // We store the data in PHP temporary storage.
-        $stream = fopen('php://temp', 'wb+');
-
-        if ($stream === false) {
-            throw new RuntimeException('Failed to create temporary stream');
-        }
-
         $filename = $tree->name() . date('-Y-m-d') . '.ged';
 
-        $this->gedcom_export_service->export($tree, $stream);
+        $stream = $this->gedcom_export_service->export($tree);
 
-        fseek($stream, 0);
         $data_filesystem->writeStream($tree->name() . date('-Y-m-d') . '.ged', $stream);
         fclose($stream);
 

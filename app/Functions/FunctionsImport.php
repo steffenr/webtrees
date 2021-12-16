@@ -114,7 +114,7 @@ class FunctionsImport
                     // Capitals
                     $date = strtoupper($date);
                     // Temporarily add leading/trailing spaces, to allow efficient matching below
-                    $date = " {$date} ";
+                    $date = ' ' . $date . ' ';
                     // Ensure space digits and letters
                     $date = preg_replace('/([A-Z])(\d)/', '$1 $2', $date);
                     $date = preg_replace('/(\d)([A-Z])/', '$1 $2', $date);
@@ -506,7 +506,7 @@ class FunctionsImport
     }
 
     /**
-     * Legacy Family Tree software generates _PLAC_DEFN records containing LAT/LONG values
+     * Legacy Family Tree software generates _PLAC records containing LAT/LONG values
      *
      * @param string $gedcom
      */
@@ -796,7 +796,7 @@ class FunctionsImport
             ->where('multimedia_file_refn', '=', mb_substr($file, 0, 248))
             ->value('m_id');
 
-        if ($xref === null && $file !== '') {
+        if ($xref === null) {
             $xref = Registry::xrefFactory()->make(Media::RECORD_TYPE);
 
             // convert to a media-object

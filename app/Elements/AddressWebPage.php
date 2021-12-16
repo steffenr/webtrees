@@ -21,8 +21,6 @@ namespace Fisharebest\Webtrees\Elements;
 
 use Fisharebest\Webtrees\Tree;
 
-use function e;
-
 /**
  * ADDRESS_WEB_PAGE := {Size=5:120}
  * The world wide web page address.
@@ -30,6 +28,8 @@ use function e;
 class AddressWebPage extends AbstractElement
 {
     protected const MAXIMUM_LENGTH = 120;
+
+    protected const PATTERN = 'https?://.*';
 
     /**
      * Display the value of this type of element.
@@ -41,8 +41,6 @@ class AddressWebPage extends AbstractElement
      */
     public function value(string $value, Tree $tree): string
     {
-        $canonical = $this->canonical($value);
-
-        return '<a dir="auto" href="' . e($canonical) . '">' . e($canonical) . '</a>';
+        return $this->valueLink($value);
     }
 }

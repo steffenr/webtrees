@@ -30,7 +30,6 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 use function assert;
 use function e;
-use function view;
 
 /**
  * Run a data-fix.
@@ -39,8 +38,7 @@ class DataFixChoose implements RequestHandlerInterface
 {
     use ViewResponseTrait;
 
-    /** @var ModuleService */
-    private $module_service;
+    private ModuleService $module_service;
 
     /**
      * DataFix constructor.
@@ -66,7 +64,7 @@ class DataFixChoose implements RequestHandlerInterface
 
         $this->layout = 'layouts/administration';
 
-        $title = view('icons/data-fix') . I18N::translate('Data fixes') . ' — ' . e($tree->title());
+        $title = I18N::translate('Data fixes') . ' — ' . e($tree->title());
 
         return $this->viewResponse('admin/data-fix-select', [
             'title'      => $title,

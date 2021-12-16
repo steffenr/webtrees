@@ -19,9 +19,9 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Module;
 
-use Fisharebest\Webtrees\Exceptions\HttpNotFoundException;
 use Fisharebest\Webtrees\Family;
 use Fisharebest\Webtrees\GedcomRecord;
+use Fisharebest\Webtrees\Http\Exceptions\HttpNotFoundException;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\Location;
@@ -54,8 +54,7 @@ class FixSearchAndReplace extends AbstractModule implements ModuleDataFixInterfa
     // A regular expression that never matches.
     private const INVALID_REGEX = '/(?!)/';
 
-    /** @var DataFixService */
-    private $data_fix_service;
+    private DataFixService $data_fix_service;
 
     /**
      * FixMissingDeaths constructor.
@@ -102,7 +101,7 @@ class FixSearchAndReplace extends AbstractModule implements ModuleDataFixInterfa
             'exact'     => I18N::translate('Match the exact text, even if it occurs in the middle of a word.'),
             'words'     => I18N::translate('Match the exact text, unless it occurs in the middle of a word.'),
             'wildcards' => I18N::translate('Use a “?” to match a single character, use “*” to match zero or more characters.'),
-            /* I18N: http://en.wikipedia.org/wiki/Regular_expression */
+            /* I18N: https://en.wikipedia.org/wiki/Regular_expression */
             'regex'     => I18N::translate('Regular expression'),
         ];
 

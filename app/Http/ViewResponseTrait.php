@@ -32,13 +32,12 @@ use function view;
  */
 trait ViewResponseTrait
 {
-    /** @var string */
-    protected $layout = 'layouts/default';
+    protected string $layout = 'layouts/default';
 
     /**
-     * @param string  $view_name
-     * @param mixed[] $view_data
-     * @param int     $status
+     * @param string       $view_name
+     * @param array<mixed> $view_data
+     * @param int          $status
      *
      * @return ResponseInterface
      */

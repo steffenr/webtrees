@@ -21,7 +21,7 @@ namespace Fisharebest\Webtrees\Http\RequestHandlers;
 
 use Fig\Http\Message\StatusCodeInterface;
 use Fisharebest\Webtrees\Auth;
-use Fisharebest\Webtrees\Exceptions\HttpNotFoundException;
+use Fisharebest\Webtrees\Http\Exceptions\HttpNotFoundException;
 use Fisharebest\Webtrees\Module\DescendancyChartModule;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Services\TreeService;
@@ -45,11 +45,9 @@ class RedirectDescendencyPhp implements RequestHandlerInterface
         3 => 'families',
     ];
 
-    /** @var TreeService */
-    private $tree_service;
+    private DescendancyChartModule $chart;
 
-    /** @var DescendancyChartModule */
-    private $chart;
+    private TreeService $tree_service;
 
     /**
      * @param DescendancyChartModule $chart

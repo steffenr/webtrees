@@ -27,7 +27,6 @@ use Fisharebest\Webtrees\Webtrees;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Throwable;
 
 use function filter_var;
 use function gethostbyaddr;
@@ -43,8 +42,7 @@ class EmailPreferencesPage implements RequestHandlerInterface
 {
     use ViewResponseTrait;
 
-    /** @var EmailService */
-    private $email_service;
+    private EmailService $email_service;
 
     /**
      * AdminSiteController constructor.
@@ -81,11 +79,7 @@ class EmailPreferencesPage implements RequestHandlerInterface
         $DKIM_SELECTOR  = Site::getPreference('DKIM_SELECTOR');
         $DKIM_KEY       = Site::getPreference('DKIM_KEY');
 
-        try {
-            $hostname = gethostbyaddr(gethostbyname(gethostname()));
-        } catch (Throwable $ex) {
-            $hostname = 'localhost';
-        }
+        $hostname = gethostbyaddr(gethostbyname(gethostname() ?: 'localhost'));
 
         // Defaults
         $SMTP_PORT      = $SMTP_PORT ?: '25';

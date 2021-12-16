@@ -35,15 +35,11 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use RuntimeException;
 
 use function addcslashes;
-use function app;
 use function assert;
 use function fclose;
-use function fopen;
 use function pathinfo;
-use function rewind;
 use function strtolower;
 use function tmpfile;
 
@@ -56,17 +52,27 @@ class ExportGedcomClient implements RequestHandlerInterface
 {
     use ViewResponseTrait;
 
-    /** @var GedcomExportService */
-    private $gedcom_export_service;
+    private GedcomExportService $gedcom_export_service;
+
+    private ResponseFactoryInterface $response_factory;
+
+    private StreamFactoryInterface $stream_factory;
 
     /**
      * ExportGedcomServer constructor.
      *
-     * @param GedcomExportService $gedcom_export_service
+     * @param GedcomExportService      $gedcom_export_service
+     * @param ResponseFactoryInterface $response_factory
+     * @param StreamFactoryInterface   $stream_factory
      */
-    public function __construct(GedcomExportService $gedcom_export_service)
-    {
+    public function __construct(
+        GedcomExportService $gedcom_export_service,
+        ResponseFactoryInterface $response_factory,
+        StreamFactoryInterface $stream_factory
+    ) {
         $this->gedcom_export_service = $gedcom_export_service;
+        $this->response_factory = $response_factory;
+        $this->stream_factory = $stream_factory;
     }
 
     /**
@@ -109,26 +115,17 @@ class ExportGedcomClient implements RequestHandlerInterface
         }
 
         if ($zip || $media) {
-            // Export the GEDCOM to an in-memory stream.
-            $tmp_stream = fopen('php://temp', 'wb+');
+            $resource = $this->gedcom_export_service->export($tree, true, $encoding, $access_level, $media_path);
 
-            if ($tmp_stream === false) {
-                throw new RuntimeException('Failed to create temporary stream');
-            }
-
-            $this->gedcom_export_service->export($tree, $tmp_stream, true, $encoding, $access_level, $media_path);
-
-            rewind($tmp_stream);
-
-            $path = $tree->getPreference('MEDIA_DIRECTORY', 'media/');
+            $path = $tree->getPreference('MEDIA_DIRECTORY');
 
             // Create a new/empty .ZIP file
             $temp_zip_file  = stream_get_meta_data(tmpfile())['uri'];
             $zip_provider   = new FilesystemZipArchiveProvider($temp_zip_file, 0755);
             $zip_adapter    = new ZipArchiveAdapter($zip_provider);
             $zip_filesystem = new Filesystem($zip_adapter);
-            $zip_filesystem->writeStream($download_filename, $tmp_stream);
-            fclose($tmp_stream);
+            $zip_filesystem->writeStream($download_filename, $resource);
+            fclose($resource);
 
             if ($media) {
                 $media_filesystem = $tree->mediaFilesystem($data_filesystem);
@@ -150,43 +147,22 @@ class ExportGedcomClient implements RequestHandlerInterface
                 }
             }
 
-            // Use a stream, so that we do not have to load the entire file into memory.
-            $stream_factory = app(StreamFactoryInterface::class);
-            assert($stream_factory instanceof StreamFactoryInterface);
-
-            $http_stream   = $stream_factory->createStreamFromFile($temp_zip_file);
+            $stream   = $this->stream_factory->createStreamFromFile($temp_zip_file);
             $filename = addcslashes($download_filename, '"') . '.zip';
 
-            /** @var ResponseFactoryInterface $response_factory */
-            $response_factory = app(ResponseFactoryInterface::class);
-
-            return $response_factory->createResponse()
-                ->withBody($http_stream)
+            return $this->response_factory->createResponse()
+                ->withBody($stream)
                 ->withHeader('Content-Type', 'application/zip')
                 ->withHeader('Content-Disposition', 'attachment; filename="' . $filename . '"');
         }
 
-        $resource = fopen('php://temp', 'wb+');
-
-        if ($resource === false) {
-            throw new RuntimeException('Failed to create temporary stream');
-        }
-
-        $this->gedcom_export_service->export($tree, $resource, true, $encoding, $access_level, $media_path);
-        rewind($resource);
+        $resource = $this->gedcom_export_service->export($tree, true, $encoding, $access_level, $media_path);
 
         $charset = $convert ? 'ISO-8859-1' : 'UTF-8';
+        $stream  = $this->stream_factory->createStreamFromResource($resource);
 
-        $stream_factory = app(StreamFactoryInterface::class);
-        assert($stream_factory instanceof StreamFactoryInterface);
-
-        $http_stream = $stream_factory->createStreamFromResource($resource);
-
-        /** @var ResponseFactoryInterface $response_factory */
-        $response_factory = app(ResponseFactoryInterface::class);
-
-        return $response_factory->createResponse()
-            ->withBody($http_stream)
+        return $this->response_factory->createResponse()
+            ->withBody($stream)
             ->withHeader('Content-Type', 'text/x-gedcom; charset=' . $charset)
             ->withHeader('Content-Disposition', 'attachment; filename="' . addcslashes($download_filename, '"') . '"');
     }

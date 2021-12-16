@@ -28,12 +28,11 @@ use function redirect;
 use function route;
 
 /**
- * Delete a place location from the control panel.
+ * Delete a location from the control panel.
  */
 class MapDataDelete implements RequestHandlerInterface
 {
-    /** @var MapDataService */
-    private $map_data_service;
+    private MapDataService $map_data_service;
 
     /**
      * Dependency injection.

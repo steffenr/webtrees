@@ -1,6 +1,7 @@
 <?php
 
 use Fisharebest\Webtrees\Auth;
+use Fisharebest\Webtrees\Fact;
 use Fisharebest\Webtrees\Http\RequestHandlers\AddNewFact;
 use Fisharebest\Webtrees\Http\RequestHandlers\DeleteRecord;
 use Fisharebest\Webtrees\Http\RequestHandlers\EditFactPage;
@@ -13,6 +14,8 @@ use Fisharebest\Webtrees\Individual;
 use Illuminate\Support\Collection;
 
 /**
+ * @var bool               $can_upload_media
+ * @var Collection<Fact>   $clipboard_facts
  * @var Individual         $record
  * @var Collection<string> $shares
  */
@@ -20,14 +23,14 @@ use Illuminate\Support\Collection;
 ?>
 
 <div class="dropdown wt-page-menu">
-    <button class="btn btn-primary dropdown-toggle wt-page-menu-button" type="button" id="page-menu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <button class="btn btn-primary dropdown-toggle wt-page-menu-button" type="button" id="page-menu" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         <?= view('icons/menu') ?>
         <?= I18N::translate('edit') ?>
     </button>
 
-    <div class="dropdown-menu dropdown-menu-right wt-page-menu-items" aria-labelledby="page-menu">
+    <div class="dropdown-menu dropdown-menu-end wt-page-menu-items" aria-labelledby="page-menu">
         <?php if ($shares->isNotEmpty()): ?>
-            <button class="dropdown-item"  data-toggle="modal" data-target="#wt-shares-modal">
+            <button class="dropdown-item"  data-bs-toggle="modal" data-bs-target="#wt-shares-modal">
                 <?= view('icons/share') ?>
                 <?= I18N::translate('Share') ?>
             </button>
@@ -86,10 +89,12 @@ use Illuminate\Support\Collection;
 
         <div class="dropdown-divider"></div>
 
-        <a class="dropdown-item" href="<?= e(route(AddNewFact::class, ['tree' => $record->tree()->name(), 'xref' => $record->xref(), 'fact' => 'OBJE'])) ?>">
-            <?= view('icons/add') ?>
-            <?= I18N::translate('Add a media object') ?>
-        </a>
+        <?php if ($can_upload_media) : ?>
+            <a class="dropdown-item" href="<?= e(route(AddNewFact::class, ['tree' => $record->tree()->name(), 'xref' => $record->xref(), 'fact' => 'OBJE'])) ?>">
+                <?= view('icons/add') ?>
+                <?= I18N::translate('Add a media object') ?>
+            </a>
+        <?php endif ?>
 
         <?php if ($record->facts(['OBJE'], false, null, true)->count() > 1) : ?>
             <a class="dropdown-item" href="<?= e(route(ReorderMediaPage::class, ['tree' => $record->tree()->name(), 'xref' => $record->xref()])) ?>">
@@ -103,9 +108,15 @@ use Illuminate\Support\Collection;
             </div>
         <?php endif ?>
 
+        <?php if ($clipboard_facts->isNotEmpty()) : ?>
+            <div class="dropdown-divider"></div>
+
+            <?= view('record-page-menu-clipboard', ['clipboard_facts' => $clipboard_facts, 'record' => $record]) ?>
+        <?php endif ?>
+
         <div class="dropdown-divider"></div>
 
-        <a class="dropdown-item" href="#" data-confirm="<?= I18N::translate('Are you sure you want to delete “%s”?', strip_tags($record->fullName())) ?>" data-post-url="<?= e(route(DeleteRecord::class, ['tree' => $record->tree()->name(), 'xref' => $record->xref()])) ?>">
+        <a class="dropdown-item" href="#" data-wt-confirm="<?= I18N::translate('Are you sure you want to delete “%s”?', strip_tags($record->fullName())) ?>" data-wt-post-url="<?= e(route(DeleteRecord::class, ['tree' => $record->tree()->name(), 'xref' => $record->xref()])) ?>">
             <?= view('icons/delete') ?>
             <?= I18N::translate('Delete') ?>
         </a>

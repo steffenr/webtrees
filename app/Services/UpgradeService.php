@@ -21,23 +21,38 @@ namespace Fisharebest\Webtrees\Services;
 
 use Fig\Http\Message\StatusCodeInterface;
 use Fisharebest\Webtrees\Carbon;
-use Fisharebest\Webtrees\Exceptions\HttpServerErrorException;
+use Fisharebest\Webtrees\Http\Exceptions\HttpServerErrorException;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Site;
 use Fisharebest\Webtrees\Webtrees;
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Collection;
 use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemOperator;
+use League\Flysystem\FilesystemReader;
 use League\Flysystem\StorageAttributes;
 use League\Flysystem\UnableToDeleteFile;
 use League\Flysystem\ZipArchive\FilesystemZipArchiveProvider;
 use League\Flysystem\ZipArchive\ZipArchiveAdapter;
+use RuntimeException;
 use ZipArchive;
 
+use function explode;
+use function fclose;
+use function file_exists;
+use function file_put_contents;
+use function fopen;
+use function ftell;
+use function fwrite;
 use function rewind;
+use function strlen;
+use function unlink;
+use function version_compare;
+
+use const DIRECTORY_SEPARATOR;
+use const PHP_VERSION;
 
 /**
  * Automatic upgrades.
@@ -64,8 +79,7 @@ class UpgradeService
     // If the update server doesn't respond after this time, give up.
     private const HTTP_TIMEOUT = 3.0;
 
-    /** @var TimeoutService */
-    private $timeout_service;
+    private TimeoutService $timeout_service;
 
     /**
      * UpgradeService constructor.
@@ -112,7 +126,7 @@ class UpgradeService
         $zip_adapter    = new ZipArchiveAdapter($zip_provider, 'webtrees');
         $zip_filesystem = new Filesystem($zip_adapter);
 
-        $files = $zip_filesystem->listContents('', Filesystem::LIST_DEEP)
+        $files = $zip_filesystem->listContents('', FilesystemReader::LIST_DEEP)
             ->filter(static function (StorageAttributes $attributes): bool {
                 return $attributes->isFile();
             })
@@ -132,12 +146,13 @@ class UpgradeService
      * @param string             $path
      *
      * @return int The number of bytes downloaded
+     * @throws GuzzleException
      * @throws FilesystemException
      */
     public function downloadFile(string $url, FilesystemOperator $filesystem, string $path): int
     {
         // We store the data in PHP temporary storage.
-        $tmp = fopen('php://temp', 'wb+');
+        $tmp = fopen('php://memory', 'wb+');
 
         // Read from the URL
         $client   = new Client();
@@ -146,16 +161,21 @@ class UpgradeService
 
         // Download the file to temporary storage.
         while (!$stream->eof()) {
-            fwrite($tmp, $stream->read(self::READ_BLOCK_SIZE));
+            $data = $stream->read(self::READ_BLOCK_SIZE);
+
+            $bytes_written = fwrite($tmp, $data);
+
+            if ($bytes_written !== strlen($data)) {
+                throw new RuntimeException('Unable to write to stream.  Perhaps the disk is full?');
+            }
 
             if ($this->timeout_service->isTimeNearlyUp()) {
+                $stream->close();
                 throw new HttpServerErrorException(I18N::translate('The server’s time limit has been reached.'));
             }
         }
 
-        if (is_resource($stream)) {
-            fclose($stream);
-        }
+        $stream->close();
 
         // Copy from temporary storage to the file.
         $bytes = ftell($tmp);
@@ -177,7 +197,7 @@ class UpgradeService
      */
     public function moveFiles(FilesystemOperator $source, FilesystemOperator $destination): void
     {
-        foreach ($source->listContents('', Filesystem::LIST_DEEP) as $attributes) {
+        foreach ($source->listContents('', FilesystemReader::LIST_DEEP) as $attributes) {
             if ($attributes->isFile()) {
                 $destination->write($attributes->path(), $source->read($attributes->path()));
                 $source->delete($attributes->path());
@@ -202,7 +222,7 @@ class UpgradeService
     {
         foreach ($folders_to_clean as $folder_to_clean) {
             try {
-                foreach ($filesystem->listContents($folder_to_clean, Filesystem::LIST_DEEP) as $path) {
+                foreach ($filesystem->listContents($folder_to_clean, FilesystemReader::LIST_DEEP) as $path) {
                     if ($path['type'] === 'file' && !$files_to_keep->contains($path['path'])) {
                         try {
                             $filesystem->delete($path['path']);
@@ -279,7 +299,7 @@ class UpgradeService
      * Fetching the remote file can be slow, so check infrequently, and cache the result.
      * Pass the current versions of webtrees, PHP and MySQL, as the response
      * may be different for each. The server logs are used to generate
-     * installation statistics which can be found at http://dev.webtrees.net/statistics.html
+     * installation statistics which can be found at https://dev.webtrees.net/statistics.html
      *
      * @return string
      */
@@ -303,7 +323,7 @@ class UpgradeService
                     Site::setPreference('LATEST_WT_VERSION', $response->getBody()->getContents());
                     Site::setPreference('LATEST_WT_VERSION_TIMESTAMP', (string) $current_timestamp);
                 }
-            } catch (RequestException $ex) {
+            } catch (GuzzleException $ex) {
                 // Can't connect to the server?
                 // Use the existing information about latest versions.
             }

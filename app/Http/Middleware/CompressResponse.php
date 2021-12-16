@@ -31,7 +31,6 @@ use function gzdeflate;
 use function gzencode;
 use function in_array;
 use function str_contains;
-use function strlen;
 use function strstr;
 use function strtolower;
 use function strtr;
@@ -51,8 +50,7 @@ class CompressResponse implements MiddlewareInterface
         'image/svg+xml',
     ];
 
-    /** @var StreamFactoryInterface */
-    protected $stream_factory;
+    protected StreamFactoryInterface $stream_factory;
 
     /**
      * CompressResponse constructor.
@@ -98,7 +96,6 @@ class CompressResponse implements MiddlewareInterface
             return $response
                 ->withBody($stream)
                 ->withHeader('content-encoding', $method)
-                ->withHeader('content-length', (string) strlen($content))
                 ->withHeader('vary', 'accept-encoding');
         }
 

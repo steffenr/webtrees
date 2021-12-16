@@ -5,7 +5,6 @@ use Fisharebest\Webtrees\Functions\FunctionsPrintFacts;
 use Fisharebest\Webtrees\Http\RequestHandlers\AddNewFact;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
-use Fisharebest\Webtrees\View;
 use Illuminate\Support\Collection;
 
 /**
@@ -22,7 +21,7 @@ use Illuminate\Support\Collection;
         <tr>
             <td colspan="2">
                 <label>
-                    <input id="show-level-2-notes" type="checkbox" data-toggle="collapse" data-target=".wt-level-two-note">
+                    <input id="show-level-2-notes" type="checkbox" data-bs-toggle="collapse" data-bs-target=".wt-level-two-note" data-wt-persist="level-two-notes">
                     <?= I18N::translate('Show all notes') ?>
                 </label>
             </td>
@@ -44,8 +43,6 @@ use Illuminate\Support\Collection;
         <?php endif ?>
 
         <?php if ($can_edit) : ?>
-            <?= view('edit/paste-fact-row', ['record' => $individual, 'facts' => $clipboard_facts]) ?>
-
             <tr>
                 <th scope="row">
                     <?= I18N::translate('Note') ?>
@@ -59,11 +56,3 @@ use Illuminate\Support\Collection;
         <?php endif ?>
     </table>
 </div>
-
-<?php View::push('javascript') ?>
-<script>
-  'use strict';
-
-  webtrees.persistentToggle("show-level-2-notes");
-</script>
-<?php View::endpush() ?>

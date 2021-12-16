@@ -19,36 +19,36 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Services;
 
+use Fisharebest\Webtrees\Exceptions\FileUploadException;
 use Fisharebest\Webtrees\FlashMessages;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Tree;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Query\Expression;
+use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
-use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemOperator;
+use League\Flysystem\FilesystemReader;
 use League\Flysystem\StorageAttributes;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Message\UploadedFileInterface;
 use RuntimeException;
 
 use function array_combine;
 use function array_diff;
+use function array_intersect;
 use function assert;
 use function dirname;
+use function explode;
 use function ini_get;
 use function intdiv;
 use function min;
 use function pathinfo;
-use function preg_replace;
 use function sha1;
 use function sort;
 use function str_contains;
-use function str_ends_with;
-use function str_starts_with;
 use function strtolower;
 use function strtr;
 use function substr;
@@ -62,19 +62,21 @@ use const UPLOAD_ERR_OK;
  */
 class MediaFileService
 {
-    public const EDIT_RESTRICTIONS = [
-        'locked',
-    ];
-
-    public const PRIVACY_RESTRICTIONS = [
-        'none',
-        'privacy',
-        'confidential',
-    ];
-
     public const EXTENSION_TO_FORM = [
         'jpeg' => 'jpg',
         'tiff' => 'tif',
+    ];
+
+    private const IGNORE_FOLDERS = [
+        // Old versions of webtrees
+        'thumbs',
+        'watermarks',
+        // Windows
+        'Thumbs.db',
+        // Synology
+        '@eaDir',
+        // QNAP,
+        '.@__thumb',
     ];
 
     /**
@@ -82,10 +84,10 @@ class MediaFileService
      */
     public function maxUploadFilesize(): string
     {
-        $sizePostMax = $this->parseIniFileSize(ini_get('post_max_size'));
-        $sizeUploadMax = $this->parseIniFileSize(ini_get('upload_max_filesize'));
+        $sizePostMax   = $this->parseIniFileSize((string) ini_get('post_max_size'));
+        $sizeUploadMax = $this->parseIniFileSize((string) ini_get('upload_max_filesize'));
 
-        $bytes =  min($sizePostMax, $sizeUploadMax);
+        $bytes = min($sizePostMax, $sizeUploadMax);
         $kb    = intdiv($bytes + 1023, 1024);
 
         return I18N::translate('%s KB', I18N::number($kb));
@@ -134,8 +136,8 @@ class MediaFileService
             ->pluck('multimedia_file_refn')
             ->all();
 
-        $media_filesystem = $disk_files = $tree->mediaFilesystem($data_filesystem);
-        $disk_files       = $this->allFilesOnDisk($media_filesystem, '', Filesystem::LIST_DEEP)->all();
+        $media_filesystem = $tree->mediaFilesystem($data_filesystem);
+        $disk_files       = $this->allFilesOnDisk($media_filesystem, '', FilesystemReader::LIST_DEEP)->all();
         $unused_files     = array_diff($disk_files, $used_files);
 
         sort($unused_files);
@@ -187,10 +189,10 @@ class MediaFileService
                 $auto     = $params['auto'];
                 $new_file = $params['new_file'];
 
-                /** @var UploadedFileInterface|null $uploaded_file */
-                $uploaded_file = $request->getUploadedFiles()['file'];
+                $uploaded_file = $request->getUploadedFiles()['file'] ?? null;
+
                 if ($uploaded_file === null || $uploaded_file->getError() !== UPLOAD_ERR_OK) {
-                    return '';
+                    throw new FileUploadException($uploaded_file);
                 }
 
                 // The filename
@@ -239,10 +241,6 @@ class MediaFileService
      */
     public function createMediaFileGedcom(string $file, string $type, string $title, string $note): string
     {
-        // Tidy non-printing characters
-        $type  = trim(preg_replace('/\s+/', ' ', $type));
-        $title = trim(preg_replace('/\s+/', ' ', $title));
-
         $gedcom = '1 FILE ' . $file;
 
         $format = strtolower(pathinfo($file, PATHINFO_EXTENSION));
@@ -282,13 +280,11 @@ class MediaFileService
     public function allFilesOnDisk(FilesystemOperator $filesystem, string $folder, bool $subfolders): Collection
     {
         try {
-            $files = $filesystem->listContents($folder, $subfolders)
-                ->filter(function (StorageAttributes $attributes): bool {
-                    return $attributes->isFile() && !$this->isLegacyFolder($attributes->path());
-                })
-                ->map(static function (StorageAttributes $attributes): string {
-                    return $attributes->path();
-                })
+            $files = $filesystem
+                ->listContents($folder, $subfolders)
+                ->filter(fn (StorageAttributes $attributes): bool => $attributes->isFile())
+                ->filter(fn (StorageAttributes $attributes): bool => !$this->ignorePath($attributes->path()))
+                ->map(fn (StorageAttributes $attributes): string => $attributes->path())
                 ->toArray();
         } catch (FilesystemException $ex) {
             $files = [];
@@ -325,6 +321,26 @@ class MediaFileService
     }
 
     /**
+     * Generate a list of all folders used by a tree.
+     *
+     * @param Tree $tree
+     *
+     * @return Collection<string>
+     * @throws FilesystemException
+     */
+    public function mediaFolders(Tree $tree): Collection
+    {
+        $folders = Registry::filesystem()->media($tree)
+            ->listContents('', FilesystemReader::LIST_DEEP)
+            ->filter(fn (StorageAttributes $attributes): bool => $attributes->isDir())
+            ->filter(fn (StorageAttributes $attributes): bool => !$this->ignorePath($attributes->path()))
+            ->map(fn (StorageAttributes $attributes): string => $attributes->path())
+            ->toArray();
+
+        return new Collection($folders);
+    }
+
+    /**
      * Generate a list of all folders in either the database or the filesystem.
      *
      * @param FilesystemOperator $data_filesystem
@@ -335,32 +351,37 @@ class MediaFileService
     public function allMediaFolders(FilesystemOperator $data_filesystem): Collection
     {
         $db_folders = DB::table('media_file')
-            ->join('gedcom_setting', 'gedcom_id', '=', 'm_file')
-            ->where('setting_name', '=', 'MEDIA_DIRECTORY')
+            ->leftJoin('gedcom_setting', static function (JoinClause $join): void {
+                $join
+                    ->on('gedcom_id', '=', 'm_file')
+                    ->where('setting_name', '=', 'MEDIA_DIRECTORY');
+            })
             ->where('multimedia_file_refn', 'NOT LIKE', 'http://%')
             ->where('multimedia_file_refn', 'NOT LIKE', 'https://%')
-            ->select(new Expression('setting_value || multimedia_file_refn AS path'))
+            ->select(new Expression("COALESCE(setting_value, 'media/') || multimedia_file_refn AS path"))
             ->pluck('path')
             ->map(static function (string $path): string {
                 return dirname($path) . '/';
             });
 
-        $media_roots = DB::table('gedcom_setting')
-            ->where('setting_name', '=', 'MEDIA_DIRECTORY')
-            ->where('gedcom_id', '>', '0')
-            ->pluck('setting_value')
+        $media_roots = DB::table('gedcom')
+            ->leftJoin('gedcom_setting', static function (JoinClause $join): void {
+                $join
+                    ->on('gedcom.gedcom_id', '=', 'gedcom_setting.gedcom_id')
+                    ->where('setting_name', '=', 'MEDIA_DIRECTORY');
+            })
+            ->where('gedcom.gedcom_id', '>', '0')
+            ->pluck(new Expression("COALESCE(setting_value, 'media/')"))
             ->uniqueStrict();
 
         $disk_folders = new Collection($media_roots);
 
         foreach ($media_roots as $media_folder) {
-            $tmp = $data_filesystem->listContents($media_folder, Filesystem::LIST_DEEP)
-                ->filter(function (StorageAttributes $attributes): bool {
-                    return $attributes->isDir() && !$this->isLegacyFolder($attributes->path());
-                })
-                ->map(static function (StorageAttributes $attributes): string {
-                    return $attributes->path() . '/';
-                })
+            $tmp = $data_filesystem
+                ->listContents($media_folder, FilesystemReader::LIST_DEEP)
+                ->filter(fn (StorageAttributes $attributes): bool => $attributes->isDir())
+                ->filter(fn (StorageAttributes $attributes): bool => !$this->ignorePath($attributes->path()))
+                ->map(fn (StorageAttributes $attributes): string => $attributes->path() . '/')
                 ->toArray();
 
             $disk_folders = $disk_folders->concat($tmp);
@@ -374,20 +395,14 @@ class MediaFileService
     }
 
     /**
-     * Some special media folders were created by earlier versions of webtrees.
+     * Ignore special media folders.
      *
      * @param string $path
      *
      * @return bool
      */
-    private function isLegacyFolder(string $path): bool
+    private function ignorePath(string $path): bool
     {
-        return
-            str_starts_with($path, 'thumbs/') ||
-            str_contains($path, '/thumbs/') ||
-            str_ends_with($path, '/thumbs') ||
-            str_starts_with($path, 'watermarks/') ||
-            str_contains($path, '/watermarks/') ||
-            str_ends_with($path, '/watermarks');
+        return array_intersect(self::IGNORE_FOLDERS, explode('/', $path)) !== [];
     }
 }

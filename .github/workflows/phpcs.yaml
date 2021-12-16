@@ -4,10 +4,20 @@ on: [push, pull_request]
 
 jobs:
   run:
-    runs-on: ubuntu-latest
+    if: ${{ !startsWith(github.event.head_commit.message, 'Translation:') }}
+    runs-on: ${{ matrix.operating-system }}
     name: PHP/PHTML/CSS
 
+    strategy:
+      matrix:
+        operating-system: ['ubuntu-latest']
+        php-version: ['8.1']
+
     steps:
+      - uses: shivammathur/setup-php@master
+        with:
+          php-version: ${{ matrix.php-version }}
+
       - uses: actions/checkout@v2
 
       - run: composer validate

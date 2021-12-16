@@ -19,31 +19,30 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Services;
 
-use Exception;
 use Fisharebest\Webtrees\Contracts\UserInterface;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Log;
 use Fisharebest\Webtrees\Site;
-use Fisharebest\Webtrees\SiteUser;
 use Psr\Http\Message\ServerRequestInterface;
-use Swift_Mailer;
-use Swift_Message;
-use Swift_NullTransport;
-use Swift_SendmailTransport;
-use Swift_Signers_DKIMSigner;
-use Swift_SmtpTransport;
-use Swift_Transport;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\Mailer\Transport\NullTransport;
+use Symfony\Component\Mailer\Transport\SendmailTransport;
+use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
+use Symfony\Component\Mailer\Transport\TransportInterface;
+use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Crypto\DkimOptions;
+use Symfony\Component\Mime\Crypto\DkimSigner;
+use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Exception\RfcComplianceException;
+use Symfony\Component\Mime\Message;
 
 use function assert;
 use function checkdnsrr;
-use function filter_var;
 use function function_exists;
 use function str_replace;
 use function strrchr;
 use function substr;
-
-use const FILTER_VALIDATE_DOMAIN;
-use const FILTER_VALIDATE_EMAIL;
 
 /**
  * Send emails.
@@ -65,38 +64,12 @@ class EmailService
      */
     public function send(UserInterface $from, UserInterface $to, UserInterface $reply_to, string $subject, string $message_text, string $message_html): bool
     {
-        // Mail needs MS-DOS line endings
-        $message_text = str_replace("\n", "\r\n", $message_text);
-        $message_html = str_replace("\n", "\r\n", $message_html);
-
         try {
-            $message = (new Swift_Message())
-                ->setSubject($subject)
-                ->setFrom($from->email(), $from->realName())
-                ->setTo($to->email(), $to->realName())
-                ->setReplyTo($reply_to->email(), $reply_to->realName())
-                ->setBody($message_html, 'text/html');
-
-            $dkim_domain   = Site::getPreference('DKIM_DOMAIN');
-            $dkim_selector = Site::getPreference('DKIM_SELECTOR');
-            $dkim_key      = Site::getPreference('DKIM_KEY');
-
-            if ($dkim_domain !== '' && $dkim_selector !== '' && $dkim_key !== '') {
-                $signer = new Swift_Signers_DKIMSigner($dkim_key, $dkim_domain, $dkim_selector);
-                $signer
-                    ->setHeaderCanon('relaxed')
-                    ->setBodyCanon('relaxed');
-
-                $message->attachSigner($signer);
-            } else {
-                // DKIM body hashes don't work with multipart/alternative content.
-                $message->addPart($message_text, 'text/plain');
-            }
-
-            $mailer = new Swift_Mailer($this->transport());
-
+            $message   = $this->message($from, $to, $reply_to, $subject, $message_text, $message_html);
+            $transport = $this->transport();
+            $mailer    = new Mailer($transport);
             $mailer->send($message);
-        } catch (Exception $ex) {
+        } catch (TransportExceptionInterface $ex) {
             Log::addErrorLog('MailService: ' . $ex->getMessage());
 
             return false;
@@ -106,11 +79,55 @@ class EmailService
     }
 
     /**
+     * Create a message
+     *
+     * @param UserInterface $from
+     * @param UserInterface $to
+     * @param UserInterface $reply_to
+     * @param string        $subject
+     * @param string        $message_text
+     * @param string        $message_html
+     *
+     * @return Message
+     */
+    protected function message(UserInterface $from, UserInterface $to, UserInterface $reply_to, string $subject, string $message_text, string $message_html): Message
+    {
+        // Mail needs MS-DOS line endings
+        $message_text = str_replace("\n", "\r\n", $message_text);
+        $message_html = str_replace("\n", "\r\n", $message_html);
+
+        $message = (new Email())
+            ->subject($subject)
+            ->from(new Address($from->email(), $from->realName()))
+            ->to(new Address($to->email(), $to->realName()))
+            ->replyTo(new Address($reply_to->email(), $reply_to->realName()))
+            ->html($message_html);
+
+        $dkim_domain   = Site::getPreference('DKIM_DOMAIN');
+        $dkim_selector = Site::getPreference('DKIM_SELECTOR');
+        $dkim_key      = Site::getPreference('DKIM_KEY');
+
+        if ($dkim_domain !== '' && $dkim_selector !== '' && $dkim_key !== '') {
+            $signer = new DkimSigner($dkim_key, $dkim_domain, $dkim_selector);
+            $options = (new DkimOptions())
+                ->headerCanon('relaxed')
+                ->bodyCanon('relaxed');
+
+            return $signer->sign($message, $options->toArray());
+        }
+
+        // DKIM body hashes don't work with multipart/alternative content.
+        $message->text($message_text);
+
+        return $message;
+    }
+
+    /**
      * Create a transport mechanism for sending mail
      *
-     * @return Swift_Transport
+     * @return TransportInterface
      */
-    protected function transport(): Swift_Transport
+    protected function transport(): TransportInterface
     {
         switch (Site::getPreference('SMTP_ACTIVE')) {
             case 'sendmail':
@@ -120,23 +137,19 @@ class EmailService
 
                 $sendmail_command = $request->getAttribute('sendmail_command', '/usr/sbin/sendmail -bs');
 
-                return new Swift_SendmailTransport($sendmail_command);
+                return new SendmailTransport($sendmail_command);
 
             case 'external':
                 // SMTP
                 $smtp_helo = Site::getPreference('SMTP_HELO');
                 $smtp_host = Site::getPreference('SMTP_HOST');
-                $smtp_port = (int) Site::getPreference('SMTP_PORT', '25');
+                $smtp_port = (int) Site::getPreference('SMTP_PORT');
                 $smtp_auth = (bool) Site::getPreference('SMTP_AUTH');
                 $smtp_user = Site::getPreference('SMTP_AUTH_USER');
                 $smtp_pass = Site::getPreference('SMTP_AUTH_PASS');
-                $smtp_encr = Site::getPreference('SMTP_SSL');
+                $smtp_encr = Site::getPreference('SMTP_SSL') === 'ssl';
 
-                if ($smtp_encr === 'none') {
-                    $smtp_encr = null;
-                }
-
-                $transport = new Swift_SmtpTransport($smtp_host, $smtp_port, $smtp_encr);
+                $transport = new EsmtpTransport($smtp_host, $smtp_port, $smtp_encr);
 
                 $transport->setLocalDomain($smtp_helo);
 
@@ -150,7 +163,7 @@ class EmailService
 
             default:
                 // For testing
-                return new Swift_NullTransport();
+                return new NullTransport();
         }
     }
 
@@ -163,23 +176,19 @@ class EmailService
      */
     public function isValidEmail(string $email): bool
     {
-        $at_domain = strrchr($email, '@');
-
-        if ($at_domain === false) {
+        try {
+            $address = new Address($email);
+        } catch (RfcComplianceException $ex) {
             return false;
         }
 
-        $domain = substr($at_domain, 1);
-
-        $email_valid  = filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
-        $domain_valid = filter_var($domain, FILTER_VALIDATE_DOMAIN) !== false;
-
         // Some web hosts disable checkdnsrr.
-        if ($domain_valid && function_exists('checkdnsrr')) {
-            $domain_valid = checkdnsrr($domain);
+        if (function_exists('checkdnsrr')) {
+            $domain = substr(strrchr($address->getAddress(), '@') ?: '@', 1);
+            return checkdnsrr($domain);
         }
 
-        return $email_valid && $domain_valid;
+        return true;
     }
 
     /**
@@ -191,10 +200,10 @@ class EmailService
     {
         return [
             'none' => I18N::translate('none'),
-            /* I18N: Secure Sockets Layer - a secure communications protocol*/
-            'ssl'  => I18N::translate('ssl'),
-            /* I18N: Transport Layer Security - a secure communications protocol */
-            'tls'  => I18N::translate('tls'),
+            /* I18N: Use SMTP over SSL/TLS, or Implicit TLS - a secure communications protocol */
+            'ssl'  => I18N::translate('SSL/TLS'),
+            /* I18N: Use SMTP with STARTTLS, or Explicit TLS - a secure communications protocol */
+            'tls'  => I18N::translate('STARTTLS'),
         ];
     }
 

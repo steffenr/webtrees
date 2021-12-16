@@ -49,21 +49,26 @@ class CreateRepositoryAction implements RequestHandlerInterface
         assert($tree instanceof Tree);
 
         $params              = (array) $request->getParsedBody();
-        $name                = $params['repository-name'];
-        $privacy_restriction = $params['privacy-restriction'];
-        $edit_restriction    = $params['edit-restriction'];
+        $name                = $params['name'];
+        $address             = $params['address'];
+        $url                 = $params['url'];
+        $restriction = $params['restriction'];
 
         // Fix non-printing characters
         $name = trim(preg_replace('/\s+/', ' ', $name));
 
         $gedcom = "0 @@ REPO\n1 NAME " . $name;
 
-        if (in_array($privacy_restriction, ['none', 'privacy', 'confidential'], true)) {
-            $gedcom .= "\n1 RESN " . $privacy_restriction;
+        if ($address !== '') {
+            $gedcom .= "\n1 ADDR " . strtr($address, ["\r\n" => "\n2 CONT "]);
         }
 
-        if ($edit_restriction === 'locked') {
-            $gedcom .= "\n1 RESN " . $edit_restriction;
+        if ($url !== '') {
+            $gedcom .= "\n1 WWW " . $url;
+        }
+
+        if (in_array($restriction, ['none', 'privacy', 'confidential', 'locked'], true)) {
+            $gedcom .= "\n1 RESN " . $restriction;
         }
 
         $record = $tree->createRecord($gedcom);

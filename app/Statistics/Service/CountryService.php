@@ -548,13 +548,14 @@ class CountryService
     /**
      * ISO3166 3 letter codes, with their 2 letter equivalent.
      * NOTE: this is not 1:1. ENG/SCO/WAL/NIR => GB
-     * NOTE: this also includes champman codes and others. Should it?
+     * NOTE: this also includes chapman codes and others. Should it?
      *
      * @return array<string>
      */
     public function iso3166(): array
     {
         return [
+            'GBR' => 'GB', // Must come before ENG, NIR, SCT and WLS
             'ABW' => 'AW',
             'AFG' => 'AF',
             'AGO' => 'AO',
@@ -632,7 +633,6 @@ class CountryService
             'FRO' => 'FO',
             'FSM' => 'FM',
             'GAB' => 'GA',
-            'GBR' => 'GB',
             'GEO' => 'GE',
             'GHA' => 'GH',
             'GIB' => 'GI',
@@ -665,7 +665,7 @@ class CountryService
             'ITA' => 'IT',
             'JAM' => 'JM',
             'JOR' => 'JO',
-            'JPN' => 'JA',
+            'JPN' => 'JP',
             'KAZ' => 'KZ',
             'KEN' => 'KE',
             'KGZ' => 'KG',

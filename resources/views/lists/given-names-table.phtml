@@ -15,9 +15,9 @@ use Fisharebest\Webtrees\I18N;
     data-info="false"
     data-paging="false"
     data-searching="false"
-    data-order="<?= e(json_encode($order ?? [[1, 'desc']])) ?>"
+    data-order="<?= e(json_encode($order ?? [[1, 'desc']], JSON_THROW_ON_ERROR)) ?>"
 >
-    <caption class="sr-only">
+    <caption class="visually-hidden">
         <?= I18N::translate('Given names') ?>
     </caption>
     <thead>

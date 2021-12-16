@@ -23,7 +23,6 @@ use Aura\Router\Route;
 use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Contracts\UserInterface;
 use Fisharebest\Webtrees\Fact;
-use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Gedcom;
 use Fisharebest\Webtrees\Http\RequestHandlers\AccountEdit;
 use Fisharebest\Webtrees\Http\RequestHandlers\ControlPanel;
@@ -41,6 +40,7 @@ use Fisharebest\Webtrees\Http\RequestHandlers\UserPageEdit;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\Menu;
+use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Services\ModuleService;
 use Fisharebest\Webtrees\Tree;
 use Psr\Http\Message\ServerRequestInterface;
@@ -124,7 +124,7 @@ trait ModuleThemeTrait
      *
      * @param Individual $individual
      *
-     * @return Menu[]
+     * @return array<Menu>
      */
     public function individualBoxMenu(Individual $individual): array
     {
@@ -139,7 +139,7 @@ trait ModuleThemeTrait
      *
      * @param Individual $individual
      *
-     * @return Menu[]
+     * @return array<Menu>
      */
     public function individualBoxMenuCharts(Individual $individual): array
     {
@@ -163,7 +163,7 @@ trait ModuleThemeTrait
      *
      * @param Individual $individual
      *
-     * @return Menu[]
+     * @return array<Menu>
      */
     public function individualBoxMenuFamilyLinks(Individual $individual): array
     {
@@ -244,7 +244,7 @@ trait ModuleThemeTrait
             $language_tag = $active_locale->languageTag();
             $class        = 'menu-language-' . $language_tag . (I18N::languageTag() === $language_tag ? ' active' : '');
             $menu->addSubmenu(new Menu($active_locale->endonym(), '#', $class, [
-                'data-post-url' => route(SelectLanguage::class, ['language' => $language_tag]),
+                'data-wt-post-url' => route(SelectLanguage::class, ['language' => $language_tag]),
             ]));
         }
 
@@ -281,7 +281,7 @@ trait ModuleThemeTrait
         }
 
         // Stay on the same tree page
-        $url  = route(LoginPage::class, ['tree' => $tree instanceof Tree ? $tree->name() : null, 'url' => $redirect]);
+        $url = route(LoginPage::class, ['tree' => $tree instanceof Tree ? $tree->name() : null, 'url' => $redirect]);
 
         return new Menu(I18N::translate('Sign in'), $url, 'menu-login', ['rel' => 'nofollow']);
     }
@@ -295,8 +295,8 @@ trait ModuleThemeTrait
     {
         if (Auth::check()) {
             $parameters = [
-                'data-post-url'   => route(Logout::class),
-                'data-reload-url' => route(HomePage::class)
+                'data-wt-post-url'   => route(Logout::class),
+                'data-wt-reload-url' => route(HomePage::class)
             ];
 
             return new Menu(I18N::translate('Sign out'), '#', 'menu-logout', $parameters);
@@ -385,22 +385,23 @@ trait ModuleThemeTrait
      */
     public function menuMyPedigree(Tree $tree): ?Menu
     {
-        $gedcomid = $tree->getUserPreference(Auth::user(), UserInterface::PREF_TREE_ACCOUNT_XREF);
+        $my_xref = $tree->getUserPreference(Auth::user(), UserInterface::PREF_TREE_ACCOUNT_XREF);
 
         $pedigree_chart = app(ModuleService::class)->findByComponent(ModuleChartInterface::class, $tree, Auth::user())
-            ->filter(static function (ModuleInterface $module): bool {
+            ->first(static function (ModuleInterface $module): bool {
                 return $module instanceof PedigreeChartModule;
             });
 
-        if ($gedcomid !== '' && $pedigree_chart instanceof PedigreeChartModule) {
-            return new Menu(
-                I18N::translate('My pedigree'),
-                route('pedigree', [
-                    'xref' => $gedcomid,
-                    'tree'  => $tree->name(),
-                ]),
-                'menu-mypedigree'
-            );
+        if ($my_xref !== '' && $pedigree_chart instanceof PedigreeChartModule) {
+            $individual = Registry::individualFactory()->make($my_xref, $tree);
+
+            if ($individual instanceof Individual) {
+                return new Menu(
+                    I18N::translate('My pedigree'),
+                    $pedigree_chart->chartUrl($individual),
+                    'menu-mypedigree'
+                );
+            }
         }
 
         return null;
@@ -444,7 +445,7 @@ trait ModuleThemeTrait
                 $class      = 'menu-theme-' . $theme->name() . ($active ? ' active' : '');
 
                 return new Menu($theme->title(), '#', $class, [
-                    'data-post-url' => route(SelectTheme::class, ['theme' => $theme->name()]),
+                    'data-wt-post-url' => route(SelectTheme::class, ['theme' => $theme->name()]),
                 ]);
             });
 
@@ -455,23 +456,11 @@ trait ModuleThemeTrait
     }
 
     /**
-     * Miscellaneous dimensions, fonts, styles, etc.
-     *
-     * @param string $parameter_name
-     *
-     * @return string|int|float
-     */
-    public function parameter($parameter_name)
-    {
-        return '';
-    }
-
-    /**
      * Generate a list of items for the main menu.
      *
      * @param Tree|null $tree
      *
-     * @return Menu[]
+     * @return array<Menu>
      */
     public function genealogyMenu(?Tree $tree): array
     {
@@ -490,7 +479,7 @@ trait ModuleThemeTrait
     /**
      * Create the genealogy menu.
      *
-     * @param Menu[] $menus
+     * @param array<Menu> $menus
      *
      * @return string
      */
@@ -506,7 +495,7 @@ trait ModuleThemeTrait
      *
      * @param Tree|null $tree
      *
-     * @return Menu[]
+     * @return array<Menu>
      */
     public function userMenu(?Tree $tree): array
     {

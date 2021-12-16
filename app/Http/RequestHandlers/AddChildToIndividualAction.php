@@ -23,6 +23,7 @@ use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Services\GedcomEditService;
 use Fisharebest\Webtrees\Tree;
+use Fisharebest\Webtrees\Validator;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -36,8 +37,7 @@ use function redirect;
  */
 class AddChildToIndividualAction implements RequestHandlerInterface
 {
-    /** @var GedcomEditService */
-    private $gedcom_edit_service;
+    private GedcomEditService $gedcom_edit_service;
 
     /**
      * AddChildToFamilyAction constructor.
@@ -86,6 +86,9 @@ class AddChildToIndividualAction implements RequestHandlerInterface
         // Link the child to the family
         $child->createFact('1 FAMC @' . $family->xref() . '@', false);
 
-        return redirect($params['url'] ?? $child->url());
+        $base_url = $request->getAttribute('base_url');
+        $url      = Validator::parsedBody($request)->isLocalUrl($base_url)->string('url') ?? $child->url();
+
+        return redirect($url);
     }
 }

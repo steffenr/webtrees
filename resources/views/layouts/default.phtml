@@ -2,7 +2,10 @@
 
 use Fisharebest\Webtrees\DebugBar;
 use Fisharebest\Webtrees\FlashMessages;
+use Fisharebest\Webtrees\Http\RequestHandlers\AppleTouchIconPng;
+use Fisharebest\Webtrees\Http\RequestHandlers\BrowserconfigXml;
 use Fisharebest\Webtrees\Http\RequestHandlers\SearchQuickAction;
+use Fisharebest\Webtrees\Http\RequestHandlers\WebmanifestJson;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Module\ModuleFooterInterface;
 use Fisharebest\Webtrees\Module\ModuleGlobalInterface;
@@ -39,20 +42,15 @@ use Psr\Http\Message\ServerRequestInterface;
             <?php endif ?>
         </title>
 
+        <!--iOS-->
+        <link rel="apple-touch-icon" sizes="180x180" href="<?= e(route(AppleTouchIconPng::class)) ?>">
         <!--Generic favicons-->
         <link rel="icon" sizes="32x32" href="<?= e(asset('favicon-32.png')) ?>">
-        <link rel="icon" sizes="128x128" href="<?= e(asset('favicon-128.png')) ?>">
         <link rel="icon" sizes="192x192" href="<?= e(asset('favicon-192.png')) ?>">
-        <!--Android-->
-        <link rel="shortcut icon" sizes="196x196" href="<?= e(asset('favicon-196.png')) ?>">
-        <!--iPad-->
-        <link rel="apple-touch-icon" sizes="152x152" href="<?= e(asset('favicon-152.png')) ?>">
-        <!--iPhone-->
-        <link rel="apple-touch-icon" sizes="180x180" href="<?= e(asset('favicon-180.png')) ?>">
         <!--IE11/Edge-->
-        <meta name="msapplication-config" content="<?= e(asset('browserconfig.xml')) ?>">
+        <meta name="msapplication-config" content="<?= e(route(BrowserconfigXml::class)) ?>">
 
-        <link rel="manifest" href="<?= e(asset('site.webmanifest')) ?>">
+        <link rel="manifest" href="<?= e(route(WebmanifestJson::class)) ?>">
 
         <link rel="stylesheet" href="<?= e(asset('css/vendor.min.css')) ?>">
         <?php foreach (app(ModuleThemeInterface::class)->stylesheets() as $stylesheet) : ?>
@@ -73,7 +71,7 @@ use Psr\Http\Message\ServerRequestInterface;
             <div class="container-lg wt-header-container">
                 <div class="row wt-header-content">
                     <div class="wt-accessibility-links position-fixed">
-                        <a class="sr-only sr-only-focusable btn btn-info btn-sm" href="#content">
+                        <a class="visually-hidden visually-hidden-focusable btn btn-info btn-sm" href="#content">
                             <?= /* I18N: Skip over the headers and menus, to the main content of the page */
                             I18N::translate('Skip to content') ?>
                         </a>
@@ -89,14 +87,12 @@ use Psr\Http\Message\ServerRequestInterface;
                                   class="wt-header-search-form" role="search">
                                 <?= csrf_field() ?>
                                 <div class="input-group">
-                                    <label class="sr-only" for="quick-search"><?= I18N::translate('Search') ?></label>
+                                    <label class="visually-hidden" for="quick-search"><?= I18N::translate('Search') ?></label>
                                     <input type="search" class="form-control wt-header-search-field" id="quick-search"
                                            name="query" size="15" placeholder="<?= I18N::translate('Search') ?>">
-                                    <div class="input-group-append">
-                                        <button type="submit" class="btn btn-primary wt-header-search-button">
-                                            <?= view('icons/search') ?>
-                                        </button>
-                                    </div>
+                                    <button type="submit" class="btn btn-primary wt-header-search-button">
+                                        <?= view('icons/search') ?>
+                                    </button>
                                 </div>
                             </form>
                         </div>
@@ -128,9 +124,7 @@ use Psr\Http\Message\ServerRequestInterface;
                 <div class="flash-messages">
                     <?php foreach (FlashMessages::getMessages() as $message) : ?>
                         <div class="alert alert-<?= e($message->status) ?> alert-dismissible" role="alert">
-                            <button type="button" class="close" data-dismiss="alert"
-                                    aria-label="<?= I18N::translate('close') ?>">
-                                <span aria-hidden="true">&times;</span>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="<?= I18N::translate('close') ?>">
                             </button>
                             <?= $message->text ?>
                         </div>

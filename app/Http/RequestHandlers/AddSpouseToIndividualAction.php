@@ -23,6 +23,7 @@ use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Services\GedcomEditService;
 use Fisharebest\Webtrees\Tree;
+use Fisharebest\Webtrees\Validator;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -36,8 +37,7 @@ use function redirect;
  */
 class AddSpouseToIndividualAction implements RequestHandlerInterface
 {
-    /** @var GedcomEditService */
-    private $gedcom_edit_service;
+    private GedcomEditService $gedcom_edit_service;
 
     /**
      * AddChildToFamilyAction constructor.
@@ -67,18 +67,21 @@ class AddSpouseToIndividualAction implements RequestHandlerInterface
         $individual = Registry::individualFactory()->make($xref, $tree);
         $individual = Auth::checkIndividualAccess($individual, true);
 
+        // Create the new spouse
         $levels = $params['ilevels'] ?? [];
         $tags   = $params['itags'] ?? [];
         $values = $params['ivalues'] ?? [];
-
-        // Create the new spouse
         $gedcom = $this->gedcom_edit_service->editLinesToGedcom('INDI', $levels, $tags, $values);
         $spouse = $tree->createIndividual("0 @@ INDI\n" . $gedcom);
 
-        // Create a new family
-        $i_link   = "\n1 " . ($individual->sex() === 'F' ? 'WIFE' : 'HUSB') . ' @' . $individual->xref() . '@';
-        $s_link   = "\n1 " . ($individual->sex() !== 'F' ? 'WIFE' : 'HUSB') . ' @' . $spouse->xref() . '@';
-        $family = $tree->createFamily("0 @@ FAM\n" . $i_link . $s_link);
+        // Create the new family
+        $levels = $params['flevels'] ?? [];
+        $tags   = $params['ftags'] ?? [];
+        $values = $params['fvalues'] ?? [];
+        $gedcom = $this->gedcom_edit_service->editLinesToGedcom('FAM', $levels, $tags, $values);
+        $i_link = "\n1 " . ($individual->sex() === 'F' ? 'WIFE' : 'HUSB') . ' @' . $individual->xref() . '@';
+        $s_link = "\n1 " . ($individual->sex() !== 'F' ? 'WIFE' : 'HUSB') . ' @' . $spouse->xref() . '@';
+        $family = $tree->createFamily("0 @@ FAM\n" . $gedcom . $i_link . $s_link);
 
         // Link the individual to the family
         $individual->createFact('1 FAMS @' . $family->xref() . '@', false);
@@ -86,6 +89,9 @@ class AddSpouseToIndividualAction implements RequestHandlerInterface
         // Link the spouse to the family
         $spouse->createFact('1 FAMS @' . $family->xref() . '@', false);
 
-        return redirect($params['url'] ?? $spouse->url());
+        $base_url = $request->getAttribute('base_url');
+        $url      = Validator::parsedBody($request)->isLocalUrl($base_url)->string('url') ?? $spouse->url();
+
+        return redirect($url);
     }
 }

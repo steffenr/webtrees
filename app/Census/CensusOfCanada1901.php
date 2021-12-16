@@ -37,7 +37,7 @@ class CensusOfCanada1901 extends CensusOfCanada implements CensusInterface
     /**
      * The columns of the census.
      *
-     * @return CensusColumnInterface[]
+     * @return array<CensusColumnInterface>
      */
     public function columns(): array
     {
@@ -46,7 +46,7 @@ class CensusOfCanada1901 extends CensusOfCanada implements CensusInterface
             new CensusColumnSexMF($this, 'Sex', 'Sex'),
             new CensusColumnNull($this, 'Color', 'Colour'),
             new CensusColumnRelationToHeadEnglish($this, 'Relation', 'Relationship to Head of Family'),
-            new CensusColumnConditionUs($this, 'S/M/W/D', 'Single, married, widowed or divorced'),
+            new CensusColumnConditionCanada($this, 'S/M/W/D', 'Single, married, widowed or divorced'),
             new CensusColumnBirthMonthDay($this, 'M/D', 'Month and date of birth'),
             new CensusColumnBirthYear($this, 'Year', 'Year of birth'),
             new CensusColumnAge($this, 'Age', 'Age at last birthday'),

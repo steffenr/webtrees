@@ -21,7 +21,6 @@ namespace Fisharebest\Webtrees\Services;
 
 use Fisharebest\Webtrees\Carbon;
 use Fisharebest\Webtrees\Exceptions\GedcomErrorException;
-use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Family;
 use Fisharebest\Webtrees\Functions\FunctionsImport;
 use Fisharebest\Webtrees\Gedcom;
@@ -31,6 +30,7 @@ use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\Location;
 use Fisharebest\Webtrees\Media;
 use Fisharebest\Webtrees\Note;
+use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Repository;
 use Fisharebest\Webtrees\Source;
 use Fisharebest\Webtrees\Submission;
@@ -40,7 +40,6 @@ use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Collection;
-use stdClass;
 
 use function addcslashes;
 use function preg_match;
@@ -71,7 +70,7 @@ class PendingChangesService
      * @param Tree $tree
      * @param int  $n
      *
-     * @return array<array<stdClass>>
+     * @return array<array<object>>
      */
     public function pendingChanges(Tree $tree, int $n): array
     {
@@ -260,7 +259,7 @@ class PendingChangesService
     /**
      * Generate a query for filtering the changes log.
      *
-     * @param string[] $params
+     * @param array<string> $params
      *
      * @return Builder
      */

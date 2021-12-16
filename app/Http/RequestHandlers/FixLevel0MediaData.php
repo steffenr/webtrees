@@ -31,7 +31,6 @@ use Illuminate\Support\Collection;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use stdClass;
 
 use function addcslashes;
 use function e;
@@ -44,11 +43,9 @@ use function view;
  */
 class FixLevel0MediaData implements RequestHandlerInterface
 {
-    /** @var DatatablesService */
-    private $datatables_service;
+    private DatatablesService $datatables_service;
 
-    /** @var TreeService */
-    private $tree_service;
+    private TreeService $tree_service;
 
     /**
      * FixLevel0MediaController constructor.
@@ -73,12 +70,13 @@ class FixLevel0MediaData implements RequestHandlerInterface
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $ignore_facts = [
-            'NAME',
-            'SEX',
-            'CHAN',
-            'NOTE',
-            'SOUR',
-            'RESN',
+            'INDI:NAME',
+            'INDI:SEX',
+            'INDI:CHAN',
+            'INDI:NOTE',
+            'INDI:SOUR',
+            'INDI:SUBM',
+            'INDI:RESN',
         ];
 
         $prefix = DB::connection()->getTablePrefix();
@@ -107,7 +105,7 @@ class FixLevel0MediaData implements RequestHandlerInterface
             ->where('descriptive_title', 'LIKE', '%' . addcslashes($request->getQueryParams()['search']['value'] ?? '', '\\%_') . '%')
             ->select(['media.m_file', 'media.m_id', 'media.m_gedcom', 'individuals.i_id', 'individuals.i_gedcom']);
 
-        return $this->datatables_service->handleQuery($request, $query, [], [], function (stdClass $datum) use ($ignore_facts): array {
+        return $this->datatables_service->handleQuery($request, $query, [], [], function (object $datum) use ($ignore_facts): array {
             $tree       = $this->tree_service->find((int) $datum->m_file);
             $media      = Registry::mediaFactory()->make($datum->m_id, $tree, $datum->m_gedcom);
             $individual = Registry::individualFactory()->make($datum->i_id, $tree, $datum->i_gedcom);
@@ -117,7 +115,7 @@ class FixLevel0MediaData implements RequestHandlerInterface
                     return
                         !$fact->isPendingDeletion() &&
                         !preg_match('/^@' . Gedcom::REGEX_XREF . '@$/', $fact->value()) &&
-                        !in_array($fact->getTag(), $ignore_facts, true);
+                        !in_array($fact->tag(), $ignore_facts, true);
                 });
 
             // The link to the media object may have been deleted in a pending change.

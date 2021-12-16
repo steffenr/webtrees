@@ -30,7 +30,6 @@ use Fisharebest\Localization\Translator;
 use Fisharebest\Webtrees\Module\ModuleCustomInterface;
 use Fisharebest\Webtrees\Module\ModuleLanguageInterface;
 use Fisharebest\Webtrees\Services\ModuleService;
-use Illuminate\Support\Collection;
 
 use function array_merge;
 use function class_exists;
@@ -215,11 +214,10 @@ class I18N
     /**
      * The preferred locales for this site, or a default list if no preference.
      *
-     * @return LocaleInterface[]
+     * @return array<LocaleInterface>
      */
     public static function activeLocales(): array
     {
-        /** @var Collection $locales */
         $locales = app(ModuleService::class)
             ->findByInterface(ModuleLanguageInterface::class, false, true)
             ->map(static function (ModuleLanguageInterface $module): LocaleInterface {
@@ -259,7 +257,7 @@ class I18N
      */
     public static function dateFormat(): string
     {
-        /* I18N: This is the format string for full dates. See http://php.net/date for codes */
+        /* I18N: This is the format string for full dates. See https://php.net/date for codes */
         return self::$translator->translate('%j %F %Y');
     }
 
@@ -568,14 +566,10 @@ class I18N
     public static function comparator(): Closure
     {
         if (self::$collator instanceof Collator) {
-            return static function (string $x, string $y): int {
-                return (int) self::$collator->compare($x, $y);
-            };
+            return static fn (string $x, string $y): int => (int) self::$collator->compare($x, $y);
         }
 
-        return static function (string $x, string $y): int {
-            return strcmp(self::strtolower($x), self::strtolower($y));
-        };
+        return static fn (string $x, string $y): int => strcmp(self::strtolower($x), self::strtolower($y));
     }
 
 
@@ -619,7 +613,7 @@ class I18N
      */
     public static function timeFormat(): string
     {
-        /* I18N: This is the format string for the time-of-day. See http://php.net/date for codes */
+        /* I18N: This is the format string for the time-of-day. See https://php.net/date for codes */
         return self::$translator->translate('%H:%i:%s');
     }
 

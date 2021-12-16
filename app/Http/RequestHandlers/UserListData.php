@@ -31,7 +31,6 @@ use Illuminate\Database\Query\JoinClause;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use stdClass;
 
 use function e;
 
@@ -40,14 +39,11 @@ use function e;
  */
 class UserListData implements RequestHandlerInterface
 {
-    /** @var DatatablesService */
-    private $datatables_service;
+    private DatatablesService $datatables_service;
 
-    /** @var ModuleService */
-    private $module_service;
+    private ModuleService $module_service;
 
-    /** @var UserService */
-    private $user_service;
+    private UserService $user_service;
 
     /**
      * UserListData constructor.
@@ -127,13 +123,13 @@ class UserListData implements RequestHandlerInterface
         $search_columns = ['user_name', 'real_name', 'email'];
         $sort_columns   = [];
 
-        $callback = function (stdClass $row) use ($languages, $user): array {
+        $callback = function (object $row) use ($languages, $user): array {
             $row_user = $this->user_service->find((int) $row->user_id);
             $datum = [
                 view('admin/users-table-options', ['row' => $row, 'self' => $user, 'user' => $row_user]),
                 $row->user_id,
-                '<span dir="auto">' . e($row->user_name) . '</span>',
-                '<span dir="auto">' . e($row->real_name) . '</span>',
+                '<bdi>' . e($row->user_name) . '</bdi>',
+                '<bdi>' . e($row->real_name) . '</bdi>',
                 '<a href="mailto:' . e($row->email) . '">' . e($row->email) . '</a>',
                 $languages->get($row->language, $row->language),
                 $row->registered_at,

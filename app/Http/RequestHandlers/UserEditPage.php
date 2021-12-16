@@ -20,7 +20,7 @@ declare(strict_types=1);
 namespace Fisharebest\Webtrees\Http\RequestHandlers;
 
 use Fisharebest\Webtrees\Contracts\UserInterface;
-use Fisharebest\Webtrees\Exceptions\HttpNotFoundException;
+use Fisharebest\Webtrees\Http\Exceptions\HttpNotFoundException;
 use Fisharebest\Webtrees\Http\ViewResponseTrait;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Module\ModuleLanguageInterface;
@@ -40,17 +40,13 @@ class UserEditPage implements RequestHandlerInterface
 {
     use ViewResponseTrait;
 
-    /** @var MessageService */
-    private $message_service;
+    private MessageService $message_service;
 
-    /** @var ModuleService */
-    private $module_service;
+    private ModuleService $module_service;
 
-    /** @var UserService */
-    private $user_service;
+    private UserService $user_service;
 
-    /** @var TreeService */
-    private $tree_service;
+    private TreeService $tree_service;
 
     /**
      * UserEditPage constructor.
@@ -85,7 +81,7 @@ class UserEditPage implements RequestHandlerInterface
         $user    = $this->user_service->find($user_id);
 
         if ($user === null) {
-            throw new HttpNotFoundException(I18N::translate('%1$s does not exist.', 'user_id:' . $user_id));
+            throw new HttpNotFoundException(I18N::translate('%s does not exist.', 'user_id:' . $user_id));
         }
 
         $languages = $this->module_service->findByInterface(ModuleLanguageInterface::class, true, true)

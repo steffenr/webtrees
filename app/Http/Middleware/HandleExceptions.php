@@ -21,7 +21,7 @@ namespace Fisharebest\Webtrees\Http\Middleware;
 
 use Fig\Http\Message\RequestMethodInterface;
 use Fig\Http\Message\StatusCodeInterface;
-use Fisharebest\Webtrees\Exceptions\HttpException;
+use Fisharebest\Webtrees\Http\Exceptions\HttpException;
 use Fisharebest\Webtrees\Http\ViewResponseTrait;
 use Fisharebest\Webtrees\Log;
 use Fisharebest\Webtrees\Services\TreeService;
@@ -54,8 +54,7 @@ class HandleExceptions implements MiddlewareInterface, StatusCodeInterface
 {
     use ViewResponseTrait;
 
-    /** @var TreeService */
-    private $tree_service;
+    private TreeService $tree_service;
 
     /**
      * HandleExceptions constructor.
@@ -81,7 +80,7 @@ class HandleExceptions implements MiddlewareInterface, StatusCodeInterface
             if (error_get_last() !== null && error_get_last()['type'] & E_ERROR) {
                 // If PHP does not display the error, then we must display it.
                 if (ini_get('display_errors') !== '1') {
-                    echo error_get_last()['message'], '<br><br>', error_get_last()['file'] , ': ', error_get_last()['line'];
+                    echo error_get_last()['message'], '<br><br>', error_get_last()['file'], ': ', error_get_last()['line'];
                 }
             }
         });

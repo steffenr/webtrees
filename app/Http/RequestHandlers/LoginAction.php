@@ -30,6 +30,7 @@ use Fisharebest\Webtrees\Services\UpgradeService;
 use Fisharebest\Webtrees\Services\UserService;
 use Fisharebest\Webtrees\Session;
 use Fisharebest\Webtrees\Tree;
+use Fisharebest\Webtrees\Validator;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -41,11 +42,9 @@ use function route;
  */
 class LoginAction implements RequestHandlerInterface
 {
-    /** @var UpgradeService */
-    private $upgrade_service;
+    private UpgradeService $upgrade_service;
 
-    /** @var UserService */
-    private $user_service;
+    private UserService $user_service;
 
     /**
      * LoginController constructor.
@@ -68,13 +67,12 @@ class LoginAction implements RequestHandlerInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $tree = $request->getAttribute('tree');
-
-        $params = (array) $request->getParsedBody();
-
-        $username = $params['username'];
-        $password = $params['password'];
-        $url      = $params['url'];
+        $tree        = $request->getAttribute('tree');
+        $base_url    = $request->getAttribute('base_url');
+        $default_url = route(HomePage::class);
+        $username    = Validator::parsedBody($request)->string('username') ?? '';
+        $password    = Validator::parsedBody($request)->string('password') ?? '';
+        $url         = Validator::parsedBody($request)->isLocalUrl($base_url)->string('url') ?? $default_url;
 
         try {
             $this->doLogin($username, $password);
@@ -84,8 +82,6 @@ class LoginAction implements RequestHandlerInterface
             }
 
             // Redirect to the target URL
-            $url = $url ?: route(HomePage::class);
-
             return redirect($url);
         } catch (Exception $ex) {
             // Failed to log in.

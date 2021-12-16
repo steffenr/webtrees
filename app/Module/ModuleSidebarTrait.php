@@ -19,6 +19,7 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Module;
 
+use Fisharebest\Webtrees\Individual;
 use Illuminate\Support\Collection;
 
 /**
@@ -26,15 +27,17 @@ use Illuminate\Support\Collection;
  */
 trait ModuleSidebarTrait
 {
-    /** @var int The default position for this sidebar.  It can be changed in the control panel. */
-    protected $sidebar_order;
+    // The default position for this sidebar.  It can be changed in the control panel.
+    protected int $sidebar_order;
 
     /**
      * The text that appears on the sidebar's title.
      *
+     * @param Individual $individual
+     *
      * @return string
      */
-    public function sidebarTitle(): string
+    public function sidebarTitle(Individual $individual): string
     {
         return $this->title();
     }
