@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2021 webtrees development team
+ * Copyright (C) 2022 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -22,16 +22,17 @@ namespace Fisharebest\Webtrees\Http\RequestHandlers;
 use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\GedcomRecord;
 use Fisharebest\Webtrees\Header;
-use Fisharebest\Webtrees\Note;
 use Fisharebest\Webtrees\Registry;
-use Fisharebest\Webtrees\Tree;
+use Fisharebest\Webtrees\Validator;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-use function assert;
 use function explode;
-use function is_string;
+use function in_array;
+use function preg_replace;
+use function redirect;
+use function trim;
 
 /**
  * Edit the raw GEDCOM of a record.
@@ -45,15 +46,10 @@ class EditRawRecordAction implements RequestHandlerInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $tree = $request->getAttribute('tree');
-        assert($tree instanceof Tree);
-
-        $xref = $request->getAttribute('xref');
-        assert(is_string($xref));
-
+        $tree   = Validator::attributes($request)->tree();
+        $xref   = Validator::attributes($request)->isXref()->string('xref');
         $record = Registry::gedcomRecordFactory()->make($xref, $tree);
         $record = Auth::checkRecordAccess($record, true);
-
         $params = (array) $request->getParsedBody();
 
         $level0   = $params['level0'];
@@ -85,7 +81,7 @@ class EditRawRecordAction implements RequestHandlerInterface
         }
         // Append the updated facts
         foreach ($facts as $fact) {
-            $gedcom .= "\n" . $fact;
+            $gedcom .= "\n" . trim($fact);
         }
 
         // Empty lines and MSDOS line endings.

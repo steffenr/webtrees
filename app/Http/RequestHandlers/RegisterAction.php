@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2021 webtrees development team
+ * Copyright (C) 2022 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -29,6 +29,7 @@ use Fisharebest\Webtrees\Log;
 use Fisharebest\Webtrees\NoReplyUser;
 use Fisharebest\Webtrees\Services\CaptchaService;
 use Fisharebest\Webtrees\Services\EmailService;
+use Fisharebest\Webtrees\Services\MessageService;
 use Fisharebest\Webtrees\Services\RateLimitService;
 use Fisharebest\Webtrees\Services\UserService;
 use Fisharebest\Webtrees\Session;
@@ -36,6 +37,7 @@ use Fisharebest\Webtrees\Site;
 use Fisharebest\Webtrees\SiteUser;
 use Fisharebest\Webtrees\Tree;
 use Fisharebest\Webtrees\TreeUser;
+use Fisharebest\Webtrees\Validator;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Support\Str;
 use Psr\Http\Message\ResponseInterface;
@@ -88,7 +90,7 @@ class RegisterAction implements RequestHandlerInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $tree = $request->getAttribute('tree');
+        $tree = Validator::attributes($request)->treeOptional();
 
         $this->checkRegistrationAllowed();
 
@@ -135,14 +137,14 @@ class RegisterAction implements RequestHandlerInterface
         $user->setPreference(UserInterface::PREF_IS_ACCOUNT_APPROVED, '');
         $user->setPreference(UserInterface::PREF_TIMESTAMP_REGISTERED, date('U'));
         $user->setPreference(UserInterface::PREF_VERIFICATION_TOKEN, $token);
-        $user->setPreference(UserInterface::PREF_CONTACT_METHOD, 'messaging2');
+        $user->setPreference(UserInterface::PREF_CONTACT_METHOD, MessageService::CONTACT_METHOD_INTERNAL_AND_EMAIL);
         $user->setPreference(UserInterface::PREF_NEW_ACCOUNT_COMMENT, $comments);
         $user->setPreference(UserInterface::PREF_IS_VISIBLE_ONLINE, '1');
         $user->setPreference(UserInterface::PREF_AUTO_ACCEPT_EDITS, '');
         $user->setPreference(UserInterface::PREF_IS_ADMINISTRATOR, '');
         $user->setPreference(UserInterface::PREF_TIMESTAMP_ACTIVE, '0');
 
-        $base_url = $request->getAttribute('base_url');
+        $base_url = Validator::attributes($request)->string('base_url');
         $reply_to = $tree instanceof Tree ? new TreeUser($tree) : new SiteUser();
 
         $verify_url = route(VerifyEmail::class, [
@@ -154,7 +156,7 @@ class RegisterAction implements RequestHandlerInterface
         // Send a verification message to the user.
         /* I18N: %s is a server name/URL */
         $this->email_service->send(
-            new Siteuser(),
+            new SiteUser(),
             $user,
             $reply_to,
             I18N::translate('Your registration at %s', $base_url),
@@ -195,7 +197,11 @@ class RegisterAction implements RequestHandlerInterface
             );
 
             $mail1_method = $administrator->getPreference(UserInterface::PREF_CONTACT_METHOD);
-            if ($mail1_method !== 'messaging3' && $mail1_method !== 'mailto' && $mail1_method !== 'none') {
+            if (
+                $mail1_method !== MessageService::CONTACT_METHOD_EMAIL &&
+                $mail1_method !== MessageService::CONTACT_METHOD_MAILTO &&
+                $mail1_method !== MessageService::CONTACT_METHOD_NONE
+            ) {
                 DB::table('message')->insert([
                     'sender'     => $user->email(),
                     'ip_address' => $request->getAttribute('client-ip'),
@@ -258,7 +264,7 @@ class RegisterAction implements RequestHandlerInterface
             throw new Exception(I18N::translate('Duplicate email address. A user with that email already exists.'));
         }
 
-        $base_url = $request->getAttribute('base_url');
+        $base_url = Validator::attributes($request)->string('base_url');
 
         // No external links
         if (preg_match('/(?!' . preg_quote($base_url, '/') . ')(((?:http|https):\/\/)[a-zA-Z0-9.-]+)/', $comments, $match)) {

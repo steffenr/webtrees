@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2021 webtrees development team
+ * Copyright (C) 2022 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -27,11 +27,20 @@ use GuzzleHttp\Psr7\Request;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
+use function strlen;
+
 /**
  * Trait ModuleMapAutocompleteTrait - default implementation of ModuleMapAutocompleteInterface
  */
 trait ModuleMapAutocompleteTrait
 {
+    /**
+     * A unique internal name for this module (based on the installation folder).
+     *
+     * @return string
+     */
+    abstract public function name(): string;
+
     /**
      * @param string $place
      *
@@ -77,7 +86,7 @@ trait ModuleMapAutocompleteTrait
      *
      * @return RequestInterface
      */
-    protected function createPlaceNameSearchRequest(string $place): RequestInterface
+    protected function createPlaceNameSearchRequest(/** @scrutinizer ignore-unused */ string $place): RequestInterface
     {
         return new Request('GET', '');
     }
@@ -87,7 +96,7 @@ trait ModuleMapAutocompleteTrait
      *
      * @return array<string>
      */
-    protected function parsePlaceNameSearchResponse(ResponseInterface $response): array
+    protected function parsePlaceNameSearchResponse(/** @scrutinizer ignore-unused */ ResponseInterface $response): array
     {
         return [];
     }

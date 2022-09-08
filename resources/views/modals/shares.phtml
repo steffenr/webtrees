@@ -1,11 +1,13 @@
 <?php
 
-/**
- * @var Collection<string> $shares
- * @var string             $title
- */
+declare(strict_types=1);
 
 use Illuminate\Support\Collection;
+
+/**
+ * @var Collection<int,string> $shares
+ * @var string                 $title
+ */
 
 ?>
 <div class="modal fade" id="wt-shares-modal" tabindex="-1" role="dialog" aria-label="<?= e($title) ?>" aria-hidden="true">
@@ -15,7 +17,7 @@ use Illuminate\Support\Collection;
 
             <div class="modal-body">
                 <div class="wt-share-list">
-                    <?php foreach ($shares as $share): ?>
+                    <?php foreach ($shares as $share) : ?>
                         <div class="wt-share-item">
                             <?= $share ?>
                         </div>

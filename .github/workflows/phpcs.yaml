@@ -11,7 +11,7 @@ jobs:
     strategy:
       matrix:
         operating-system: ['ubuntu-latest']
-        php-version: ['8.1']
+        php-version: ['8.1', '8.2']
 
     steps:
       - uses: shivammathur/setup-php@master
@@ -25,7 +25,7 @@ jobs:
       - run: composer global require squizlabs/php_codesniffer
 
       - name: PHP
-        run: ~/.composer/vendor/bin/phpcs --colors --standard=PSR12 --exclude=Generic.Files.LineLength --extensions=php index.php app modules_v4 tests
+        run: ~/.composer/vendor/bin/phpcs --colors --standard=PSR12 --exclude=Generic.Files.LineLength --extensions=php index.php app tests
 
       - name: Style sheets
         run: ~/.composer/vendor/bin/phpcs --colors --extensions=css resources/css

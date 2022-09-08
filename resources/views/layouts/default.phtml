@@ -1,6 +1,7 @@
 <?php
 
-use Fisharebest\Webtrees\DebugBar;
+declare(strict_types=1);
+
 use Fisharebest\Webtrees\FlashMessages;
 use Fisharebest\Webtrees\Http\RequestHandlers\AppleTouchIconPng;
 use Fisharebest\Webtrees\Http\RequestHandlers\BrowserconfigXml;
@@ -12,6 +13,7 @@ use Fisharebest\Webtrees\Module\ModuleGlobalInterface;
 use Fisharebest\Webtrees\Module\ModuleThemeInterface;
 use Fisharebest\Webtrees\Services\ModuleService;
 use Fisharebest\Webtrees\Tree;
+use Fisharebest\Webtrees\Validator;
 use Fisharebest\Webtrees\View;
 use Fisharebest\Webtrees\Webtrees;
 use Psr\Http\Message\ServerRequestInterface;
@@ -50,7 +52,7 @@ use Psr\Http\Message\ServerRequestInterface;
         <!--IE11/Edge-->
         <meta name="msapplication-config" content="<?= e(route(BrowserconfigXml::class)) ?>">
 
-        <link rel="manifest" href="<?= e(route(WebmanifestJson::class)) ?>">
+        <link rel="manifest" href="<?= e(route(WebmanifestJson::class)) ?>" crossorigin="use-credentials">
 
         <link rel="stylesheet" href="<?= e(asset('css/vendor.min.css')) ?>">
         <?php foreach (app(ModuleThemeInterface::class)->stylesheets() as $stylesheet) : ?>
@@ -62,11 +64,9 @@ use Psr\Http\Message\ServerRequestInterface;
         <?= app(ModuleService::class)->findByInterface(ModuleGlobalInterface::class)->map(static function (ModuleGlobalInterface $module): string {
             return $module->headContent();
         })->implode('') ?>
-
-        <?= DebugBar::renderHead() ?>
     </head>
 
-    <body class="wt-global wt-theme-<?= e(app(ModuleThemeInterface::class)->name()) ?> wt-route-<?= e(substr(strrchr($request->getAttribute('route')->name, '\\'),1)) ?>">
+    <body class="wt-global wt-theme-<?= e(app(ModuleThemeInterface::class)->name()) ?> wt-route-<?= e(substr(strrchr($route = Validator::attributes($request)->route()->name ?? '\\no-route', '\\'), 1)) ?>">
         <header class="wt-header-wrapper d-print-none">
             <div class="container-lg wt-header-container">
                 <div class="row wt-header-content">
@@ -82,18 +82,18 @@ use Psr\Http\Message\ServerRequestInterface;
                         <h1 class="col wt-site-title"><?= e($tree->title()) ?></h1>
 
                         <div class="col wt-header-search">
-                            <form method="post"
-                                  action="<?= e(route(SearchQuickAction::class, ['tree' => $tree->name()])) ?>"
-                                  class="wt-header-search-form" role="search">
-                                <?= csrf_field() ?>
+                            <form method="post" action="<?= e(route(SearchQuickAction::class, ['tree' => $tree->name()])) ?>" class="wt-header-search-form" role="search">
                                 <div class="input-group">
                                     <label class="visually-hidden" for="quick-search"><?= I18N::translate('Search') ?></label>
-                                    <input type="search" class="form-control wt-header-search-field" id="quick-search"
-                                           name="query" size="15" placeholder="<?= I18N::translate('Search') ?>">
-                                    <button type="submit" class="btn btn-primary wt-header-search-button">
+
+                                    <input type="search" class="form-control wt-header-search-field" id="quick-search" name="query" size="15" placeholder="<?= I18N::translate('Search') ?>">
+
+                                    <button type="submit" class="btn btn-primary wt-header-search-button" aria-label="<?= I18N::translate('Search') ?>">
                                         <?= view('icons/search') ?>
                                     </button>
                                 </div>
+
+                                <?= csrf_field() ?>
                             </form>
                         </div>
                     <?php endif ?>
@@ -183,7 +183,5 @@ use Psr\Http\Message\ServerRequestInterface;
         <?= app(ModuleService::class)->findByInterface(ModuleGlobalInterface::class)->map(static function (ModuleGlobalInterface $module): string {
             return $module->bodyContent();
         })->implode('') ?>
-
-        <?= DebugBar::render() ?>
     </body>
 </html>

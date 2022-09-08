@@ -1,14 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 use Fisharebest\Webtrees\Fact;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
 use Illuminate\Support\Collection;
 
 /**
- * @var Collection<Fact> $facts
- * @var Individual       $record
- * @var string           $url
+ * @var Collection<int,Fact> $facts
+ * @var Individual           $record
+ * @var string               $url
  */
 
 ?>
@@ -16,7 +18,7 @@ use Illuminate\Support\Collection;
     <span class="input-group-text" dir="ltr">iCalendar</span>
 
     <select class="custom-select" id="share-anniversary-select" aria-label=" <?= I18N::translate('Anniversary') ?>" name="fact_id">
-        <?php foreach ($facts as $url => $label): ?>
+        <?php foreach ($facts as $url => $label) : ?>
             <option value="<?= e($url) ?>"><?= $label ?></option>
         <?php endforeach ?>
     </select>
@@ -27,12 +29,10 @@ use Illuminate\Support\Collection;
 </div>
 <form id="share-anniversary-form"></form>
 <script>
-    document.getElementById('share-anniversary-button').addEventListener('click', function () {
-        console.log('clicked');
-        const select = document.getElementById('share-anniversary-select');
-        let form = document.getElementById('share-anniversary-form');
-        form.action = select.options[select.selectedIndex].value;;
-        form.submit();
-        console.log('submitted');
-    });
+  document.getElementById('share-anniversary-button').addEventListener('click', function () {
+    const select = document.getElementById('share-anniversary-select');
+    let form = document.getElementById('share-anniversary-form');
+    form.action = select.options[select.selectedIndex].value;
+    form.submit();
+  });
 </script>

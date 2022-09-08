@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Fact;
-use Fisharebest\Webtrees\Functions\FunctionsPrintFacts;
 use Fisharebest\Webtrees\Http\RequestHandlers\DeleteFact;
 use Fisharebest\Webtrees\Http\RequestHandlers\EditMediaFileModal;
 use Fisharebest\Webtrees\I18N;
@@ -26,8 +27,8 @@ use League\Flysystem\FilesystemOperator;
         <tr class="<?= $media_file->isPendingAddition() ? 'wt-new' : '' ?><?= $media_file->isPendingDeletion() ? 'wt-old' : '' ?>">
             <th scope="row">
                 <?= I18N::translate('Media file') ?>
-                <?php if ($record->canEdit()) : ?>
-                    <div class="editfacts nowrap">
+                <?php if ($record->canEdit() && !$media_file->isPendingDeletion()) : ?>
+                    <div class="pt-2 wt-fact-edit-links">
                         <a class="btn btn-link" href="#" data-bs-toggle="modal" data-bs-backdrop="static" data-bs-target="#wt-ajax-modal" data-wt-href="<?= route(EditMediaFileModal::class, ['tree' => $record->tree()->name(), 'xref' => $record->xref(), 'fact_id' => $media_file->factId()]) ?>" title="<?= I18N::translate('Edit') ?>">
                             <?= view('icons/edit') ?>
                             <span class="visually-hidden">
@@ -91,6 +92,6 @@ use League\Flysystem\FilesystemOperator;
     <?php endforeach ?>
 
     <?php foreach ($record->facts()->filter(fn (Fact $fact): bool => $fact->tag() !== 'OBJE:FILE') as $fact) : ?>
-        <?php FunctionsPrintFacts::printFact($fact, $record) ?>
+        <?= view('fact', ['fact' => $fact, 'record' => $record]) ?>
     <?php endforeach ?>
 </table>

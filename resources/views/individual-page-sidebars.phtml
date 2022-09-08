@@ -1,16 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\Module\ModuleSidebarInterface;
 use Illuminate\Support\Collection;
 
 /**
- * @var Individual                         $record
- * @var Collection<ModuleSidebarInterface> $sidebars
+ * @var Individual                             $record
+ * @var Collection<int,ModuleSidebarInterface> $sidebars
  */
 ?>
 
-<div class="col-sm-4 accordion" id="sidebar">
+<div class="accordion" id="sidebar">
     <?php foreach ($sidebars as $sidebar) : ?>
         <div class="accordion-item">
             <div class="accordion-header" id="sidebar-header-<?= $sidebar->name() ?>">

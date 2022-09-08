@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2021 webtrees development team
+ * Copyright (C) 2022 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -250,9 +250,7 @@ abstract class AbstractElement implements ElementInterface
      */
     public function subtag(string $subtag, string $repeat, string $before = ''): void
     {
-        if ($repeat === '') {
-            unset($this->subtags[$subtag]);
-        } elseif ($before === '' || ($this->subtags[$before] ?? null) === null) {
+        if ($before === '' || ($this->subtags[$before] ?? null) === null) {
             $this->subtags[$subtag] = $repeat;
         } else {
             $tmp = [];
@@ -290,10 +288,10 @@ abstract class AbstractElement implements ElementInterface
 
         if ($values === []) {
             if (str_contains($value, "\n")) {
-                return '<bdi class="d-inline-block">' . nl2br(e($value)) . '</bdi>';
+                return '<span class="ut d-inline-block">' . nl2br(e($value, false)) . '</span>';
             }
 
-            return '<bdi>' . e($value) . '</bdi>';
+            return '<span class="ut">' . e($value) . '</span>';
         }
 
         $canonical = $this->canonical($value);
@@ -323,7 +321,7 @@ abstract class AbstractElement implements ElementInterface
         $canonical = $this->canonical($value);
 
         if (str_contains($canonical, 'http://') || str_contains($canonical, 'https://')) {
-            $html = Registry::markdownFactory()->autolink()->convertToHtml($canonical);
+            $html = Registry::markdownFactory()->autolink($canonical);
 
             return strip_tags($html, ['a']);
         }
@@ -345,24 +343,13 @@ abstract class AbstractElement implements ElementInterface
 
         $format = $tree->getPreference('FORMAT_TEXT');
 
-        if ($format === 'markdown') {
-            $html = Registry::markdownFactory()->markdown($tree)->convertToHtml($canonical);
+        switch ($format) {
+            case 'markdown':
+                return Registry::markdownFactory()->markdown($canonical, $tree);
 
-            return '<div class="markdown" dir="auto">' . $html . '</div>';
+            default:
+                return Registry::markdownFactory()->autolink($canonical, $tree);
         }
-
-        $html = Registry::markdownFactory()->autolink($tree)->convertToHtml($canonical);
-        $html = strtr($html, ["</p>\n<p>" => "<br><br>"]);
-        $html = strip_tags($html, ['a', 'br']);
-        $html = trim($html);
-
-        if (str_contains($html, "\n")) {
-            $html = nl2br($html);
-
-            return '<div dir="auto">' . $html . '</div>';
-        }
-
-        return '<span dir="auto">' . $html . '</span>';
     }
 
     /**

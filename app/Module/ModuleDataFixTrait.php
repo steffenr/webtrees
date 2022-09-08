@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2021 webtrees development team
+ * Copyright (C) 2022 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -45,7 +45,7 @@ trait ModuleDataFixTrait
      *
      * @return string
      */
-    public function fixOptions(Tree $tree): string
+    public function fixOptions(/** @scrutinizer ignore-unused */ Tree $tree): string
     {
         return '';
     }
@@ -57,7 +57,7 @@ trait ModuleDataFixTrait
      * @param Tree                 $tree
      * @param array<string,string> $params
      *
-     * @return Collection<object>
+     * @return Collection<int,object>
      */
     public function recordsToFix(Tree $tree, array $params): Collection
     {
@@ -119,7 +119,7 @@ trait ModuleDataFixTrait
      *
      * @return bool
      */
-    public function doesRecordNeedUpdate(GedcomRecord $record, array $params): bool
+    public function doesRecordNeedUpdate(/** @scrutinizer ignore-unused */ GedcomRecord $record, /** @scrutinizer ignore-unused */ array $params): bool
     {
         return false;
     }
@@ -132,7 +132,7 @@ trait ModuleDataFixTrait
      *
      * @return string
      */
-    public function previewUpdate(GedcomRecord $record, array $params): string
+    public function previewUpdate(GedcomRecord $record, /** @scrutinizer ignore-unused */ array $params): string
     {
         return $record->fullName();
     }
@@ -145,7 +145,7 @@ trait ModuleDataFixTrait
      *
      * @return void
      */
-    public function updateRecord(GedcomRecord $record, array $params): void
+    public function updateRecord(/** @scrutinizer ignore-unused */ GedcomRecord $record, /** @scrutinizer ignore-unused */ array $params): void
     {
     }
 
@@ -155,9 +155,9 @@ trait ModuleDataFixTrait
      * @param Tree                 $tree
      * @param array<string,string> $params
      *
-     * @return Collection<string>|null
+     * @return Collection<int,string>|null
      */
-    protected function familiesToFix(Tree $tree, array $params): ?Collection
+    protected function familiesToFix(/** @scrutinizer ignore-unused */ Tree $tree, /** @scrutinizer ignore-unused */ array $params): ?Collection
     {
         return null;
     }
@@ -186,9 +186,9 @@ trait ModuleDataFixTrait
      * @param Tree                 $tree
      * @param array<string,string> $params
      *
-     * @return Collection<string>|null
+     * @return Collection<int,string>|null
      */
-    protected function individualsToFix(Tree $tree, array $params): ?Collection
+    protected function individualsToFix(/** @scrutinizer ignore-unused */ Tree $tree, /** @scrutinizer ignore-unused */ array $params): ?Collection
     {
         return null;
     }
@@ -217,9 +217,9 @@ trait ModuleDataFixTrait
      * @param Tree                 $tree
      * @param array<string,string> $params
      *
-     * @return Collection<string>|null
+     * @return Collection<int,string>|null
      */
-    protected function locationsToFix(Tree $tree, array $params): ?Collection
+    protected function locationsToFix(/** @scrutinizer ignore-unused */ Tree $tree, /** @scrutinizer ignore-unused */ array $params): ?Collection
     {
         return null;
     }
@@ -249,9 +249,9 @@ trait ModuleDataFixTrait
      * @param Tree                 $tree
      * @param array<string,string> $params
      *
-     * @return Collection<string>|null
+     * @return Collection<int,string>|null
      */
-    protected function mediaToFix(Tree $tree, array $params): ?Collection
+    protected function mediaToFix(/** @scrutinizer ignore-unused */ Tree $tree, /** @scrutinizer ignore-unused */ array $params): ?Collection
     {
         return null;
     }
@@ -280,9 +280,9 @@ trait ModuleDataFixTrait
      * @param Tree                 $tree
      * @param array<string,string> $params
      *
-     * @return Collection<string>|null
+     * @return Collection<int,string>|null
      */
-    protected function notesToFix(Tree $tree, array $params): ?Collection
+    protected function notesToFix(/** @scrutinizer ignore-unused */ Tree $tree, /** @scrutinizer ignore-unused */ array $params): ?Collection
     {
         return null;
     }
@@ -312,9 +312,9 @@ trait ModuleDataFixTrait
      * @param Tree                 $tree
      * @param array<string,string> $params
      *
-     * @return Collection<string>|null
+     * @return Collection<int,string>|null
      */
-    protected function repositoriesToFix(Tree $tree, array $params): ?Collection
+    protected function repositoriesToFix(/** @scrutinizer ignore-unused */ Tree $tree, /** @scrutinizer ignore-unused */ array $params): ?Collection
     {
         return null;
     }
@@ -344,9 +344,9 @@ trait ModuleDataFixTrait
      * @param Tree                 $tree
      * @param array<string,string> $params
      *
-     * @return Collection<string>|null
+     * @return Collection<int,string>|null
      */
-    protected function sourcesToFix(Tree $tree, array $params): ?Collection
+    protected function sourcesToFix(/** @scrutinizer ignore-unused */ Tree $tree, /** @scrutinizer ignore-unused */ array $params): ?Collection
     {
         return null;
     }
@@ -375,9 +375,9 @@ trait ModuleDataFixTrait
      * @param Tree                 $tree
      * @param array<string,string> $params
      *
-     * @return Collection<string>|null
+     * @return Collection<int,string>|null
      */
-    protected function submittersToFix(Tree $tree, array $params): ?Collection
+    protected function submittersToFix(/** @scrutinizer ignore-unused */ Tree $tree, /** @scrutinizer ignore-unused */ array $params): ?Collection
     {
         return null;
     }
@@ -404,11 +404,11 @@ trait ModuleDataFixTrait
     /**
      * Merge pending changes of a given type.  We need to check all pending records.
      *
-     * @param Collection<string> $records
-     * @param Tree               $tree
-     * @param string             $type
+     * @param Collection<int,string> $records
+     * @param Tree                   $tree
+     * @param string                 $type
      *
-     * @return Collection<object>
+     * @return Collection<int,object>
      */
     private function mergePendingRecords(Collection $records, Tree $tree, string $type): Collection
     {
@@ -417,8 +417,8 @@ trait ModuleDataFixTrait
             ->where('status', '=', 'pending')
             ->where(static function (Builder $query) use ($type): void {
                 $query
-                    ->where('old_gedcom', 'LIKE', '%@ ' . $type . '%')
-                    ->orWhere('new_gedcom', 'LIKE', '%@ ' . $type . '%');
+                    ->where('old_gedcom', 'LIKE', '%@ ' . $type . '\n%')
+                    ->orWhere('new_gedcom', 'LIKE', '%@ ' . $type . '\n%');
             })
             ->pluck('xref');
 

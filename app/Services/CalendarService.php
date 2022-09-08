@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2021 webtrees development team
+ * Copyright (C) 2022 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -20,7 +20,6 @@ declare(strict_types=1);
 namespace Fisharebest\Webtrees\Services;
 
 use Fisharebest\ExtCalendar\PersianCalendar;
-use Fisharebest\Webtrees\Carbon;
 use Fisharebest\Webtrees\Date;
 use Fisharebest\Webtrees\Date\AbstractCalendarDate;
 use Fisharebest\Webtrees\Date\FrenchDate;
@@ -41,6 +40,7 @@ use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Collection;
 
 use function array_merge;
+use function assert;
 use function in_array;
 use function preg_match_all;
 use function range;
@@ -130,7 +130,7 @@ class CalendarService
         }
 
         if ($filterof === 'recent') {
-            $query->where('d_julianday1', '>=', Carbon::now()->subYears(100)->julianDay());
+            $query->where('d_julianday1', '>=', Registry::timestampFactory()->now()->subtractYears(100)->julianDay());
         }
 
         $ind_query = (clone $query)
@@ -201,7 +201,7 @@ class CalendarService
      * @param string $sort_by
      * @param Tree   $tree
      *
-     * @return Collection<Fact>
+     * @return Collection<int,Fact>
      */
     public function getEventsList(int $jd1, int $jd2, string $events, bool $only_living, string $sort_by, Tree $tree): Collection
     {
@@ -332,7 +332,7 @@ class CalendarService
             }
 
             if ($filterof === 'recent') {
-                $query->where('d_julianday1', '>=', Carbon::now()->subYears(100)->julianDay());
+                $query->where('d_julianday1', '>=', Registry::timestampFactory()->now()->subtractYears(100)->julianDay());
             }
 
             $query

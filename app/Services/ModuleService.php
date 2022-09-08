@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2021 webtrees development team
+ * Copyright (C) 2022 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -42,6 +42,7 @@ use Fisharebest\Webtrees\Module\CensusAssistantModule;
 use Fisharebest\Webtrees\Module\ChangeReportModule;
 use Fisharebest\Webtrees\Module\ChartsBlockModule;
 use Fisharebest\Webtrees\Module\ChartsMenuModule;
+use Fisharebest\Webtrees\Module\CheckForNewVersion;
 use Fisharebest\Webtrees\Module\CkeditorModule;
 use Fisharebest\Webtrees\Module\ClippingsCartModule;
 use Fisharebest\Webtrees\Module\CloudsTheme;
@@ -49,20 +50,6 @@ use Fisharebest\Webtrees\Module\ColorsTheme;
 use Fisharebest\Webtrees\Module\CompactTreeChartModule;
 use Fisharebest\Webtrees\Module\ContactsFooterModule;
 use Fisharebest\Webtrees\Module\CustomCssJsModule;
-use Fisharebest\Webtrees\Module\CustomTagsAldfaer;
-use Fisharebest\Webtrees\Module\CustomTagsBrothersKeeper;
-use Fisharebest\Webtrees\Module\CustomTagsFamilyTreeBuilder;
-use Fisharebest\Webtrees\Module\CustomTagsFamilyTreeMaker;
-use Fisharebest\Webtrees\Module\CustomTagsGedcom53;
-use Fisharebest\Webtrees\Module\CustomTagsGedcomL;
-use Fisharebest\Webtrees\Module\CustomTagsGenPluswin;
-use Fisharebest\Webtrees\Module\CustomTagsLegacy;
-use Fisharebest\Webtrees\Module\CustomTagsPersonalAncestralFile;
-use Fisharebest\Webtrees\Module\CustomTagsPhpGedView;
-use Fisharebest\Webtrees\Module\CustomTagsReunion;
-use Fisharebest\Webtrees\Module\CustomTagsRootsMagic;
-use Fisharebest\Webtrees\Module\CustomTagsTheMasterGenealogist;
-use Fisharebest\Webtrees\Module\CustomTagsWebtrees;
 use Fisharebest\Webtrees\Module\CzechMonarchsAndPresidents;
 use Fisharebest\Webtrees\Module\DeathReportModule;
 use Fisharebest\Webtrees\Module\DescendancyChartModule;
@@ -89,6 +76,7 @@ use Fisharebest\Webtrees\Module\FixNameTags;
 use Fisharebest\Webtrees\Module\FixPlaceNames;
 use Fisharebest\Webtrees\Module\FixPrimaryTag;
 use Fisharebest\Webtrees\Module\FixSearchAndReplace;
+use Fisharebest\Webtrees\Module\FixWtObjeSortTag;
 use Fisharebest\Webtrees\Module\FrenchHistory;
 use Fisharebest\Webtrees\Module\FrequentlyAskedQuestionsModule;
 use Fisharebest\Webtrees\Module\GeonamesAutocomplete;
@@ -202,7 +190,6 @@ use Fisharebest\Webtrees\Module\ModuleAnalyticsInterface;
 use Fisharebest\Webtrees\Module\ModuleBlockInterface;
 use Fisharebest\Webtrees\Module\ModuleChartInterface;
 use Fisharebest\Webtrees\Module\ModuleCustomInterface;
-use Fisharebest\Webtrees\Module\ModuleCustomTagsInterface;
 use Fisharebest\Webtrees\Module\ModuleDataFixInterface;
 use Fisharebest\Webtrees\Module\ModuleFooterInterface;
 use Fisharebest\Webtrees\Module\ModuleHistoricEventsInterface;
@@ -274,6 +261,7 @@ use Illuminate\Support\Collection;
 use Throwable;
 
 use function app;
+use function assert;
 use function basename;
 use function dirname;
 use function glob;
@@ -293,7 +281,6 @@ class ModuleService
         ModuleAnalyticsInterface::class,
         ModuleBlockInterface::class,
         ModuleChartInterface::class,
-        ModuleCustomTagsInterface::class,
         ModuleDataFixInterface::class,
         ModuleFooterInterface::class,
         ModuleHistoricEventsInterface::class,
@@ -350,6 +337,7 @@ class ModuleService
         'change_report'           => ChangeReportModule::class,
         'charts'                  => ChartsBlockModule::class,
         'charts-menu'             => ChartsMenuModule::class,
+        'check-for-new-version'   => CheckForNewVersion::class,
         'ckeditor'                => CkeditorModule::class,
         'clippings'               => ClippingsCartModule::class,
         'clouds'                  => CloudsTheme::class,
@@ -358,20 +346,6 @@ class ModuleService
         'contact-links'           => ContactsFooterModule::class,
         'czech-leaders'           => CzechMonarchsAndPresidents::class,
         'custom-css-js'           => CustomCssJsModule::class,
-        'custom-tags-aldfaer'     => CustomTagsAldfaer::class,
-        'custom-tags-bk'          => CustomTagsBrothersKeeper::class,
-        'custom-tags-gedcom-53'   => CustomTagsGedcom53::class,
-        'custom-tags-gedcom-l'    => CustomTagsGedcomL::class,
-        'custom-tags-genpluswin'  => CustomTagsGenPluswin::class,
-        'custom-tags-legacy'      => CustomTagsLegacy::class,
-        'custom-tags-ftb'         => CustomTagsFamilyTreeBuilder::class,
-        'custom-tags-ftm'         => CustomTagsFamilyTreeMaker::class,
-        'custom-tags-paf'         => CustomTagsPersonalAncestralFile::class,
-        'custom-tags-phpgedview'  => CustomTagsPhpGedView::class,
-        'custom-tags-reunion'     => CustomTagsReunion::class,
-        'custom-tags-roots-magic' => CustomTagsRootsMagic::class,
-        'custom-tags-tmg'         => CustomTagsTheMasterGenealogist::class,
-        'custom-tags-webtrees'    => CustomTagsWebtrees::class,
         'death_report'            => DeathReportModule::class,
         'descendancy'             => DescendancyModule::class,
         'descendancy_chart'       => DescendancyChartModule::class,
@@ -397,6 +371,7 @@ class ModuleService
         'fix-place-names'         => FixPlaceNames::class,
         'fix-prim-tag'            => FixPrimaryTag::class,
         'fix-search-and-replace'  => FixSearchAndReplace::class,
+        'fix-wt-obje-sort'        => FixWtObjeSortTag::class,
         'gedcom_block'            => WelcomeBlockModule::class,
         'gedcom_favorites'        => FamilyTreeFavoritesModule::class,
         'gedcom_news'             => FamilyTreeNewsModule::class,
@@ -574,7 +549,7 @@ class ModuleService
      * @param Tree          $tree
      * @param UserInterface $user
      *
-     * @return Collection<ModuleInterface>
+     * @return Collection<string,ModuleInterface>
      */
     public function findByComponent(string $interface, Tree $tree, UserInterface $user): Collection
     {
@@ -591,7 +566,7 @@ class ModuleService
      * @param bool   $include_disabled
      * @param bool   $sort
      *
-     * @return Collection<ModuleInterface>
+     * @return Collection<string,ModuleInterface>
      */
     public function findByInterface(string $interface, bool $include_disabled = false, bool $sort = false): Collection
     {
@@ -625,7 +600,7 @@ class ModuleService
      *
      * @param bool $include_disabled
      *
-     * @return Collection<ModuleInterface>
+     * @return Collection<string,ModuleInterface>
      */
     public function all(bool $include_disabled = false): Collection
     {
@@ -678,13 +653,14 @@ class ModuleService
     /**
      * All core modules in the system.
      *
-     * @return Collection<ModuleInterface>
+     * @return Collection<string,ModuleInterface>
      */
     private function coreModules(): Collection
     {
         return Collection::make(self::CORE_MODULES)
             ->map(static function (string $class, string $name): ModuleInterface {
                 $module = app($class);
+                assert($module instanceof ModuleInterface);
 
                 $module->setName($name);
 
@@ -695,7 +671,7 @@ class ModuleService
     /**
      * All custom modules in the system.  Custom modules are defined in modules_v4/
      *
-     * @return Collection<ModuleCustomInterface>
+     * @return Collection<string,ModuleCustomInterface>
      */
     private function customModules(): Collection
     {
@@ -850,7 +826,7 @@ class ModuleService
     /**
      * During setup, we'll need access to some languages.
      *
-     * @return Collection<ModuleLanguageInterface>
+     * @return Collection<string,ModuleLanguageInterface>
      */
     public function setupLanguages(): Collection
     {
@@ -885,7 +861,7 @@ class ModuleService
      *
      * @param bool $include_disabled
      *
-     * @return Collection<ModuleInterface>
+     * @return Collection<string,ModuleInterface>
      */
     public function otherModules(bool $include_disabled = false): Collection
     {
@@ -904,7 +880,7 @@ class ModuleService
     /**
      * Generate a list of module names which exist in the database but not on disk.
      *
-     * @return Collection<string>
+     * @return Collection<int,string>
      */
     public function deletedModules(): Collection
     {
@@ -936,7 +912,7 @@ class ModuleService
     }
 
     /**
-     * @return Collection<string>
+     * @return Collection<int,string>
      */
     public function componentsWithAccess(): Collection
     {
@@ -944,7 +920,7 @@ class ModuleService
     }
 
     /**
-     * @return Collection<string>
+     * @return Collection<int,string>
      */
     public function componentsWithOrder(): Collection
     {

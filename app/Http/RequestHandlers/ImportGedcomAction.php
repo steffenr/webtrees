@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2021 webtrees development team
+ * Copyright (C) 2022 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -24,20 +24,19 @@ use Fisharebest\Webtrees\FlashMessages;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Services\TreeService;
-use Fisharebest\Webtrees\Tree;
+use Fisharebest\Webtrees\Validator;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\UnableToReadFile;
-use Nyholm\Psr7\UploadedFile;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-use function assert;
 use function basename;
 use function redirect;
 use function route;
 
+use const UPLOAD_ERR_NO_FILE;
 use const UPLOAD_ERR_OK;
 
 /**
@@ -49,6 +48,10 @@ class ImportGedcomAction implements RequestHandlerInterface
 
     private TreeService $tree_service;
 
+    /**
+     * @param StreamFactoryInterface $stream_factory
+     * @param TreeService            $tree_service
+     */
     public function __construct(StreamFactoryInterface $stream_factory, TreeService $tree_service)
     {
         $this->tree_service   = $tree_service;
@@ -64,8 +67,7 @@ class ImportGedcomAction implements RequestHandlerInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $tree = $request->getAttribute('tree');
-        assert($tree instanceof Tree);
+        $tree = Validator::attributes($request)->tree();
 
         $data_filesystem = Registry::filesystem()->data();
 
@@ -74,6 +76,7 @@ class ImportGedcomAction implements RequestHandlerInterface
         $keep_media         = (bool) ($params['keep_media'] ?? false);
         $WORD_WRAPPED_NOTES = (bool) ($params['WORD_WRAPPED_NOTES'] ?? false);
         $GEDCOM_MEDIA_PATH  = $params['GEDCOM_MEDIA_PATH'];
+        $encoding           = $params['encoding'] ?? '';
 
         // Save these choices as defaults
         $tree->setPreference('keep_media', $keep_media ? '1' : '0');
@@ -83,22 +86,24 @@ class ImportGedcomAction implements RequestHandlerInterface
         if ($source === 'client') {
             $upload = $request->getUploadedFiles()['tree_name'] ?? null;
 
-            if ($upload === null || $upload->getError() !== UPLOAD_ERR_OK) {
+            if ($upload === null || $upload->getError() === UPLOAD_ERR_NO_FILE) {
+                FlashMessages::addMessage(I18N::translate('No GEDCOM file was received.'), 'danger');
+            } elseif ($upload->getError() !== UPLOAD_ERR_OK) {
                 throw new FileUploadException($upload);
+            } else {
+                $this->tree_service->importGedcomFile($tree, $upload->getStream(), basename($upload->getClientFilename()), $encoding);
             }
-
-            $this->tree_service->importGedcomFile($tree, $upload->getStream(), basename($upload->getClientFilename()));
         }
 
         if ($source === 'server') {
             $basename = basename($params['tree_name'] ?? '');
 
-            if ($basename) {
+            if ($basename === '') {
+                FlashMessages::addMessage(I18N::translate('No GEDCOM file was received.'), 'danger');
+            } else {
                 $resource = $data_filesystem->readStream($basename);
                 $stream   = $this->stream_factory->createStreamFromResource($resource);
-                $this->tree_service->importGedcomFile($tree, $stream, $basename);
-            } else {
-                FlashMessages::addMessage(I18N::translate('No GEDCOM file was received.'), 'danger');
+                $this->tree_service->importGedcomFile($tree, $stream, $basename, $encoding);
             }
         }
 

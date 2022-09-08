@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2021 webtrees development team
+ * Copyright (C) 2022 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -30,13 +30,15 @@ use League\Flysystem\UnableToRetrieveMetadata;
 use function bin2hex;
 use function getimagesizefromstring;
 use function http_build_query;
+use function in_array;
 use function intdiv;
+use function is_array;
 use function ksort;
 use function md5;
 use function pathinfo;
 use function random_bytes;
 use function str_contains;
-use function strtolower;
+use function strtoupper;
 
 use const PATHINFO_EXTENSION;
 
@@ -79,7 +81,6 @@ class MediaFile
 
         if (preg_match('/^\d FILE (.+)/m', $gedcom, $match)) {
             $this->multimedia_file_refn = $match[1];
-            $this->multimedia_format    = pathinfo($match[1], PATHINFO_EXTENSION);
         }
 
         if (preg_match('/^\d FORM (.+)/m', $gedcom, $match)) {
@@ -272,7 +273,7 @@ class MediaFile
      */
     public function mimeType(): string
     {
-        $extension = strtolower(pathinfo($this->multimedia_file_refn, PATHINFO_EXTENSION));
+        $extension = strtoupper(pathinfo($this->multimedia_file_refn, PATHINFO_EXTENSION));
 
         return Mime::TYPES[$extension] ?? Mime::DEFAULT_TYPE;
     }

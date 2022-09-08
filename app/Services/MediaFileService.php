@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2021 webtrees development team
+ * Copyright (C) 2022 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -24,6 +24,7 @@ use Fisharebest\Webtrees\FlashMessages;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Tree;
+use Fisharebest\Webtrees\Validator;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\JoinClause;
@@ -39,22 +40,24 @@ use RuntimeException;
 use function array_combine;
 use function array_diff;
 use function array_intersect;
-use function assert;
 use function dirname;
 use function explode;
 use function ini_get;
 use function intdiv;
+use function is_float;
 use function min;
 use function pathinfo;
 use function sha1;
 use function sort;
 use function str_contains;
-use function strtolower;
+use function strlen;
+use function strtoupper;
 use function strtr;
 use function substr;
 use function trim;
 
 use const PATHINFO_EXTENSION;
+use const PHP_INT_MAX;
 use const UPLOAD_ERR_OK;
 
 /**
@@ -63,8 +66,8 @@ use const UPLOAD_ERR_OK;
 class MediaFileService
 {
     public const EXTENSION_TO_FORM = [
-        'jpeg' => 'jpg',
-        'tiff' => 'tif',
+        'JPEG' => 'JPG',
+        'TIFF' => 'TIF',
     ];
 
     private const IGNORE_FOLDERS = [
@@ -77,6 +80,8 @@ class MediaFileService
         '@eaDir',
         // QNAP,
         '.@__thumb',
+        // WebDAV,
+        '_DAV',
     ];
 
     /**
@@ -104,19 +109,23 @@ class MediaFileService
     {
         $number = (int) $size;
 
-        switch (substr($size, -1)) {
-            case 'g':
-            case 'G':
-                return $number * 1073741824;
-            case 'm':
-            case 'M':
-                return $number * 1048576;
-            case 'k':
-            case 'K':
-                return $number * 1024;
-            default:
-                return $number;
+        $units = [
+            'g' => 1073741824,
+            'G' => 1073741824,
+            'm' => 1048576,
+            'M' => 1048576,
+            'k' => 1024,
+            'K' => 1024,
+        ];
+
+        $number *= $units[substr($size, -1)] ?? 1;
+
+        if (is_float($number)) {
+            // Probably a 32bit version of PHP, with an INI setting >= 2GB
+            return PHP_INT_MAX;
         }
+
+        return $number;
     }
 
     /**
@@ -156,8 +165,7 @@ class MediaFileService
      */
     public function uploadFile(ServerRequestInterface $request): string
     {
-        $tree = $request->getAttribute('tree');
-        assert($tree instanceof Tree);
+        $tree = Validator::attributes($request)->tree();
 
         $data_filesystem = Registry::filesystem()->data();
 
@@ -243,10 +251,14 @@ class MediaFileService
     {
         $gedcom = '1 FILE ' . $file;
 
-        $format = strtolower(pathinfo($file, PATHINFO_EXTENSION));
-        $format = self::EXTENSION_TO_FORM[$format] ?? $format;
+        if (str_contains($file, '://')) {
+            $format = '';
+        } else {
+            $format = strtoupper(pathinfo($file, PATHINFO_EXTENSION));
+            $format = self::EXTENSION_TO_FORM[$format] ?? $format;
+        }
 
-        if ($format !== '') {
+        if ($format !== '' && strlen($format) <= 4) {
             $gedcom .= "\n2 FORM " . $format;
         } elseif ($type !== '') {
             $gedcom .= "\n2 FORM";
@@ -275,7 +287,7 @@ class MediaFileService
      * @param string             $folder     Root folder
      * @param bool               $subfolders Include subfolders
      *
-     * @return Collection<string>
+     * @return Collection<int,string>
      */
     public function allFilesOnDisk(FilesystemOperator $filesystem, string $folder, bool $subfolders): Collection
     {
@@ -299,7 +311,7 @@ class MediaFileService
      * @param string $media_folder Root folder
      * @param bool   $subfolders   Include subfolders
      *
-     * @return Collection<string>
+     * @return Collection<int,string>
      */
     public function allFilesInDatabase(string $media_folder, bool $subfolders): Collection
     {
@@ -325,7 +337,7 @@ class MediaFileService
      *
      * @param Tree $tree
      *
-     * @return Collection<string>
+     * @return Collection<int,string>
      * @throws FilesystemException
      */
     public function mediaFolders(Tree $tree): Collection
@@ -345,7 +357,7 @@ class MediaFileService
      *
      * @param FilesystemOperator $data_filesystem
      *
-     * @return Collection<string,string>
+     * @return Collection<array-key,string>
      * @throws FilesystemException
      */
     public function allMediaFolders(FilesystemOperator $data_filesystem): Collection
@@ -389,6 +401,7 @@ class MediaFileService
 
         return $disk_folders->concat($db_folders)
             ->uniqueStrict()
+            ->sort(I18N::comparator())
             ->mapWithKeys(static function (string $folder): array {
                 return [$folder => $folder];
             });
