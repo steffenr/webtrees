@@ -79,6 +79,7 @@ use Fisharebest\Webtrees\Elements\Coordinates;
 use Fisharebest\Webtrees\Elements\CopyrightFile;
 use Fisharebest\Webtrees\Elements\CopyrightSourceData;
 use Fisharebest\Webtrees\Elements\CountOfChildren;
+use Fisharebest\Webtrees\Elements\CountOfChildrenFam;
 use Fisharebest\Webtrees\Elements\CountOfMarriages;
 use Fisharebest\Webtrees\Elements\Cremation;
 use Fisharebest\Webtrees\Elements\CustomElement;
@@ -97,7 +98,6 @@ use Fisharebest\Webtrees\Elements\EventsRecorded;
 use Fisharebest\Webtrees\Elements\EventTypeCitedFrom;
 use Fisharebest\Webtrees\Elements\FamilyCensus;
 use Fisharebest\Webtrees\Elements\FamilyEvent;
-use Fisharebest\Webtrees\Elements\FamilyFact;
 use Fisharebest\Webtrees\Elements\FamilyRecord;
 use Fisharebest\Webtrees\Elements\FamilyResidence;
 use Fisharebest\Webtrees\Elements\FileName;
@@ -467,7 +467,7 @@ class Gedcom
             'FAM:MARR:PLAC'              => new PlaceName(I18N::translate('Place of marriage')),
             'FAM:MARR:TYPE'              => new MarriageType(I18N::translate('Type of marriage')),
             'FAM:MARS'                   => new MarriageSettlement(I18N::translate('Marriage settlement')),
-            'FAM:NCHI'                   => new CountOfChildren(I18N::translate('Number of children')),
+            'FAM:NCHI'                   => new CountOfChildrenFam(I18N::translate('Number of children')),
             'FAM:NOTE'                   => new NoteStructure(I18N::translate('Note')),
             'FAM:OBJE'                   => new XrefMedia(I18N::translate('Media object')),
             'FAM:REFN'                   => new UserReferenceNumber(I18N::translate('Reference number')),
@@ -718,9 +718,9 @@ class Gedcom
             'INDI:OCCU'                  => new Occupation(I18N::translate('Occupation')),
             'INDI:OCCU:AGNC'             => new ResponsibleAgency(I18N::translate('Employer')),
             'INDI:ORDN'                  => new Ordination(I18N::translate('Ordination')),
-            'INDI:ORDN:AGNC'             => new Ordination(I18N::translate('Religious institution')),
-            'INDI:ORDN:DATE'             => new Ordination(I18N::translate('Date of ordination')),
-            'INDI:ORDN:PLAC'             => new Ordination(I18N::translate('Place of ordination')),
+            'INDI:ORDN:AGNC'             => new ResponsibleAgency(I18N::translate('Religious institution')),
+            'INDI:ORDN:DATE'             => new DateValue(I18N::translate('Date of ordination')),
+            'INDI:ORDN:PLAC'             => new PlaceName(I18N::translate('Place of ordination')),
             'INDI:PROB'                  => new Probate(I18N::translate('Probate')),
             'INDI:PROP'                  => new Possessions(I18N::translate('Property')),
             'INDI:REFN'                  => new UserReferenceNumber(I18N::translate('Reference number')),
@@ -896,8 +896,6 @@ class Gedcom
     {
         return [
             'FAM:CHAN:_WT_USER'           => new WebtreesUser(I18N::translate('Author of last change')),
-            'FAM:FACT'                    => new FamilyFact(I18N::translate('Fact')),
-            'FAM:FACT:TYPE'               => new EventOrFactClassification(I18N::translate('Type of fact')),
             'FAM:*:_ASSO'                 => new XrefAssociate(I18N::translate('Associate')),
             'FAM:*:_ASSO:NOTE'            => new NoteStructure(I18N::translate('Note on association')),
             'FAM:*:_ASSO:RELA'            => new RelationIsDescriptor(I18N::translate('Relationship')),
@@ -1024,6 +1022,29 @@ class Gedcom
             'INDI' => array_map(static fn (string $tag): array => [$tag, '0:M'], $custom_individual_tags),
         ];
 
+        // GEDCOM 7 tags
+        if (Site::getPreference('CUSTOM_FAM_FACT') === '1') {
+            $subtags['FAM'][] = ['FACT', '0:M'];
+        }
+        if (Site::getPreference('CUSTOM_FAM_NCHI') === '1') {
+            $subtags['FAM:NCHI'] = [
+                ['TYPE', '0:1:?'],
+                ['DATE', '0:1'],
+                ['PLAC', '0:1:?'],
+                ['ADDR', '0:1:?'],
+                ['EMAIL', '0:1:?'],
+                ['WWW', '0:1:?'],
+                ['PHON', '0:1:?'],
+                ['FAX', '0:1:?'],
+                ['CAUS', '0:1:?'],
+                ['AGNC', '0:1:?'],
+                ['RELI', '0:1:?'],
+                ['NOTE', '0:M'],
+                ['OBJE', '0:M'],
+                ['SOUR', '0:M'],
+                ['RESN', '0:1'],
+            ];
+        }
         if (Site::getPreference('CUSTOM_TIME_TAGS') === '1') {
             $subtags['INDI:BIRT:DATE'][] = ['TIME', '0:1'];
             $subtags['INDI:DEAT:DATE'][] = ['TIME', '0:1'];

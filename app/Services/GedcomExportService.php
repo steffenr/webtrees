@@ -55,7 +55,6 @@ use function is_string;
 use function pathinfo;
 use function preg_match_all;
 use function rewind;
-use function str_contains;
 use function stream_filter_append;
 use function stream_get_meta_data;
 use function strlen;
@@ -95,12 +94,14 @@ class GedcomExportService
     }
 
     /**
-     * @param Tree                        $tree           - Export data from this tree
-     * @param bool                        $sort_by_xref   - Write GEDCOM records in XREF order
-     * @param string                      $encoding       - Convert from UTF-8 to other encoding
-     * @param string                      $privacy        - Filter records by role
-     * @param string                      $filename       - Name of download file, without an extension
-     * @param string                      $format         - One of: gedcom, zip, zipmedia, gedzip
+     * @param Tree            $tree         - Export data from this tree
+     * @param bool            $sort_by_xref - Write GEDCOM records in XREF order
+     * @param string          $encoding     - Convert from UTF-8 to other encoding
+     * @param string          $privacy      - Filter records by role
+     * @param string          $line_endings
+     * @param string          $filename     - Name of download file, without an extension
+     * @param string          $format       - One of: gedcom, zip, zipmedia, gedzip
+     * @param Collection|null $records
      *
      * @return ResponseInterface
      */
@@ -228,7 +229,7 @@ class GedcomExportService
             ];
         }
 
-        $media_filesystem = Registry::filesystem()->media($tree);
+        $media_filesystem = $tree->mediaFilesystem();
 
         foreach ($data as $rows) {
             foreach ($rows as $datum) {

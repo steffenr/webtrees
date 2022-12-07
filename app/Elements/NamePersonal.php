@@ -100,6 +100,26 @@ class NamePersonal extends AbstractElement
     }
 
     /**
+     * Convert a value to a canonical form.
+     *
+     * @param string $value
+     *
+     * @return string
+     */
+    public function canonical(string $value): string
+    {
+        $value = parent::canonical($value);
+
+        if ($value === '//') {
+            return '';
+        }
+
+        return $value;
+    }
+
+
+
+    /**
      * Create a default value for this element.
      *
      * @param Tree $tree

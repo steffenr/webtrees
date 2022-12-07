@@ -23,6 +23,7 @@ use Fisharebest\Webtrees\GedcomRecord;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Tree;
+use Fisharebest\Webtrees\Validator;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Support\Str;
 use Psr\Http\Message\ServerRequestInterface;
@@ -81,6 +82,7 @@ class TopPageViewsModule extends AbstractModule implements ModuleBlockInterface
         $query = DB::table('hit_counter')
             ->where('gedcom_id', '=', $tree->id())
             ->whereIn('page_name', self::PAGES)
+            ->select(['page_parameter', 'page_count'])
             ->orderByDesc('page_count');
 
         $results = [];
@@ -90,7 +92,7 @@ class TopPageViewsModule extends AbstractModule implements ModuleBlockInterface
             if ($record instanceof GedcomRecord && $record->canShow()) {
                 $results[] = [
                     'record' => $record,
-                    'count'  => $row->page_count,
+                    'count'  => (int) $row->page_count,
                 ];
             }
 
@@ -156,9 +158,9 @@ class TopPageViewsModule extends AbstractModule implements ModuleBlockInterface
      */
     public function saveBlockConfiguration(ServerRequestInterface $request, int $block_id): void
     {
-        $params = (array) $request->getParsedBody();
+        $num = Validator::parsedBody($request)->integer('num');
 
-        $this->setBlockSetting($block_id, 'num', $params['num']);
+        $this->setBlockSetting($block_id, 'num', (string) $num);
     }
 
     /**

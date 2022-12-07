@@ -91,7 +91,7 @@ class ImageFactory implements ImageFactoryInterface
         try {
             try {
                 $mime_type = $filesystem->mimeType($path);
-            } catch (UnableToRetrieveMetadata $ex) {
+            } catch (UnableToRetrieveMetadata) {
                 $mime_type = Mime::DEFAULT_TYPE;
             }
 
@@ -156,7 +156,7 @@ class ImageFactory implements ImageFactoryInterface
      */
     public function mediaFileResponse(MediaFile $media_file, bool $add_watermark, bool $download): ResponseInterface
     {
-        $filesystem = Registry::filesystem()->media($media_file->media()->tree());
+        $filesystem = $media_file->media()->tree()->mediaFilesystem();
         $path       = $media_file->filename();
 
         if (!$add_watermark || !$media_file->isImage()) {
@@ -205,7 +205,7 @@ class ImageFactory implements ImageFactoryInterface
         bool $add_watermark
     ): ResponseInterface {
         // Where are the images stored.
-        $filesystem = Registry::filesystem()->media($media_file->media()->tree());
+        $filesystem = $media_file->media()->tree()->mediaFilesystem();
 
         // Where is the image stored in the filesystem.
         $path = $media_file->filename();
@@ -387,7 +387,7 @@ class ImageFactory implements ImageFactoryInterface
         try {
             // Auto-rotate using EXIF information.
             return $image->orientate();
-        } catch (NotSupportedException $ex) {
+        } catch (NotSupportedException) {
             // If we can't auto-rotate the image, then don't.
             return $image;
         }

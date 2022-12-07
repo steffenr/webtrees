@@ -26,8 +26,6 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-use function in_array;
-
 /**
  * Process a form to create a new submitter.
  */
@@ -41,12 +39,11 @@ class CreateSubmitterAction implements RequestHandlerInterface
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $tree        = Validator::attributes($request)->tree();
-        $params      = (array) $request->getParsedBody();
-        $name        = $params['submitter_name'];
-        $address     = $params['submitter_address'];
-        $email       = $params['submitter_email'];
-        $phone       = $params['submitter_phone'];
-        $restriction = $params['restriction'];
+        $name        = Validator::parsedBody($request)->string('submitter_name');
+        $address     = Validator::parsedBody($request)->string('submitter_address');
+        $email       = Validator::parsedBody($request)->string('submitter_email');
+        $phone       = Validator::parsedBody($request)->string('submitter_phone');
+        $restriction = Validator::parsedBody($request)->isInArray(['', 'NONE', 'PRIVACY', 'CONFIDENTIAL', 'LOCKED'])->string('restriction');
 
         // Fix non-printing characters
         $name = trim(preg_replace('/\s+/', ' ', $name));
@@ -65,7 +62,7 @@ class CreateSubmitterAction implements RequestHandlerInterface
             $gedcom .= "\n1 PHON " . $phone;
         }
 
-        if (in_array($restriction, ['none', 'privacy', 'confidential', 'locked'], true)) {
+        if ($restriction !== '') {
             $gedcom .= "\n1 RESN " . $restriction;
         }
 
