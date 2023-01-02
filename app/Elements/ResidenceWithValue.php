@@ -20,13 +20,25 @@ declare(strict_types=1);
 namespace Fisharebest\Webtrees\Elements;
 
 /**
- * An event which never happened.
+ * ResidenceWithValue
  */
-class NonEvent extends AbstractElement
+class ResidenceWithValue extends AbstractElement
 {
     protected const SUBTAGS = [
-        'DATE' => '0:1',
-        'NOTE' => '0:1',
-        'SOUR' => '0:1',
+        'TYPE'  => '0:1:?',
+        'DATE'  => '0:1',
+        'PLAC'  => '0:1',
+        'ADDR'  => '0:1',
+        'EMAIL' => '0:1:?',
+        'WWW'   => '0:1:?',
+        'PHON'  => '0:1:?',
+        'FAX'   => '0:1:?',
+        'CAUS'  => '0:1:?',
+        'AGNC'  => '0:1:?',
+        'RELI'  => '0:1:?',
+        'NOTE'  => '0:M',
+        'OBJE'  => '0:M',
+        'SOUR'  => '0:M',
+        'RESN'  => '0:1',
     ];
 }

@@ -3,15 +3,16 @@ msgstr ""
 "Project-Id-Version: webtrees 1.0\n"
 "Report-Msgid-Bugs-To: i18n@webtrees.net\n"
 "POT-Creation-Date: 2022-11-27 17:22+0000\n"
-"PO-Revision-Date: 2022-09-05 19:50+0000\n"
-"Last-Translator: Martin <der@bauschaffen.de>\n"
-"Language-Team: German <https://translate.webtrees.net/projects/webtrees/webtrees/de/>\n"
+"PO-Revision-Date: 2022-12-28 11:18+0000\n"
+"Last-Translator: marku5 <markusl@gmx.de>\n"
+"Language-Team: German <https://translate.webtrees.net/projects/webtrees/"
+"webtrees/de/>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 3.9.1\n"
+"X-Generator: Weblate 4.14.2\n"
 
 #: resources/xml/reports/ahnentafel_report.xml:161
 #: resources/xml/reports/ahnentafel_report.xml:189
@@ -162,7 +163,7 @@ msgstr "%j. %F %Y"
 #: app/Statistics/Service/CenturyService.php:39
 #, php-format
 msgid "%s BCE"
-msgstr "%s v. Chr."
+msgstr "%s v. u. Z."
 
 #. I18N: size of file in KB
 #: app/Http/RequestHandlers/ManageMediaData.php:362 app/MediaFile.php:312
@@ -422,13 +423,13 @@ msgstr "Cousin %s. Grades"
 #: app/Date/JulianDate.php:98
 #, php-format
 msgid "%s&nbsp;BCE"
-msgstr "%s&nbsp;v. Chr."
+msgstr "%s&nbsp;v. u. Z."
 
 #. I18N: CE=Common Era, for Julian years > 0. See https://en.wikipedia.org/wiki/Common_Era
 #: app/Date/JulianDate.php:102 app/Date/JulianDate.php:106
 #, php-format
 msgid "%s&nbsp;CE"
-msgstr "%s&nbsp;n. Chr."
+msgstr "%s&nbsp;n. u. Z."
 
 #. I18N: Label on a graph; 40+ means 40 or more
 #: app/Module/StatisticsChartModule.php:860
@@ -751,7 +752,9 @@ msgstr "Eine Liste der Zweige einer Familie."
 #. I18N: Description of the “Pending changes” module
 #: app/Module/ReviewChangesModule.php:93
 msgid "A list of changes that need to be reviewed by a moderator, and email notifications."
-msgstr "Eine Liste der Änderungen, die die Zustimmung des Moderators brauchen, sowie E-Mail-Benachrichtigungen."
+msgstr ""
+"Eine Liste der Änderungen, die von einem Moderator geprüft werden müssen, "
+"sowie E-Mail-Benachrichtigungen."
 
 #. I18N: Description of the “Families” module
 #: app/Module/FamilyListModule.php:54
@@ -852,7 +855,9 @@ msgstr "Ein Medienobjekt ist ein Eintrag im Stammbaum, welcher Informationen üb
 #: resources/views/emails/verify-notify-text.phtml:17
 #, php-format
 msgid "A new user (%1$s) has requested an account (%2$s) and verified an email address (%3$s)."
-msgstr "Ein neuer Benutzer (%1$s) hat ein Benutzerkonto (%2$s) angefragt und und dies mit der E-Mail-Adresse (%3$s) bestätigt."
+msgstr ""
+"Ein neuer Benutzer (%1$s) hat ein Benutzerkonto (%2$s) angefragt und dies "
+"mit der E-Mail-Adresse (%3$s) bestätigt."
 
 #: app/Http/RequestHandlers/LoginAction.php:80
 #: app/Module/CheckForNewVersion.php:99
@@ -1877,7 +1882,7 @@ msgid "An hourglass chart of an individual’s ancestors and descendants."
 msgstr "Ein Sanduhrdiagramm der Vorfahren und Nachkommen einer Person."
 
 #: resources/views/edit/reorder-families.phtml:75
-msgid "An individual can have more than one set of parents.  For example, birth and adopted."
+msgid "An individual can have more than one set of parents. For example, birth and adopted."
 msgstr "Eine Person kann mehr als ein Elternpaar haben. Zum Beispiel leibliche und Adoptiveltern."
 
 #. I18N: Description of the “Interactive tree” module
@@ -3841,7 +3846,7 @@ msgstr "Vergleich"
 #: app/Elements/LdsOrdinanceStatus.php:77
 #: app/Elements/LdsSpouseSealingDateStatus.php:74
 msgid "Completed before 1970; date not available"
-msgstr "Vor 1970 fertiggestellt; Datum nicht verfügbar"
+msgstr "Fertiggestellt vor 1970; Datum nicht verfügbar"
 
 #. I18N: LDS sealing status; see https://en.wikipedia.org/wiki/Sealing_(Mormonism)
 #: app/Elements/LdsBaptismDateStatus.php:67
@@ -5707,7 +5712,7 @@ msgstr "Tragen Sie eine zusätzliche Notiz zu diesem Favoriten ein"
 #: app/Services/LeafletJsService.php:75
 #: resources/views/modules/interactive-tree/chart.phtml:25
 msgid "Enter fullscreen"
-msgstr ""
+msgstr "Vollbildmodus aktivieren"
 
 #: resources/views/search-replace-page.phtml:47
 msgid "Entire record"
@@ -5847,7 +5852,7 @@ msgstr "Von der Vorlage ausgeschlossen"
 #: app/Services/LeafletJsService.php:76
 #: resources/views/modules/interactive-tree/chart.phtml:26
 msgid "Exit fullscreen"
-msgstr ""
+msgstr "Vollbildmodus verlassen"
 
 #. I18N: placeholder text for registration-comments field
 #: resources/views/register-page.phtml:89
@@ -5871,7 +5876,7 @@ msgstr "Exportiere alle Stammbäume in GEDCOM-Dateien…"
 msgid "Export preferences"
 msgstr "Export-Einstellungen"
 
-#. I18N: A configuration setting. …who were born in the last XX years or died in the    last YY years
+#. I18N: A configuration setting. …who were born in the last XX years or died in the last YY years
 #: resources/views/admin/trees-privacy.phtml:102
 msgid "Extend privacy to dead individuals"
 msgstr "Datenschutz auf Verstorbene ausweiten"
@@ -6115,7 +6120,7 @@ msgstr "Familienvolkszählung"
 
 #: resources/views/admin/tags.phtml:975
 msgid "Family fact"
-msgstr ""
+msgstr "Familientatsache"
 
 #: resources/views/admin/tags.phtml:1025
 msgid "Family facts and events"
@@ -6430,7 +6435,9 @@ msgstr "Es wurden alte Dateien einer Vorgängerversion von webtrees gefunden. Al
 #: resources/views/admin/clean-data.phtml:22
 #, php-format
 msgid "Files marked with %s are required for proper operation and cannot be removed."
-msgstr "Dateien, die mit %s gekennzeichnet sind, sind notwendig für die ordnungsgemäße Funktion und können nicht entfernt werden."
+msgstr ""
+"Die mit %s gekennzeichneten Dateien sind für den ordnungsgemäßen Betrieb "
+"erforderlich und können nicht entfernt werden."
 
 #: resources/views/calendar-page.phtml:122
 #: resources/views/lists/datatables-attributes.phtml:34
@@ -6825,7 +6832,7 @@ msgstr "GEDCOM"
 
 #: resources/views/admin/tags.phtml:935
 msgid "GEDCOM 7"
-msgstr ""
+msgstr "GEDCOM 7"
 
 #. I18N: A configuration setting
 #: resources/views/admin/trees-check.phtml:27
@@ -7296,7 +7303,7 @@ msgstr "Höhe"
 #: resources/views/emails/register-user-text.phtml:16
 #, php-format
 msgid "Hello %s…"
-msgstr "Hallo %s!"
+msgstr "Hallo %s…"
 
 #: resources/views/register-success-page.phtml:21
 #, php-format
@@ -7308,7 +7315,7 @@ msgstr "Hallo %s!<br>Danke für Ihre Anfrage."
 #: resources/views/emails/verify-notify-html.phtml:16
 #: resources/views/emails/verify-notify-text.phtml:14
 msgid "Hello administrator…"
-msgstr "Hallo Administrator!"
+msgstr "Hallo Administrator…"
 
 #: app/Http/RequestHandlers/HelpText.php:280 resources/views/help/link.phtml:13
 #: resources/views/help/link.phtml:15
@@ -7749,7 +7756,7 @@ msgstr "In diesem Monat…"
 msgid "In this year…"
 msgstr "In diesem Jahr…"
 
-#. I18N: "thumbs" is fixed text.  Do not change it.
+#. I18N: "thumbs" is fixed text. Do not change it.
 #: resources/views/admin/webtrees1-thumbnails.phtml:21
 msgid "In webtrees version 1, you could add custom thumbnails to media objects by creating files in the “thumbs” folders."
 msgstr "In webtrees 1 konnten Sie durch Erstellen von Dateien im Ordner \"thumbs\" benutzerdefinierte Vorschaubilder zu Medienobjekten hinzufügen."
@@ -10286,7 +10293,7 @@ msgstr "Es sind keine Ereignisse für diese Familie vorhanden."
 #: app/Http/RequestHandlers/MapDataImportAction.php:94
 #: app/Http/RequestHandlers/MapDataImportAction.php:110
 msgid "No file was received."
-msgstr ""
+msgstr "Es wurde keine Datei empfangen."
 
 #. I18N: PHP internal error message - php.net/manual/en/features.file-upload.errors.php
 #: app/Exceptions/FileUploadException.php:50
@@ -10835,7 +10842,7 @@ msgstr "Orlando, Florida, Vereinigte Staaten"
 #: app/Statistics/Google/ChartCommonSurname.php:137
 #: resources/views/admin/control-panel.phtml:739
 msgid "Other"
-msgstr "Sonstiges"
+msgstr "Sonstige"
 
 #: resources/views/admin/trees-preferences.phtml:409
 msgid "Other facts to show in charts"
@@ -11197,7 +11204,7 @@ msgid "Place names are frequently too long to fit on charts, lists, etc. They ca
 msgstr "Ortsbezeichnungen sind häufig zu lang, um in Listen, Tafeln oder ähnliches zu passen. Sie können abgekürzt werden, indem nur die ersten Teile, wie <i>Stadt, Kreis</i> oder die letzten Teile, wie <i>Region, Land</i> gezeigt werden."
 
 #: resources/views/help/place.phtml:14
-msgid "Place names can change over time.  In genealogy, it is customary to use the current name for a town or country. The historic name can be shown in sources, notes, etc."
+msgid "Place names can change over time. In genealogy, it is customary to use the current name for a town or country. The historic name can be shown in sources, notes, etc."
 msgstr "Ortsnamen können sich im Laufe der Zeit ändern. In der Genealogie ist es üblich, den aktuellen Namen für eine Stadt oder ein Land zu verwenden. Der historische Name kann in Quellen, Notizen usw. angezeigt werden."
 
 #: resources/views/help/place.phtml:10
@@ -12035,7 +12042,7 @@ msgstr "Reno, Nevada, Vereinigte Staaten"
 #: resources/views/admin/trees-merge.phtml:42
 #: resources/views/admin/trees.phtml:201
 msgid "Renumber XREFs"
-msgstr "xref_ID’s neu nummerieren"
+msgstr "xref_IDs neu nummerieren"
 
 #: resources/views/modules/fix-place-names/options.phtml:21
 msgid "Replace"
@@ -14489,8 +14496,10 @@ msgid "The new user will be asked to confirm their email address before the acco
 msgstr "Der neue Benutzer wird aufgefordert seine E-Mail-Adresse zu bestätigen, bevor das Konto erstellt wird."
 
 #: resources/views/admin/tags.phtml:938
-msgid "The next version of the GEDCOM standard will add new tags and remove old ones.  You can use some of the new tags now."
+msgid "The next version of the GEDCOM standard will add new tags and remove old ones. You can use some of the new tags now."
 msgstr ""
+"Die nächste Version des GEDCOM-Standards wird neue Tags hinzufügen und alte "
+"entfernen. Sie können einige der neuen Tags bereits jetzt verwenden."
 
 #: app/Http/RequestHandlers/CreateNoteAction.php:65
 msgid "The note has been created"
@@ -21747,7 +21756,7 @@ msgstr "…"
 #~ msgid "If the number of times that a certain surname occurs is lower than the threshold, it will not appear in the list. It can be added here manually. If more than one surname is entered, they must be separated by a comma. <b>Surnames are case-sensitive.</b>"
 #~ msgstr "Wenn die Häufigkeit eines vorkommenden Nachnamens niedriger ist als die festgelegte Mindestanzahl, so erscheint er nicht in der Liste der häufigsten Nachnamen. Hier können einzelne solcher Namen manuell zur Liste hinzugefügt werden. Wenn Sie mehrere Namen angeben, trennen Sie diese jeweils durch ein Komma. <b>Bitte beachten Sie die Groß- und Kleinschreibung.</b>"
 
-#~ msgid "If the thumbnail image is the same as the original image, it is no longer needed and you should delete it.  If it is a custom image, you should add it to the media object."
+#~ msgid "If the thumbnail image is the same as the original image, it is no longer needed and you should delete it. If it is a custom image, you should add it to the media object."
 #~ msgstr "Falls das Vorschaubild gleich dem Originalbild ist, wird es nicht länger benötigt und kann gelöscht werden. Wenn es ein benutzerdefiniertes Bild ist, sollten Sie es zum Medienobjekt hinzufügen."
 
 #~ msgid "If visitors can not see the family tree, they will not be able to sign up for an account. You will need to add their account manually."
@@ -22966,7 +22975,7 @@ msgstr "…"
 #~ msgstr "Beim Hinzufügen einer Verknüpfung darf das ID-Feld nicht leer sein."
 
 #~ msgid "When adding new close relatives, you can add source citations to the records (individual and family) or to the facts and events (birth, marriage, and death). This option controls whether records or facts will be selected by default."
-#~ msgstr "Beim Hinzufügen von neuen nahen Verwandten, können Quellangaben zu den Personen- und Familendatensätzen oder zu Ereignissen wie Geburt, Heirat und Tod erfolgen. Diese Auswahl steuert, ob standardmäßig Datensätze oder Ereignisse  ausgewählt werden sollen."
+#~ msgstr "Beim Hinzufügen von neuen nahen Verwandten, können Quellangaben zu den Personen- und Familendatensätzen oder zu Ereignissen wie Geburt, Heirat und Tod erfolgen. Diese Auswahl steuert, ob standardmäßig Datensätze oder Ereignisse ausgewählt werden sollen."
 
 #~ msgid "When new records are created, they are given an internal ID number. You can specify the prefix used for each type of record."
 #~ msgstr "Wenn ein neuer Eintrag erstellt wird, bekommt dieser eine interne ID Nummer. Sie können entscheiden, welchen Präfix jede ID für jeden Typen erhält."

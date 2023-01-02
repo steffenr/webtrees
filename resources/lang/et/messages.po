@@ -3,15 +3,16 @@ msgstr ""
 "Project-Id-Version: webtrees\n"
 "Report-Msgid-Bugs-To: i18n@webtrees.net\n"
 "POT-Creation-Date: 2022-11-27 17:22+0000\n"
-"PO-Revision-Date: 2021-06-01 11:33+0000\n"
-"Last-Translator: J <jorgenvvv@gmail.com>\n"
-"Language-Team: Estonian <https://translate.webtrees.net/projects/webtrees/webtrees/et/>\n"
+"PO-Revision-Date: 2022-12-28 11:18+0000\n"
+"Last-Translator: maamesilane <maidu.leever@gmail.com>\n"
+"Language-Team: Estonian <https://translate.webtrees.net/projects/webtrees/"
+"webtrees/et/>\n"
 "Language: et\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 3.9.1\n"
+"X-Generator: Weblate 4.14.2\n"
 "X-Poedit-Language: Estonian\n"
 "X-Poedit-SourceCharset: utf-8\n"
 "X-Poedit-SearchPath-0: .\n"
@@ -1882,7 +1883,7 @@ msgid "An hourglass chart of an individual’s ancestors and descendants."
 msgstr "Liivakella joonis isiku esivanematest ja järeltulijatest."
 
 #: resources/views/edit/reorder-families.phtml:75
-msgid "An individual can have more than one set of parents.  For example, birth and adopted."
+msgid "An individual can have more than one set of parents. For example, birth and adopted."
 msgstr "Isikul saab olla rohkem kui üks paar vanemaid. Näiteks sünnivanemad ja kasuvanemad."
 
 #. I18N: Description of the “Interactive tree” module
@@ -5876,7 +5877,7 @@ msgstr "Ekspordi kõik sugupuud GEDCOM failidesse…"
 msgid "Export preferences"
 msgstr "Eksportimise eelistused"
 
-#. I18N: A configuration setting. …who were born in the last XX years or died in the    last YY years
+#. I18N: A configuration setting. …who were born in the last XX years or died in the last YY years
 #: resources/views/admin/trees-privacy.phtml:102
 msgid "Extend privacy to dead individuals"
 msgstr "Laienda privaatsussätted ka surnud isikutele"
@@ -6789,7 +6790,7 @@ msgstr "Kellelt"
 #: resources/views/admin/site-logs.phtml:39
 msgctxt "Start of date range"
 msgid "From"
-msgstr "Kellelt"
+msgstr "Alates"
 
 #. I18N: a month in the French republican calendar
 #: app/Date/FrenchDate.php:171
@@ -7754,7 +7755,7 @@ msgstr "Sellel kuul …"
 msgid "In this year…"
 msgstr "Sellel aastal …"
 
-#. I18N: "thumbs" is fixed text.  Do not change it.
+#. I18N: "thumbs" is fixed text. Do not change it.
 #: resources/views/admin/webtrees1-thumbnails.phtml:21
 msgid "In webtrees version 1, you could add custom thumbnails to media objects by creating files in the “thumbs” folders."
 msgstr "Webtrees 1. versioonis oli võimalik lisada meediaobjektidele kohandatud pisipilte luues faile \"thumbs\" kaustas."
@@ -11202,7 +11203,7 @@ msgid "Place names are frequently too long to fit on charts, lists, etc. They ca
 msgstr "Kohanimed on tihtipeale liiga pikad, et mahtuda joonistele, nimekirjadesse jne. Neid saab lühendada näidates ainult mõnda esimest osa nimest nagu <i>küla, maakond</i> või mõnda viimast osa nimest nagu <i>piirkond, riik</i>."
 
 #: resources/views/help/place.phtml:14
-msgid "Place names can change over time.  In genealogy, it is customary to use the current name for a town or country. The historic name can be shown in sources, notes, etc."
+msgid "Place names can change over time. In genealogy, it is customary to use the current name for a town or country. The historic name can be shown in sources, notes, etc."
 msgstr "Kohanimed võivad aja jooksul muutuda. Genealoogias on tavaks kasutada linna või riigi kehtivat nime. Ajaloolist nime saab näidata allikates, märkmetes jne."
 
 #: resources/views/help/place.phtml:10
@@ -14494,7 +14495,7 @@ msgid "The new user will be asked to confirm their email address before the acco
 msgstr "Enne kasutaja loomist palutakse uuel kasutajal oma e-maili aadress kinnitada."
 
 #: resources/views/admin/tags.phtml:938
-msgid "The next version of the GEDCOM standard will add new tags and remove old ones.  You can use some of the new tags now."
+msgid "The next version of the GEDCOM standard will add new tags and remove old ones. You can use some of the new tags now."
 msgstr ""
 
 #: app/Http/RequestHandlers/CreateNoteAction.php:65
@@ -15404,7 +15405,7 @@ msgstr "Saaja"
 #: resources/views/admin/site-logs.phtml:46
 msgctxt "End of date range"
 msgid "To"
-msgstr "Saaja"
+msgstr "Kuni"
 
 #: resources/views/modules/html/config.phtml:34
 msgid "To assist you in getting started with this block, we have created several standard templates. When you select one of these templates, the text area will contain a copy that you can then alter to suit your site’s requirements."
@@ -21744,7 +21745,7 @@ msgstr "…"
 #~ msgid "If the number of times that a certain surname occurs is lower than the threshold, it will not appear in the list. It can be added here manually. If more than one surname is entered, they must be separated by a comma. <b>Surnames are case-sensitive.</b>"
 #~ msgstr "Kui arv mitu korda mõni perekonnanimi esineb on väiksem kui lävend, siis seda nimekirjas ei kuvata. Neid nimesid saab siin manuaalselt sisestada. Kui sisestate rohkem kui ühe nime, siis eraldage need komadega. <b>Perekonnanimed on suurtähetundlikud.</b>"
 
-#~ msgid "If the thumbnail image is the same as the original image, it is no longer needed and you should delete it.  If it is a custom image, you should add it to the media object."
+#~ msgid "If the thumbnail image is the same as the original image, it is no longer needed and you should delete it. If it is a custom image, you should add it to the media object."
 #~ msgstr "Kui pisipilt on sama mis originaalpilt, siis see pole enam vajalik ja peaksite selle kustutama. Kui see on kohandatud pilt, siis peaksite selle lisama meediaobjekti."
 
 #~ msgid "If visitors can not see the family tree, they will not be able to sign up for an account. You will need to add their account manually."
