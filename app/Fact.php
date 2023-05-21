@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2022 webtrees development team
+ * Copyright (C) 2023 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -35,6 +35,7 @@ use function preg_match;
 use function preg_replace;
 use function str_contains;
 use function str_ends_with;
+use function str_starts_with;
 use function usort;
 
 /**
@@ -314,20 +315,20 @@ class Fact
      */
     public function canShow(int $access_level = null): bool
     {
-        $access_level = $access_level ?? Auth::accessLevel($this->record->tree());
+        $access_level ??= Auth::accessLevel($this->record->tree());
 
         // Does this record have an explicit restriction notice?
         $element     = new RestrictionNotice('');
         $restriction = $element->canonical($this->attribute('RESN'));
 
-        if (str_ends_with($restriction, RestrictionNotice::VALUE_CONFIDENTIAL)) {
+        if (str_starts_with($restriction, RestrictionNotice::VALUE_CONFIDENTIAL)) {
             return Auth::PRIV_NONE >= $access_level;
         }
 
-        if (str_ends_with($restriction, RestrictionNotice::VALUE_PRIVACY)) {
+        if (str_starts_with($restriction, RestrictionNotice::VALUE_PRIVACY)) {
             return Auth::PRIV_USER >= $access_level;
         }
-        if (str_ends_with($restriction, RestrictionNotice::VALUE_NONE)) {
+        if (str_starts_with($restriction, RestrictionNotice::VALUE_NONE)) {
             return true;
         }
 
@@ -374,7 +375,7 @@ class Fact
     }
 
     /**
-     * The place where the event occured.
+     * The place where the event occurred.
      *
      * @return Place
      */
@@ -605,7 +606,7 @@ class Fact
     /**
      * Helper functions to sort facts
      *
-     * @return Closure
+     * @return Closure(Fact,Fact):int
      */
     private static function dateComparator(): Closure
     {
@@ -635,7 +636,7 @@ class Fact
     /**
      * Helper functions to sort facts.
      *
-     * @return Closure
+     * @return Closure(Fact,Fact):int
      */
     public static function typeComparator(): Closure
     {

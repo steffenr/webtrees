@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2022 webtrees development team
+ * Copyright (C) 2023 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -26,7 +26,6 @@ use Fisharebest\Webtrees\Services\ModuleService;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Support\Collection;
 
-use function app;
 use function e;
 use function is_object;
 use function preg_split;
@@ -211,7 +210,7 @@ class Place
     public function url(): string
     {
         //find a module providing the place hierarchy
-        $module = app(ModuleService::class)
+        $module = Registry::container()->get(ModuleService::class)
             ->findByComponent(ModuleListInterface::class, $this->tree, Auth::user())
             ->first(static function (ModuleInterface $module): bool {
                 return $module instanceof PlaceHierarchyListModule;

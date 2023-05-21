@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2022 webtrees development team
+ * Copyright (C) 2023 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -39,9 +39,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-use function app;
 use function array_search;
-use function assert;
 use function e;
 use function explode;
 use function in_array;
@@ -130,16 +128,14 @@ class BranchesListModule extends AbstractModule implements ModuleListInterface, 
      */
     public function listUrl(Tree $tree, array $parameters = []): string
     {
-        $request = app(ServerRequestInterface::class);
-        assert($request instanceof ServerRequestInterface);
-
-        $xref = Validator::attributes($request)->isXref()->string('xref', '');
+        $request = Registry::container()->get(ServerRequestInterface::class);
+        $xref    = Validator::attributes($request)->isXref()->string('xref', '');
 
         if ($xref !== '') {
             $individual = Registry::individualFactory()->make($xref, $tree);
 
             if ($individual instanceof Individual && $individual->canShow()) {
-                $parameters['surname'] = $parameters['surname'] ?? $individual->getAllNames()[0]['surn'] ?? null;
+                $parameters['surname'] ??= $individual->getAllNames()[0]['surn'] ?? null;
             }
         }
 

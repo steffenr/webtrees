@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2022 webtrees development team
+ * Copyright (C) 2023 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -29,13 +29,11 @@ use Fisharebest\Webtrees\Services\PendingChangesService;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Support\Collection;
 
-use function app;
 use function array_combine;
 use function array_keys;
 use function array_map;
 use function array_search;
 use function array_shift;
-use function assert;
 use function count;
 use function date;
 use function e;
@@ -115,7 +113,7 @@ class GedcomRecord
     /**
      * A closure which will filter out private records.
      *
-     * @return Closure
+     * @return Closure(GedcomRecord):bool
      */
     public static function accessFilter(): Closure
     {
@@ -127,7 +125,7 @@ class GedcomRecord
     /**
      * A closure which will compare records by name.
      *
-     * @return Closure
+     * @return Closure(GedcomRecord,GedcomRecord):int
      */
     public static function nameComparator(): Closure
     {
@@ -153,7 +151,7 @@ class GedcomRecord
      *
      * @param int $direction +1 to sort ascending, -1 to sort descending
      *
-     * @return Closure
+     * @return Closure(GedcomRecord,GedcomRecord):int
      */
     public static function lastChangeComparator(int $direction = 1): Closure
     {
@@ -248,7 +246,7 @@ class GedcomRecord
      */
     public function canShow(int $access_level = null): bool
     {
-        $access_level = $access_level ?? Auth::accessLevel($this->tree);
+        $access_level ??= Auth::accessLevel($this->tree);
 
         // We use this value to bypass privacy checks. For example,
         // when downloading data or when calculating privacy itself.
@@ -614,7 +612,7 @@ class GedcomRecord
         int $access_level = null,
         bool $ignore_deleted = false
     ): Collection {
-        $access_level = $access_level ?? Auth::accessLevel($this->tree);
+        $access_level ??= Auth::accessLevel($this->tree);
 
         // Convert BIRT into INDI:BIRT, etc.
         $filter = array_map(fn (string $tag): string => $this->tag() . ':' . $tag, $filter);
@@ -844,8 +842,7 @@ class GedcomRecord
             $this->pending = $new_gedcom;
 
             if (Auth::user()->getPreference(UserInterface::PREF_AUTO_ACCEPT_EDITS) === '1') {
-                $pending_changes_service = app(PendingChangesService::class);
-                assert($pending_changes_service instanceof PendingChangesService);
+                $pending_changes_service = Registry::container()->get(PendingChangesService::class);
 
                 $pending_changes_service->acceptRecord($this);
                 $this->gedcom  = $new_gedcom;
@@ -896,8 +893,7 @@ class GedcomRecord
 
         // Accept this pending change
         if (Auth::user()->getPreference(UserInterface::PREF_AUTO_ACCEPT_EDITS) === '1') {
-            $pending_changes_service = app(PendingChangesService::class);
-            assert($pending_changes_service instanceof PendingChangesService);
+            $pending_changes_service = Registry::container()->get(PendingChangesService::class);
 
             $pending_changes_service->acceptRecord($this);
             $this->gedcom  = $gedcom;
@@ -929,9 +925,7 @@ class GedcomRecord
 
         // Auto-accept this pending change
         if (Auth::user()->getPreference(UserInterface::PREF_AUTO_ACCEPT_EDITS) === '1') {
-            $pending_changes_service = app(PendingChangesService::class);
-            assert($pending_changes_service instanceof PendingChangesService);
-
+            $pending_changes_service = Registry::container()->get(PendingChangesService::class);
             $pending_changes_service->acceptRecord($this);
         }
 

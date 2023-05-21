@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2022 webtrees development team
+ * Copyright (C) 2023 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -176,10 +176,10 @@ class Gedcom7 implements CustomTagInterface
 
         if (Site::getPreference('CUSTOM_RESI_VALUE') === '1') {
             if (Site::getPreference('HIDE_FAM_RESI') !== '1') {
-                $tags['FAM:RESI'] = new ResidenceWithValue('Family residence');
+                $tags['FAM:RESI'] = new ResidenceWithValue(I18N::translate('Family residence'));
             }
 
-            $tags['INDI:RESI'] = new ResidenceWithValue('Residence');
+            $tags['INDI:RESI'] = new ResidenceWithValue(I18N::translate('Residence'));
         }
 
         return $tags;

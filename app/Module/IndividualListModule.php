@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2022 webtrees development team
+ * Copyright (C) 2023 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -19,6 +19,7 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Module;
 
+use Fig\Http\Message\StatusCodeInterface;
 use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Contracts\UserInterface;
 use Fisharebest\Webtrees\Family;
@@ -37,10 +38,12 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-use function app;
 use function array_filter;
 use function array_keys;
+use function array_map;
+use function array_merge;
 use function array_sum;
+use function array_values;
 use function assert;
 use function e;
 use function implode;
@@ -48,6 +51,7 @@ use function ob_get_clean;
 use function ob_start;
 use function route;
 use function uksort;
+use function usort;
 use function view;
 
 use const ARRAY_FILTER_USE_KEY;
@@ -112,10 +116,8 @@ class IndividualListModule extends AbstractModule implements ModuleListInterface
      */
     public function listUrl(Tree $tree, array $parameters = []): string
     {
-        $request = app(ServerRequestInterface::class);
-        assert($request instanceof ServerRequestInterface);
-
-        $xref = Validator::attributes($request)->isXref()->string('xref', '');
+        $request = Registry::container()->get(ServerRequestInterface::class);
+        $xref    = Validator::attributes($request)->isXref()->string('xref', '');
 
         if ($xref !== '') {
             $individual = Registry::individualFactory()->make($xref, $tree);
@@ -123,7 +125,7 @@ class IndividualListModule extends AbstractModule implements ModuleListInterface
             if ($individual instanceof Individual && $individual->canShow()) {
                 $primary_name = $individual->getPrimaryName();
 
-                $parameters['surname'] = $parameters['surname'] ?? $individual->getAllNames()[$primary_name]['surn'] ?? null;
+                $parameters['surname'] ??= $individual->getAllNames()[$primary_name]['surn'] ?? null;
             }
         }
 
@@ -166,7 +168,7 @@ class IndividualListModule extends AbstractModule implements ModuleListInterface
         ];
 
         if ($surname_param !== $surname) {
-            return Registry::responseFactory()->redirectUrl($this->listUrl($tree, $params));
+            return Registry::responseFactory()->redirectUrl($this->listUrl($tree, $params), StatusCodeInterface::STATUS_MOVED_PERMANENTLY);
         }
 
         return $this->createResponse($tree, $user, $params, false);
@@ -420,8 +422,11 @@ class IndividualListModule extends AbstractModule implements ModuleListInterface
                     if ($count < $tree->getPreference('SUBLIST_TRIGGER_I')) {
                         $falpha = '';
                     } else {
-                        $givn_initials = $this->givenNameInitials($tree, array_keys($surns), $show_marnm === 'yes', $families);
                         // Break long lists by initial letter of given name
+                        $surns         = array_values(array_map(static fn ($x): array => array_keys($x), $surns));
+                        $surns         = array_merge(...$surns);
+                        $givn_initials = $this->givenNameInitials($tree, $surns, $show_marnm === 'yes', $families);
+
                         if ($surname !== '' || $show_all) {
                             if (!$show_all) {
                                 echo '<h2 class="wt-page-title">', I18N::translate('Individuals with surname %s', $legend), '</h2>';
@@ -580,7 +585,7 @@ class IndividualListModule extends AbstractModule implements ModuleListInterface
         }
 
         $query
-            ->select($this->binaryColumn('n_givn', 'n_givn'), new Expression('COUNT(*) AS count'))
+            ->select([$this->binaryColumn('n_givn', 'n_givn'), new Expression('COUNT(*) AS count')])
             ->groupBy([$this->binaryColumn('n_givn')]);
 
         foreach ($query->get() as $row) {
@@ -661,7 +666,7 @@ class IndividualListModule extends AbstractModule implements ModuleListInterface
         }
 
         foreach ($all_surnames as $surn => $surnames) {
-            $initial = I18N::language()->initialLetter($surn);
+            $initial = I18N::language()->initialLetter((string) $surn);
 
             $initials[$initial] ??= 0;
             $initials[$initial] += array_sum($surnames);

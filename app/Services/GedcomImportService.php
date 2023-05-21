@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2022 webtrees development team
+ * Copyright (C) 2023 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -41,12 +41,10 @@ use Fisharebest\Webtrees\Tree;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Query\JoinClause;
 
-use function app;
 use function array_chunk;
 use function array_intersect_key;
 use function array_map;
 use function array_unique;
-use function assert;
 use function date;
 use function explode;
 use function max;
@@ -81,8 +79,7 @@ class GedcomImportService
      */
     private function reformatRecord(string $rec, Tree $tree): string
     {
-        $gedcom_service = app(GedcomService::class);
-        assert($gedcom_service instanceof GedcomService);
+        $gedcom_service = Registry::container()->get(GedcomService::class);
 
         // Strip out mac/msdos line endings
         $rec = preg_replace("/[\r\n]+/", "\n", $rec);
