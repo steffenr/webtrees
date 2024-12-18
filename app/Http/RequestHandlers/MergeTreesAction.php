@@ -19,6 +19,7 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Http\RequestHandlers;
 
+use Fisharebest\Webtrees\DB;
 use Fisharebest\Webtrees\FlashMessages;
 use Fisharebest\Webtrees\Header;
 use Fisharebest\Webtrees\I18N;
@@ -26,7 +27,6 @@ use Fisharebest\Webtrees\Services\AdminService;
 use Fisharebest\Webtrees\Services\TreeService;
 use Fisharebest\Webtrees\Tree;
 use Fisharebest\Webtrees\Validator;
-use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Expression;
 use Psr\Http\Message\ResponseInterface;
@@ -46,8 +46,6 @@ class MergeTreesAction implements RequestHandlerInterface
     private TreeService $tree_service;
 
     /**
-     * AdminTreesController constructor.
-     *
      * @param AdminService $admin_service
      * @param TreeService  $tree_service
      */
@@ -71,7 +69,7 @@ class MergeTreesAction implements RequestHandlerInterface
         $tree2 = $this->tree_service->all()->get($tree2_name);
 
         if ($tree1 instanceof Tree && $tree2 instanceof Tree && $tree1 !== $tree2 && $this->admin_service->countCommonXrefs($tree1, $tree2) === 0) {
-            (new Builder(DB::connection()))->from('individuals')->insertUsing([
+            DB::query()->from('individuals')->insertUsing([
                 'i_file',
                 'i_id',
                 'i_rin',
@@ -88,7 +86,7 @@ class MergeTreesAction implements RequestHandlerInterface
                     ->where('i_file', '=', $tree1->id());
             });
 
-            (new Builder(DB::connection()))->from('families')->insertUsing([
+            DB::query()->from('families')->insertUsing([
                 'f_file',
                 'f_id',
                 'f_husb',
@@ -107,7 +105,7 @@ class MergeTreesAction implements RequestHandlerInterface
                     ->where('f_file', '=', $tree1->id());
             });
 
-            (new Builder(DB::connection()))->from('sources')->insertUsing([
+            DB::query()->from('sources')->insertUsing([
                 's_file',
                 's_id',
                 's_name',
@@ -122,7 +120,7 @@ class MergeTreesAction implements RequestHandlerInterface
                     ->where('s_file', '=', $tree1->id());
             });
 
-            (new Builder(DB::connection()))->from('media')->insertUsing([
+            DB::query()->from('media')->insertUsing([
                 'm_file',
                 'm_id',
                 'm_gedcom',
@@ -135,7 +133,7 @@ class MergeTreesAction implements RequestHandlerInterface
                     ->where('m_file', '=', $tree1->id());
             });
 
-            (new Builder(DB::connection()))->from('media_file')->insertUsing([
+            DB::query()->from('media_file')->insertUsing([
                 'm_file',
                 'm_id',
                 'multimedia_file_refn',
@@ -154,7 +152,7 @@ class MergeTreesAction implements RequestHandlerInterface
                     ->where('m_file', '=', $tree1->id());
             });
 
-            (new Builder(DB::connection()))->from('other')->insertUsing([
+            DB::query()->from('other')->insertUsing([
                 'o_file',
                 'o_id',
                 'o_type',
@@ -170,7 +168,7 @@ class MergeTreesAction implements RequestHandlerInterface
                     ->where('o_file', '=', $tree1->id());
             });
 
-            (new Builder(DB::connection()))->from('name')->insertUsing([
+            DB::query()->from('name')->insertUsing([
                 'n_file',
                 'n_id',
                 'n_num',
@@ -203,7 +201,7 @@ class MergeTreesAction implements RequestHandlerInterface
                     ->where('n_file', '=', $tree1->id());
             });
 
-            (new Builder(DB::connection()))->from('dates')->insertUsing([
+            DB::query()->from('dates')->insertUsing([
                 'd_file',
                 'd_gid',
                 'd_day',
@@ -230,7 +228,7 @@ class MergeTreesAction implements RequestHandlerInterface
                     ->where('d_file', '=', $tree1->id());
             });
 
-            (new Builder(DB::connection()))->from('link')->insertUsing([
+            DB::query()->from('link')->insertUsing([
                 'l_file',
                 'l_from',
                 'l_type',

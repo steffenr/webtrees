@@ -19,12 +19,10 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Elements;
 
-/**
- * Test harness for the class TextFromSource
- *
- * @covers \Fisharebest\Webtrees\Elements\AbstractElement
- * @covers \Fisharebest\Webtrees\Elements\TextFromSource
- */
+use PHPUnit\Framework\Attributes\CoversClass;
+
+#[CoversClass(AbstractElement::class)]
+#[CoversClass(TextFromSource::class)]
 class TextFromSourceTest extends AbstractElementTestCase
 {
     /**
@@ -37,9 +35,6 @@ class TextFromSourceTest extends AbstractElementTestCase
         self::$element = new TextFromSource('label');
     }
 
-    /**
-     * @return void
-     */
     public function testCanonical(): void
     {
         self::assertSame('Foo  bAr  baZ', self::$element->canonical('Foo  bAr  baZ'));

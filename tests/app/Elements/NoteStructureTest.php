@@ -19,12 +19,10 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Elements;
 
-/**
- * Test harness for the class NoteStructure
- *
- * @covers \Fisharebest\Webtrees\Elements\AbstractElement
- * @covers \Fisharebest\Webtrees\Elements\NoteStructure
- */
+use PHPUnit\Framework\Attributes\CoversClass;
+
+#[CoversClass(AbstractElement::class)]
+#[CoversClass(NoteStructure::class)]
 class NoteStructureTest extends AbstractElementTestCase
 {
     /**
@@ -37,9 +35,6 @@ class NoteStructureTest extends AbstractElementTestCase
         self::$element = new NoteStructure('label');
     }
 
-    /**
-     * @return void
-     */
     public function testCanonical(): void
     {
         self::assertSame('Foo  bAr  baZ', self::$element->canonical('Foo  bAr  baZ'));

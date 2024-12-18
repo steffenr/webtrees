@@ -23,19 +23,12 @@ use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\Place;
 use Fisharebest\Webtrees\TestCase;
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-/**
- * Test harness for the class CensusColumnBornForeignParts
- */
+#[CoversClass(CensusColumnBornForeignParts::class)]
+#[CoversClass(AbstractCensusColumn::class)]
 class CensusColumnBornForeignPartsTest extends TestCase
 {
-    /**
-     * Get place mock.
-     *
-     * @param string $place Gedcom Place
-     *
-     * @return Place
-     */
     private function getPlaceMock(string $place): Place
     {
         $placeParts = explode(', ', $place);
@@ -47,12 +40,6 @@ class CensusColumnBornForeignPartsTest extends TestCase
         return $placeMock;
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Census\CensusColumnBornForeignParts
-     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
-     *
-     * @return void
-     */
     public function testBornEnglandCensusEngland(): void
     {
         $individual = $this->createMock(Individual::class);
@@ -66,12 +53,6 @@ class CensusColumnBornForeignPartsTest extends TestCase
         self::assertSame('', $column->generate($individual, $individual));
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Census\CensusColumnBornForeignParts
-     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
-     *
-     * @return void
-     */
     public function testBornWalesCensusEngland(): void
     {
         $individual = $this->createMock(Individual::class);
@@ -85,12 +66,6 @@ class CensusColumnBornForeignPartsTest extends TestCase
         self::assertSame('', $column->generate($individual, $individual));
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Census\CensusColumnBornForeignParts
-     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
-     *
-     * @return void
-     */
     public function testBornScotlandCensusEngland(): void
     {
         $individual = $this->createMock(Individual::class);
@@ -104,12 +79,6 @@ class CensusColumnBornForeignPartsTest extends TestCase
         self::assertSame('S', $column->generate($individual, $individual));
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Census\CensusColumnBornForeignParts
-     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
-     *
-     * @return void
-     */
     public function testBornIrelandCensusEngland(): void
     {
         $individual = $this->createMock(Individual::class);
@@ -123,12 +92,6 @@ class CensusColumnBornForeignPartsTest extends TestCase
         self::assertSame('I', $column->generate($individual, $individual));
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Census\CensusColumnBornForeignParts
-     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
-     *
-     * @return void
-     */
     public function testBornForeignCensusEngland(): void
     {
         $individual = $this->createMock(Individual::class);
@@ -142,12 +105,6 @@ class CensusColumnBornForeignPartsTest extends TestCase
         self::assertSame('F', $column->generate($individual, $individual));
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Census\CensusColumnBornForeignParts
-     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
-     *
-     * @return void
-     */
     public function testBornEnglandCensusIreland(): void
     {
         $individual = $this->createMock(Individual::class);
@@ -161,12 +118,6 @@ class CensusColumnBornForeignPartsTest extends TestCase
         self::assertSame('E', $column->generate($individual, $individual));
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Census\CensusColumnBornForeignParts
-     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
-     *
-     * @return void
-     */
     public function testBornWalesCensusIreland(): void
     {
         $individual = $this->createMock(Individual::class);
@@ -180,12 +131,6 @@ class CensusColumnBornForeignPartsTest extends TestCase
         self::assertSame('E', $column->generate($individual, $individual));
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Census\CensusColumnBornForeignParts
-     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
-     *
-     * @return void
-     */
     public function testBornScotlandCensusIreland(): void
     {
         $individual = $this->createMock(Individual::class);
@@ -199,12 +144,6 @@ class CensusColumnBornForeignPartsTest extends TestCase
         self::assertSame('S', $column->generate($individual, $individual));
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Census\CensusColumnBornForeignParts
-     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
-     *
-     * @return void
-     */
     public function testBornIrelandCensusIreland(): void
     {
         $individual = $this->createMock(Individual::class);
@@ -218,12 +157,6 @@ class CensusColumnBornForeignPartsTest extends TestCase
         self::assertSame('', $column->generate($individual, $individual));
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Census\CensusColumnBornForeignParts
-     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
-     *
-     * @return void
-     */
     public function testBornForeignCensusIreland(): void
     {
         $individual = $this->createMock(Individual::class);
@@ -237,12 +170,6 @@ class CensusColumnBornForeignPartsTest extends TestCase
         self::assertSame('F', $column->generate($individual, $individual));
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Census\CensusColumnBornForeignParts
-     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
-     *
-     * @return void
-     */
     public function testBornEnglandCensusScotland(): void
     {
         $individual = $this->createMock(Individual::class);
@@ -256,12 +183,6 @@ class CensusColumnBornForeignPartsTest extends TestCase
         self::assertSame('E', $column->generate($individual, $individual));
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Census\CensusColumnBornForeignParts
-     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
-     *
-     * @return void
-     */
     public function testBornWalesCensusScotland(): void
     {
         $individual = $this->createMock(Individual::class);
@@ -275,12 +196,6 @@ class CensusColumnBornForeignPartsTest extends TestCase
         self::assertSame('E', $column->generate($individual, $individual));
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Census\CensusColumnBornForeignParts
-     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
-     *
-     * @return void
-     */
     public function testBornScotlandCensusScotland(): void
     {
         $individual = $this->createMock(Individual::class);
@@ -294,12 +209,6 @@ class CensusColumnBornForeignPartsTest extends TestCase
         self::assertSame('', $column->generate($individual, $individual));
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Census\CensusColumnBornForeignParts
-     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
-     *
-     * @return void
-     */
     public function testBornIrelandCensusScotland(): void
     {
         $individual = $this->createMock(Individual::class);
@@ -313,12 +222,6 @@ class CensusColumnBornForeignPartsTest extends TestCase
         self::assertSame('I', $column->generate($individual, $individual));
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Census\CensusColumnBornForeignParts
-     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
-     *
-     * @return void
-     */
     public function testBornForeignCensusScotland(): void
     {
         $individual = $this->createMock(Individual::class);
@@ -332,12 +235,6 @@ class CensusColumnBornForeignPartsTest extends TestCase
         self::assertSame('F', $column->generate($individual, $individual));
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Census\CensusColumnBornForeignParts
-     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
-     *
-     * @return void
-     */
     public function testBornEnglandCensusWales(): void
     {
         $individual = $this->createMock(Individual::class);
@@ -351,12 +248,6 @@ class CensusColumnBornForeignPartsTest extends TestCase
         self::assertSame('', $column->generate($individual, $individual));
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Census\CensusColumnBornForeignParts
-     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
-     *
-     * @return void
-     */
     public function testBornWalesCensusWales(): void
     {
         $individual = $this->createMock(Individual::class);
@@ -370,12 +261,6 @@ class CensusColumnBornForeignPartsTest extends TestCase
         self::assertSame('', $column->generate($individual, $individual));
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Census\CensusColumnBornForeignParts
-     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
-     *
-     * @return void
-     */
     public function testBornScotlandCensusWales(): void
     {
         $individual = $this->createMock(Individual::class);
@@ -389,12 +274,6 @@ class CensusColumnBornForeignPartsTest extends TestCase
         self::assertSame('S', $column->generate($individual, $individual));
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Census\CensusColumnBornForeignParts
-     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
-     *
-     * @return void
-     */
     public function testBornIrelandCensusWales(): void
     {
         $individual = $this->createMock(Individual::class);
@@ -408,12 +287,6 @@ class CensusColumnBornForeignPartsTest extends TestCase
         self::assertSame('I', $column->generate($individual, $individual));
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Census\CensusColumnBornForeignParts
-     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
-     *
-     * @return void
-     */
     public function testBornForeignCensusWales(): void
     {
         $individual = $this->createMock(Individual::class);
@@ -427,12 +300,6 @@ class CensusColumnBornForeignPartsTest extends TestCase
         self::assertSame('F', $column->generate($individual, $individual));
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Census\CensusColumnBornForeignParts
-     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
-     *
-     * @return void
-     */
     public function testBornNowhereCensusEngland(): void
     {
         $individual = $this->createMock(Individual::class);
@@ -446,12 +313,6 @@ class CensusColumnBornForeignPartsTest extends TestCase
         self::assertSame('', $column->generate($individual, $individual));
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Census\CensusColumnBornForeignParts
-     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
-     *
-     * @return void
-     */
     public function testBornNowhereCensusWales(): void
     {
         $individual = $this->createMock(Individual::class);
@@ -465,12 +326,6 @@ class CensusColumnBornForeignPartsTest extends TestCase
         self::assertSame('', $column->generate($individual, $individual));
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Census\CensusColumnBornForeignParts
-     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
-     *
-     * @return void
-     */
     public function testBornNowhereCensusScotland(): void
     {
         $individual = $this->createMock(Individual::class);

@@ -19,12 +19,10 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Elements;
 
-/**
- * Test harness for the class MaidenheadLocator
- *
- * @covers \Fisharebest\Webtrees\Elements\AbstractElement
- * @covers \Fisharebest\Webtrees\Elements\MaidenheadLocator
- */
+use PHPUnit\Framework\Attributes\CoversClass;
+
+#[CoversClass(AbstractElement::class)]
+#[CoversClass(MaidenheadLocator::class)]
 class MaidenheadLocatorTest extends AbstractElementTestCase
 {
     /**
@@ -37,10 +35,6 @@ class MaidenheadLocatorTest extends AbstractElementTestCase
         self::$element = new MaidenheadLocator('label');
     }
 
-
-    /**
-     * @return void
-     */
     public function testCanonical(): void
     {
         self::assertSame('AB', self::$element->canonical('ab'));

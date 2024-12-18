@@ -21,10 +21,10 @@ namespace Fisharebest\Webtrees\Factories;
 
 use Closure;
 use Fisharebest\Webtrees\Contracts\SourceFactoryInterface;
+use Fisharebest\Webtrees\DB;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Source;
 use Fisharebest\Webtrees\Tree;
-use Illuminate\Database\Capsule\Manager as DB;
 
 use function preg_match;
 
@@ -33,19 +33,12 @@ use function preg_match;
  */
 class SourceFactory extends AbstractGedcomRecordFactory implements SourceFactoryInterface
 {
-    private const TYPE_CHECK_REGEX = '/^0 @[^@]+@ ' . Source::RECORD_TYPE . '/';
-
+    private const string TYPE_CHECK_REGEX = '/^0 @[^@]+@ ' . Source::RECORD_TYPE . '/';
 
     /**
      * Create a individual.
-     *
-     * @param string      $xref
-     * @param Tree        $tree
-     * @param string|null $gedcom
-     *
-     * @return Source|null
      */
-    public function make(string $xref, Tree $tree, string $gedcom = null): ?Source
+    public function make(string $xref, Tree $tree, string|null $gedcom = null): Source|null
     {
         return Registry::cache()->array()->remember(self::class . $xref . '@' . $tree->id(), function () use ($xref, $tree, $gedcom) {
             $gedcom ??= $this->gedcom($xref, $tree);
@@ -84,7 +77,7 @@ class SourceFactory extends AbstractGedcomRecordFactory implements SourceFactory
      *
      * @return Source
      */
-    public function new(string $xref, string $gedcom, ?string $pending, Tree $tree): Source
+    public function new(string $xref, string $gedcom, string|null $pending, Tree $tree): Source
     {
         return new Source($xref, $gedcom, $pending, $tree);
     }
@@ -97,7 +90,7 @@ class SourceFactory extends AbstractGedcomRecordFactory implements SourceFactory
      *
      * @return string|null
      */
-    protected function gedcom(string $xref, Tree $tree): ?string
+    protected function gedcom(string $xref, Tree $tree): string|null
     {
         return DB::table('sources')
             ->where('s_id', '=', $xref)

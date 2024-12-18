@@ -37,8 +37,6 @@ class TomSelectSubmission extends AbstractTomSelectHandler
     protected SearchService $search_service;
 
     /**
-     * TomSelectSubmission constructor.
-     *
      * @param SearchService $search_service
      */
     public function __construct(
@@ -70,11 +68,9 @@ class TomSelectSubmission extends AbstractTomSelectHandler
             $results = $this->search_service->searchSubmissions([$tree], $search, $offset, $limit);
         }
 
-        return $results->map(static function (Submission $submission) use ($at): array {
-            return [
-                'text'  => view('selects/submission', ['submission' => $submission]),
-                'value' => $at . $submission->xref() . $at,
-            ];
-        });
+        return $results->map(static fn (Submission $submission): array => [
+            'text'  => view('selects/submission', ['submission' => $submission]),
+            'value' => $at . $submission->xref() . $at,
+        ]);
     }
 }

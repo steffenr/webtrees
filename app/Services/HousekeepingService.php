@@ -19,7 +19,7 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Services;
 
-use Illuminate\Database\Capsule\Manager as DB;
+use Fisharebest\Webtrees\DB;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemOperator;
 use League\Flysystem\FilesystemReader;
@@ -36,7 +36,7 @@ class HousekeepingService
 {
     // This is a list of old files and directories, from earlier versions of webtrees.
     // git diff 1.7.9..master --name-status | grep ^D
-    private const OLD_PATHS = [
+    private const array OLD_PATHS = [
         // Removed in 1.0.3
         'themechange.php',
         // Removed in 1.1.0

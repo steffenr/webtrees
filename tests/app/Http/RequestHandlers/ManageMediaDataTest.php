@@ -27,30 +27,26 @@ use Fisharebest\Webtrees\Services\LinkedRecordService;
 use Fisharebest\Webtrees\Services\MediaFileService;
 use Fisharebest\Webtrees\Services\TreeService;
 use Fisharebest\Webtrees\TestCase;
+use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-/**
- * Test ManageMediaData class.
- *
- * @covers \Fisharebest\Webtrees\Http\RequestHandlers\ManageMediaData
- */
+#[CoversClass(ManageMediaData::class)]
 class ManageMediaDataTest extends TestCase
 {
     protected static bool $uses_database = true;
 
-    /**
-     * @return void
-     */
     public function testDataLocal(): void
     {
         $datatables_service    = new DatatablesService();
         $gedcom_import_service = new GedcomImportService();
         $linked_record_service = new LinkedRecordService();
-        $media_file_service    = new MediaFileService();
+        $media_file_service    = $this->createMock(MediaFileService::class);
+        $media_file_service->method('allMediaFolders')->willReturn(new Collection(['media/']));
         $tree_service          = new TreeService($gedcom_import_service);
         $handler               = new ManageMediaData($datatables_service, $linked_record_service, $media_file_service, $tree_service);
         $request               = self::createRequest(RequestMethodInterface::METHOD_GET, [
             'files'        => 'local',
-            'media_folder' => '',
+            'media_folder' => 'media/',
             'subfolders'   => 'include',
             'search'       => ['value' => ''],
             'start'        => '0',
@@ -61,20 +57,18 @@ class ManageMediaDataTest extends TestCase
         self::assertSame(StatusCodeInterface::STATUS_OK, $response->getStatusCode());
     }
 
-    /**
-     * @return void
-     */
     public function testDataExternal(): void
     {
         $datatables_service    = new DatatablesService();
         $gedcom_import_service = new GedcomImportService();
         $linked_record_service = new LinkedRecordService();
-        $media_file_service    = new MediaFileService();
+        $media_file_service    = $this->createMock(MediaFileService::class);
+        $media_file_service->method('allMediaFolders')->willReturn(new Collection(['media/']));
         $tree_service          = new TreeService($gedcom_import_service);
         $handler               = new ManageMediaData($datatables_service, $linked_record_service, $media_file_service, $tree_service);
         $request               = self::createRequest(RequestMethodInterface::METHOD_GET, [
             'files'        => 'local',
-            'media_folder' => '',
+            'media_folder' => 'media/',
             'subfolders'   => 'include',
             'search'       => ['value' => ''],
             'start'        => '0',
@@ -85,20 +79,18 @@ class ManageMediaDataTest extends TestCase
         self::assertSame(StatusCodeInterface::STATUS_OK, $response->getStatusCode());
     }
 
-    /**
-     * @return void
-     */
     public function testDataUnused(): void
     {
         $datatables_service    = new DatatablesService();
         $gedcom_import_service = new GedcomImportService();
         $linked_record_service = new LinkedRecordService();
-        $media_file_service    = new MediaFileService();
+        $media_file_service    = $this->createMock(MediaFileService::class);
+        $media_file_service->method('allMediaFolders')->willReturn(new Collection(['media/']));
         $tree_service          = new TreeService($gedcom_import_service);
         $handler               = new ManageMediaData($datatables_service, $linked_record_service, $media_file_service, $tree_service);
         $request               = self::createRequest(RequestMethodInterface::METHOD_GET, [
             'files'        => 'local',
-            'media_folder' => '',
+            'media_folder' => 'media/',
             'subfolders'   => 'include',
             'search'       => ['value' => ''],
             'start'        => '0',

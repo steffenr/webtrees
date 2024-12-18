@@ -20,13 +20,13 @@ declare(strict_types=1);
 namespace Fisharebest\Webtrees\Module;
 
 use Fisharebest\Webtrees\Auth;
+use Fisharebest\Webtrees\DB;
 use Fisharebest\Webtrees\GedcomRecord;
 use Fisharebest\Webtrees\Http\RequestHandlers\TreePage;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Tree;
 use Fisharebest\Webtrees\Validator;
-use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Support\Str;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -49,11 +49,6 @@ class FamilyTreeFavoritesModule extends AbstractModule implements ModuleBlockInt
         return I18N::translate('Favorites');
     }
 
-    /**
-     * A sentence describing what this module does.
-     *
-     * @return string
-     */
     public function description(): string
     {
         /* I18N: Description of the “Favorites” module */
@@ -248,14 +243,7 @@ class FamilyTreeFavoritesModule extends AbstractModule implements ModuleBlockInt
         ]);
     }
 
-    /**
-     * @param string $type
-     * @param string $xref
-     * @param Tree   $tree
-     *
-     * @return GedcomRecord|null
-     */
-    private function getRecordForType(string $type, string $xref, Tree $tree): ?GedcomRecord
+    private function getRecordForType(string $type, string $xref, Tree $tree): GedcomRecord|null
     {
         switch ($type) {
             case 'indi':

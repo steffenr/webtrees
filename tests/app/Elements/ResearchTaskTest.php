@@ -19,12 +19,10 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Elements;
 
-/**
- * Test harness for the class ResearchTask
- *
- * @covers \Fisharebest\Webtrees\Elements\AbstractElement
- * @covers \Fisharebest\Webtrees\Elements\ResearchTask
- */
+use PHPUnit\Framework\Attributes\CoversClass;
+
+#[CoversClass(AbstractElement::class)]
+#[CoversClass(ResearchTask::class)]
 class ResearchTaskTest extends AbstractElementTestCase
 {
     /**
@@ -37,9 +35,6 @@ class ResearchTaskTest extends AbstractElementTestCase
         self::$element = new ResearchTask('label');
     }
 
-    /**
-     * @return void
-     */
     public function testCanonical(): void
     {
         self::assertSame('Foo  bAr  baZ', self::$element->canonical('Foo  bAr  baZ'));

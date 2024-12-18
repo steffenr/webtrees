@@ -19,17 +19,13 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees;
 
-/**
- * Test harness for the class Date
- *
- * @covers \Fisharebest\Webtrees\Date
- */
+use PHPUnit\Framework\Attributes\CoversClass;
+
+#[CoversClass(Date::class)]
 class DateTest extends TestCase
 {
     /**
      * Test that the class exists
-     *
-     * @return void
      */
     public function testClassExists(): void
     {

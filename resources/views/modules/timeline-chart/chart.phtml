@@ -9,15 +9,15 @@ use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
 
 /**
- * @var int               $baseyear
- * @var int               $bheight
- * @var array<int>        $birthdays
- * @var array<int>        $birthmonths
- * @var array<int>        $birthyears
- * @var int               $scale
- * @var int               $topyear
- * @var array<Fact>       $indifacts
- * @var array<Individual> $individuals
+ * @var int                   $baseyear
+ * @var int                   $bheight
+ * @var array<int>            $birthdays
+ * @var array<int>            $birthmonths
+ * @var array<int>            $birthyears
+ * @var int                   $scale
+ * @var int                   $topyear
+ * @var array<int,Fact>       $indifacts
+ * @var array<int,Individual> $individuals
  */
 
 ?>
@@ -213,7 +213,7 @@ use Fisharebest\Webtrees\Individual;
 
                 dbox.style.top = (boxmean + bheight / 3) + "px";
             }
-            // the new X posistion moves the same as the y position
+            // the new X position moves the same as the y position
             if (textDirection === 'rtl') {
                 newx = dbox.offsetRight + Math.abs(newy - boxmean);
             } else {

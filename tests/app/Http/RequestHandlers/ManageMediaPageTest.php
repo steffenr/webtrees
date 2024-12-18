@@ -22,19 +22,13 @@ namespace Fisharebest\Webtrees\Http\RequestHandlers;
 use Fig\Http\Message\StatusCodeInterface;
 use Fisharebest\Webtrees\Services\MediaFileService;
 use Fisharebest\Webtrees\TestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-/**
- * Test ManageMediaPage class.
- *
- * @covers \Fisharebest\Webtrees\Http\RequestHandlers\ManageMediaPage
- */
+#[CoversClass(ManageMediaPage::class)]
 class ManageMediaPageTest extends TestCase
 {
     protected static bool $uses_database = true;
 
-    /**
-     * @return void
-     */
     public function testIndex(): void
     {
         $media_file_service = new MediaFileService();

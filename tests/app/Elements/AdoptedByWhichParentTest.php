@@ -19,12 +19,10 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Elements;
 
-/**
- * Test harness for the class AdoptedByWhichParent
- *
- * @covers \Fisharebest\Webtrees\Elements\AbstractElement
- * @covers \Fisharebest\Webtrees\Elements\AdoptedByWhichParent
- */
+use PHPUnit\Framework\Attributes\CoversClass;
+
+#[CoversClass(AbstractElement::class)]
+#[CoversClass(AdoptedByWhichParent::class)]
 class AdoptedByWhichParentTest extends AbstractElementTestCase
 {
     /**
@@ -37,9 +35,6 @@ class AdoptedByWhichParentTest extends AbstractElementTestCase
         self::$element = new AdoptedByWhichParent('label');
     }
 
-    /**
-     * @return void
-     */
     public function testCanonical(): void
     {
         self::assertSame('FOO BAR BAZ', self::$element->canonical('Foo  bAr  baZ'));

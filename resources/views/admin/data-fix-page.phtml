@@ -79,15 +79,15 @@ use Fisharebest\Webtrees\View;
 
     <hr>
 
-    <a href="#" data-bs-toggle="modal" data-bs-backdrop="static" data-bs-target="#wt-ajax-modal" data-wt-href="<?= e(route(HelpText::class, ['topic' => 'data-fixes'])) ?>">
+    <a href="#" data-bs-toggle="modal" data-bs-target="#wt-ajax-modal" data-wt-href="<?= e(route(HelpText::class, ['topic' => 'data-fixes'])) ?>">
         <?= view('icons/help') ?>
         <?= I18N::translate('Why does this list include records that do not need to be updated?') ?>
     </a>
 </div>
 
 <div id="data-fix-progress" class="d-none">
-    <div class="progress">
-        <div class="progress-bar" role="progressbar"></div>
+    <div class="progress" role="progressbar">
+        <div class="progress-bar"></div>
     </div>
 </div>
 

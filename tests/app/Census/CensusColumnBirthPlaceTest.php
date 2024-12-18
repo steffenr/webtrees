@@ -22,19 +22,12 @@ namespace Fisharebest\Webtrees\Census;
 use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\Place;
 use Fisharebest\Webtrees\TestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-/**
- * Test harness for the class CensusColumnBirthPlace
- */
+#[CoversClass(CensusColumnBirthPlace::class)]
+#[CoversClass(AbstractCensusColumn::class)]
 class CensusColumnBirthPlaceTest extends TestCase
 {
-    /**
-     * Get place mock.
-     *
-     * @param string $place Gedcom Place
-     *
-     * @return Place
-     */
     private function getPlaceMock(string $place): Place
     {
         $placeMock = $this->createMock(Place::class);
@@ -43,12 +36,6 @@ class CensusColumnBirthPlaceTest extends TestCase
         return $placeMock;
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Census\CensusColumnBirthPlace
-     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
-     *
-     * @return void
-     */
     public function testPlaceCountry(): void
     {
         $individual = $this->createMock(Individual::class);
@@ -62,12 +49,6 @@ class CensusColumnBirthPlaceTest extends TestCase
         self::assertSame('Westminster, London', $column->generate($individual, $individual));
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Census\CensusColumnBirthPlace
-     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
-     *
-     * @return void
-     */
     public function testPlaceAndCountry(): void
     {
         $individual = $this->createMock(Individual::class);
@@ -81,12 +62,6 @@ class CensusColumnBirthPlaceTest extends TestCase
         self::assertSame('', $column->generate($individual, $individual));
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Census\CensusColumnBirthPlace
-     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
-     *
-     * @return void
-     */
     public function testDifferentCountry(): void
     {
         $individual = $this->createMock(Individual::class);

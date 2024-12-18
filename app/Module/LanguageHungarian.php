@@ -108,7 +108,7 @@ class LanguageHungarian extends AbstractModule implements ModuleLanguageInterfac
      */
     public function initialLetter(string $string): string
     {
-        foreach (['DZS', 'DZ', 'GY', 'LY', 'NY', 'SZ', 'TY', 'ZS'] as $digraph) {
+        foreach (['CS', 'DZS', 'DZ', 'GY', 'LY', 'NY', 'SZ', 'TY', 'ZS'] as $digraph) {
             if (str_starts_with($string, $digraph)) {
                 return $digraph;
             }
@@ -124,7 +124,6 @@ class LanguageHungarian extends AbstractModule implements ModuleLanguageInterfac
     {
         return new LocaleHu();
     }
-
 
     /**
      * Letters with diacritics that are considered distinct letters in this language.

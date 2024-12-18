@@ -21,7 +21,6 @@ namespace Fisharebest\Webtrees;
 
 use Fisharebest\Webtrees\Elements\XrefMedia;
 use Fisharebest\Webtrees\Http\RequestHandlers\MediaPage;
-use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Support\Collection;
 
 use function array_filter;
@@ -32,9 +31,9 @@ use function array_unique;
  */
 class Media extends GedcomRecord
 {
-    public const RECORD_TYPE = 'OBJE';
+    public const string RECORD_TYPE = 'OBJE';
 
-    protected const ROUTE_NAME = MediaPage::class;
+    protected const string ROUTE_NAME = MediaPage::class;
 
     /**
      * Each object type may have its own special rules, and re-implement this function.
@@ -70,22 +69,16 @@ class Media extends GedcomRecord
     public function mediaFiles(): Collection
     {
         return $this->facts(['FILE'])
-            ->map(function (Fact $fact): MediaFile {
-                return new MediaFile($fact->gedcom(), $this);
-            });
+            ->map(fn (Fact $fact): MediaFile => new MediaFile($fact->gedcom(), $this));
     }
 
     /**
      * Get the first media file that contains an image.
-     *
-     * @return MediaFile|null
      */
-    public function firstImageFile(): ?MediaFile
+    public function firstImageFile(): MediaFile|null
     {
         return $this->mediaFiles()
-            ->first(static function (MediaFile $media_file): bool {
-                return $media_file->isImage() && !$media_file->isExternal();
-            });
+            ->first(static fn (MediaFile $media_file): bool => $media_file->isImage() && !$media_file->isExternal());
     }
 
     /**

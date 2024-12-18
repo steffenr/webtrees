@@ -66,11 +66,6 @@ class CheckForNewVersion extends AbstractModule implements MiddlewareInterface
         return I18N::translate('Check for new version');
     }
 
-    /**
-     * A sentence describing what this module does.
-     *
-     * @return string
-     */
     public function description(): string
     {
         return I18N::translate('Send an email to all administrators when an upgrade is available.');
@@ -105,12 +100,12 @@ class CheckForNewVersion extends AbstractModule implements MiddlewareInterface
                         view('emails/new-version-text', [
                             'latest_version' => $latest_version,
                             'recipient'      => $administrator,
-                            'url'            => $request->getAttribute('base_url'),
+                            'url'            => $request->getAttribute('base_url', ''),
                         ]),
                         view('emails/new-version-html', [
                             'latest_version' => $latest_version,
                             'recipient'      => $administrator,
-                            'url'            => $request->getAttribute('base_url'),
+                            'url'            => $request->getAttribute('base_url', ''),
                         ])
                     );
                 }

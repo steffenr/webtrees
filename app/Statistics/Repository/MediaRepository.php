@@ -19,12 +19,12 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Statistics\Repository;
 
+use Fisharebest\Webtrees\DB;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Statistics\Google\ChartMedia;
 use Fisharebest\Webtrees\Statistics\Repository\Interfaces\MediaRepositoryInterface;
 use Fisharebest\Webtrees\Statistics\Service\ColorService;
 use Fisharebest\Webtrees\Tree;
-use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Query\Expression;
 
 /**
@@ -39,26 +39,26 @@ class MediaRepository implements MediaRepositoryInterface
     /**
      * Available media types.
      */
-    private const MEDIA_TYPE_ALL         = 'all';
-    private const MEDIA_TYPE_AUDIO       = 'audio';
-    private const MEDIA_TYPE_BOOK        = 'book';
-    private const MEDIA_TYPE_CARD        = 'card';
-    private const MEDIA_TYPE_CERTIFICATE = 'certificate';
-    private const MEDIA_TYPE_COAT        = 'coat';
-    private const MEDIA_TYPE_DOCUMENT    = 'document';
-    private const MEDIA_TYPE_ELECTRONIC  = 'electronic';
-    private const MEDIA_TYPE_FICHE       = 'fiche';
-    private const MEDIA_TYPE_FILM        = 'film';
-    private const MEDIA_TYPE_MAGAZINE    = 'magazine';
-    private const MEDIA_TYPE_MANUSCRIPT  = 'manuscript';
-    private const MEDIA_TYPE_MAP         = 'map';
-    private const MEDIA_TYPE_NEWSPAPER   = 'newspaper';
-    private const MEDIA_TYPE_PAINTING    = 'painting';
-    private const MEDIA_TYPE_PHOTO       = 'photo';
-    private const MEDIA_TYPE_TOMBSTONE   = 'tombstone';
-    private const MEDIA_TYPE_VIDEO       = 'video';
-    private const MEDIA_TYPE_OTHER       = 'other';
-    private const MEDIA_TYPE_UNKNOWN     = '';
+    private const string MEDIA_TYPE_ALL         = 'all';
+    private const string MEDIA_TYPE_AUDIO       = 'audio';
+    private const string MEDIA_TYPE_BOOK        = 'book';
+    private const string MEDIA_TYPE_CARD        = 'card';
+    private const string MEDIA_TYPE_CERTIFICATE = 'certificate';
+    private const string MEDIA_TYPE_COAT        = 'coat';
+    private const string MEDIA_TYPE_DOCUMENT    = 'document';
+    private const string MEDIA_TYPE_ELECTRONIC  = 'electronic';
+    private const string MEDIA_TYPE_FICHE       = 'fiche';
+    private const string MEDIA_TYPE_FILM        = 'film';
+    private const string MEDIA_TYPE_MAGAZINE    = 'magazine';
+    private const string MEDIA_TYPE_MANUSCRIPT  = 'manuscript';
+    private const string MEDIA_TYPE_MAP         = 'map';
+    private const string MEDIA_TYPE_NEWSPAPER   = 'newspaper';
+    private const string MEDIA_TYPE_PAINTING    = 'painting';
+    private const string MEDIA_TYPE_PHOTO       = 'photo';
+    private const string MEDIA_TYPE_TOMBSTONE   = 'tombstone';
+    private const string MEDIA_TYPE_VIDEO       = 'video';
+    private const string MEDIA_TYPE_OTHER       = 'other';
+    private const string MEDIA_TYPE_UNKNOWN     = '';
 
     /**
      * @param ColorService $color_service
@@ -244,12 +244,12 @@ class MediaRepository implements MediaRepositoryInterface
      *
      * @return string
      */
-    public function chartMedia(string $color_from = null, string $color_to = null): string
+    public function chartMedia(string|null $color_from = null, string|null $color_to = null): string
     {
         $media = DB::table('media_file')
             ->where('m_file', '=', $this->tree->id())
             ->groupBy('source_media_type')
-            ->pluck(new Expression('COUNT(*)'), 'source_media_type')
+            ->pluck(new Expression('COUNT(*) AS total'), 'source_media_type')
             ->map(static fn (string $n): int => (int) $n)
             ->all();
 

@@ -19,6 +19,7 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Services;
 
+use Fisharebest\Webtrees\DB;
 use Fisharebest\Webtrees\Module\ModuleAnalyticsInterface;
 use Fisharebest\Webtrees\Module\ModuleBlockInterface;
 use Fisharebest\Webtrees\Module\ModuleChartInterface;
@@ -32,38 +33,20 @@ use Fisharebest\Webtrees\Module\ModuleSidebarInterface;
 use Fisharebest\Webtrees\Module\ModuleTabInterface;
 use Fisharebest\Webtrees\Module\ModuleThemeInterface;
 use Fisharebest\Webtrees\TestCase;
-use Illuminate\Database\Capsule\Manager as DB;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-/**
- * Test the modules
- *
- * @coversNothing
- */
+#[CoversClass(ModuleService::class)]
 class ModuleServiceTest extends TestCase
 {
     protected static bool $uses_database = true;
 
-    /**
-     * @covers \Fisharebest\Webtrees\Services\ModuleService::all
-     * @covers \Fisharebest\Webtrees\Services\ModuleService::coreModules
-     * @covers \Fisharebest\Webtrees\Services\ModuleService::customModules
-     * @covers \Fisharebest\Webtrees\Services\ModuleService::moduleComparator
-     * @return void
-     */
     public function testAll(): void
     {
         $module_service = new ModuleService();
 
-        self::assertNotEmpty($module_service->all());
+        self::assertNotEmpty($module_service->all()->all());
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Services\ModuleService::findByComponent
-     * @covers \Fisharebest\Webtrees\Services\ModuleService::menuComparator
-     * @covers \Fisharebest\Webtrees\Services\ModuleService::sidebarComparator
-     * @covers \Fisharebest\Webtrees\Services\ModuleService::tabComparator
-     * @return void
-     */
     public function testFindByComponent(): void
     {
         $user_service   = new UserService();
@@ -80,10 +63,6 @@ class ModuleServiceTest extends TestCase
         self::assertNotEmpty($module_service->findByComponent(ModuleTabInterface::class, $tree, $user)->all());
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Services\ModuleService::findByInterface
-     * @return void
-     */
     public function testFindByInterface(): void
     {
         $module_service = new ModuleService();
@@ -104,10 +83,6 @@ class ModuleServiceTest extends TestCase
         self::assertEmpty($module_service->findByInterface('not-a-valid-class-or-interface')->all());
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Services\ModuleService::otherModules
-     * @return void
-     */
     public function testOtherModules(): void
     {
         DB::table('module')->insert(['module_name' => 'not-a-module']);
@@ -118,20 +93,16 @@ class ModuleServiceTest extends TestCase
         $modules = $module_service->otherModules()
             ->filter(fn (ModuleInterface $module): bool => !$module instanceof ModuleCustomInterface);
 
-        self::assertSame(4, $modules->count());
+        self::assertCount(4, $modules);
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Services\ModuleService::deletedModules
-     * @return void
-     */
     public function testDeletedModules(): void
     {
         DB::table('module')->insert(['module_name' => 'not-a-module']);
 
         $module_service = new ModuleService();
 
-        self::assertSame(1, $module_service->deletedModules()->count());
+        self::assertCount(1, $module_service->deletedModules());
         self::assertSame('not-a-module', $module_service->deletedModules()->first());
     }
 }

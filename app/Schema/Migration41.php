@@ -19,7 +19,7 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Schema;
 
-use Illuminate\Database\Capsule\Manager as DB;
+use Fisharebest\Webtrees\DB;
 use Illuminate\Database\Schema\Blueprint;
 
 /**
@@ -27,11 +27,6 @@ use Illuminate\Database\Schema\Blueprint;
  */
 class Migration41 implements MigrationInterface
 {
-    /**
-     * Upgrade to the next version
-     *
-     * @return void
-     */
     public function upgrade(): void
     {
         DB::schema()->table('module', static function (Blueprint $table): void {

@@ -19,12 +19,10 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Elements;
 
-/**
- * Test harness for the class ContentDescription
- *
- * @covers \Fisharebest\Webtrees\Elements\AbstractElement
- * @covers \Fisharebest\Webtrees\Elements\ContentDescription
- */
+use PHPUnit\Framework\Attributes\CoversClass;
+
+#[CoversClass(AbstractElement::class)]
+#[CoversClass(ContentDescription::class)]
 class ContentDescriptionTest extends AbstractElementTestCase
 {
     /**
@@ -37,9 +35,6 @@ class ContentDescriptionTest extends AbstractElementTestCase
         self::$element = new ContentDescription('label');
     }
 
-    /**
-     * @return void
-     */
     public function testCanonical(): void
     {
         self::assertSame('Foo  bAr  baZ', self::$element->canonical('Foo  bAr  baZ'));

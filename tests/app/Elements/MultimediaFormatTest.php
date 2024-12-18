@@ -19,12 +19,10 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Elements;
 
-/**
- * Test harness for the class MultimediaFormat
- *
- * @covers \Fisharebest\Webtrees\Elements\AbstractElement
- * @covers \Fisharebest\Webtrees\Elements\MultimediaFormat
- */
+use PHPUnit\Framework\Attributes\CoversClass;
+
+#[CoversClass(AbstractElement::class)]
+#[CoversClass(MultimediaFormat::class)]
 class MultimediaFormatTest extends AbstractElementTestCase
 {
     /**
@@ -37,9 +35,6 @@ class MultimediaFormatTest extends AbstractElementTestCase
         self::$element = new MultimediaFormat('label');
     }
 
-    /**
-     * @return void
-     */
     public function testCanonical(): void
     {
         self::assertSame('JPG', self::$element->canonical('jpg'));

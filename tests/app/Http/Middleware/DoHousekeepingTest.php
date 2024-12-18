@@ -22,20 +22,14 @@ namespace Fisharebest\Webtrees\Http\Middleware;
 use Fig\Http\Message\StatusCodeInterface;
 use Fisharebest\Webtrees\Services\HousekeepingService;
 use Fisharebest\Webtrees\TestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 use Psr\Http\Server\RequestHandlerInterface;
 
 use function response;
 
-/**
- * Test the DoHousekeeping middleware.
- *
- * @covers \Fisharebest\Webtrees\Http\Middleware\DoHousekeeping
- */
+#[CoversClass(DoHousekeeping::class)]
 class DoHousekeepingTest extends TestCase
 {
-    /**
-     * @return void
-     */
     public function testMiddleware(): void
     {
         $handler = $this->createMock(RequestHandlerInterface::class);

@@ -25,18 +25,12 @@ use Fisharebest\Webtrees\Family;
 use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\TestCase;
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-/**
- * Test harness for the class CensusColumnMonthIfMarriedWithinYear
- */
+#[CoversClass(CensusColumnMonthIfMarriedWithinYear::class)]
+#[CoversClass(AbstractCensusColumn::class)]
 class CensusColumnMonthIfMarriedWithinYearTest extends TestCase
 {
-    /**
-     * @covers \Fisharebest\Webtrees\Census\CensusColumnMonthIfMarriedWithinYear
-     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
-     *
-     * @return void
-     */
     public function testMarriedWithinYear(): void
     {
         $fact = $this->createMock(Fact::class);
@@ -56,12 +50,6 @@ class CensusColumnMonthIfMarriedWithinYearTest extends TestCase
         self::assertSame('Dec', $column->generate($individual, $individual));
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Census\CensusColumnMonthIfMarriedWithinYear
-     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
-     *
-     * @return void
-     */
     public function testMarriedOverYearBeforeTheCensus(): void
     {
         $fact = $this->createMock(Fact::class);
@@ -81,12 +69,6 @@ class CensusColumnMonthIfMarriedWithinYearTest extends TestCase
         self::assertSame('', $column->generate($individual, $individual));
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Census\CensusColumnMonthIfMarriedWithinYear
-     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
-     *
-     * @return void
-     */
     public function testMarriedAfterTheCensus(): void
     {
         $fact = $this->createMock(Fact::class);
@@ -106,12 +88,6 @@ class CensusColumnMonthIfMarriedWithinYearTest extends TestCase
         self::assertSame('', $column->generate($individual, $individual));
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Census\CensusColumnMonthIfMarriedWithinYear
-     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
-     *
-     * @return void
-     */
     public function testNoMarriage(): void
     {
         $family = $this->createMock(Family::class);
@@ -128,12 +104,6 @@ class CensusColumnMonthIfMarriedWithinYearTest extends TestCase
         self::assertSame('', $column->generate($individual, $individual));
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Census\CensusColumnMonthIfMarriedWithinYear
-     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
-     *
-     * @return void
-     */
     public function testNoSpouseFamily(): void
     {
         $individual = $this->createMock(Individual::class);

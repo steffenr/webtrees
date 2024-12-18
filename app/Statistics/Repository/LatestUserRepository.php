@@ -21,11 +21,11 @@ namespace Fisharebest\Webtrees\Statistics\Repository;
 
 use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Contracts\UserInterface;
+use Fisharebest\Webtrees\DB;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Services\UserService;
 use Fisharebest\Webtrees\Statistics\Repository\Interfaces\LatestUserRepositoryInterface;
-use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\JoinClause;
 
@@ -41,8 +41,6 @@ class LatestUserRepository implements LatestUserRepositoryInterface
     private UserService $user_service;
 
     /**
-     * LatestUserRepository constructor.
-     *
      * @param UserService $user_service
      */
     public function __construct(UserService $user_service)
@@ -112,7 +110,7 @@ class LatestUserRepository implements LatestUserRepositoryInterface
      *
      * @return string
      */
-    public function latestUserRegDate(string $format = null): string
+    public function latestUserRegDate(string|null $format = null): string
     {
         $format ??= I18N::dateFormat();
         $user      = $this->latestUserQuery();
@@ -126,7 +124,7 @@ class LatestUserRepository implements LatestUserRepositoryInterface
      *
      * @return string
      */
-    public function latestUserRegTime(string $format = null): string
+    public function latestUserRegTime(string|null $format = null): string
     {
         $format ??= str_replace('%', '', I18N::timeFormat());
         $user = $this->latestUserQuery();
@@ -140,7 +138,7 @@ class LatestUserRepository implements LatestUserRepositoryInterface
      *
      * @return string
      */
-    public function latestUserLoggedin(string $yes = null, string $no = null): string
+    public function latestUserLoggedin(string|null $yes = null, string|null $no = null): string
     {
         $yes ??= I18N::translate('yes');
         $no ??= I18N::translate('no');

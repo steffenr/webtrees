@@ -35,13 +35,11 @@ class NotesTabModule extends AbstractModule implements ModuleTabInterface
     use ModuleTabTrait;
 
     /** @var Collection<array-key,Fact>|null  */
-    private ?Collection $facts = null;
+    private Collection|null $facts = null;
 
     private ClipboardService $clipboard_service;
 
     /**
-     * NotesTabModule constructor.
-     *
      * @param ClipboardService $clipboard_service
      */
     public function __construct(ClipboardService $clipboard_service)
@@ -60,11 +58,6 @@ class NotesTabModule extends AbstractModule implements ModuleTabInterface
         return I18N::translate('Notes');
     }
 
-    /**
-     * A sentence describing what this module does.
-     *
-     * @return string
-     */
     public function description(): string
     {
         /* I18N: Description of the “Notes” module */

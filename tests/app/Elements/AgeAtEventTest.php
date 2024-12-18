@@ -20,13 +20,10 @@ declare(strict_types=1);
 namespace Fisharebest\Webtrees\Elements;
 
 use Fisharebest\Webtrees\Tree;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-/**
- * Test harness for the class AgeAtEvent
- *
- * @covers \Fisharebest\Webtrees\Elements\AbstractElement
- * @covers \Fisharebest\Webtrees\Elements\AgeAtEvent
- */
+#[CoversClass(AbstractElement::class)]
+#[CoversClass(AgeAtEvent::class)]
 class AgeAtEventTest extends AbstractElementTestCase
 {
     /**
@@ -39,9 +36,6 @@ class AgeAtEventTest extends AbstractElementTestCase
         self::$element = new AgeAtEvent('label');
     }
 
-    /**
-     * @return void
-     */
     public function testCanonical(): void
     {
         self::assertSame('CHILD', self::$element->canonical('cHiLd'));
@@ -51,12 +45,9 @@ class AgeAtEventTest extends AbstractElementTestCase
         self::assertSame('1y 2m 3d', self::$element->canonical('1Y  2M  3D'));
     }
 
-    /**
-     * @return void
-     */
     public function testValue(): void
     {
-        $tree = $this->createStub(Tree::class);
+        $tree = $this->createMock(Tree::class);
 
         self::assertSame('child', self::$element->value('cHiLd', $tree));
         self::assertSame('infant', self::$element->value('iNfAnT ', $tree));

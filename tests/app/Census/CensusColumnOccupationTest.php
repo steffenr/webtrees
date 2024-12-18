@@ -23,18 +23,12 @@ use Fisharebest\Webtrees\Fact;
 use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\TestCase;
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-/**
- * Test harness for the class CensusColumnOccupation
- */
+#[CoversClass(CensusColumnOccupation::class)]
+#[CoversClass(AbstractCensusColumn::class)]
 class CensusColumnOccupationTest extends TestCase
 {
-    /**
-     * @covers \Fisharebest\Webtrees\Census\CensusColumnOccupation
-     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
-     *
-     * @return void
-     */
     public function testNoOccupation(): void
     {
         $individual = $this->createMock(Individual::class);
@@ -47,12 +41,6 @@ class CensusColumnOccupationTest extends TestCase
         self::assertSame('', $column->generate($individual, $individual));
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Census\CensusColumnOccupation
-     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
-     *
-     * @return void
-     */
     public function testOccupation(): void
     {
         $fact = $this->createMock(Fact::class);

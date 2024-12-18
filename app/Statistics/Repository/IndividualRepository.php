@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace Fisharebest\Webtrees\Statistics\Repository;
 
 use Fisharebest\Webtrees\Auth;
+use Fisharebest\Webtrees\DB;
 use Fisharebest\Webtrees\Gedcom;
 use Fisharebest\Webtrees\GedcomRecord;
 use Fisharebest\Webtrees\I18N;
@@ -42,11 +43,9 @@ use Fisharebest\Webtrees\Statistics\Repository\Interfaces\IndividualRepositoryIn
 use Fisharebest\Webtrees\Statistics\Service\CenturyService;
 use Fisharebest\Webtrees\Statistics\Service\ColorService;
 use Fisharebest\Webtrees\Tree;
-use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\JoinClause;
-use stdClass;
 
 use function array_key_exists;
 use function array_keys;
@@ -441,7 +440,7 @@ class IndividualRepository implements IndividualRepositoryInterface
     }
 
     /**
-     * Count the number of distinct given names (or the number of occurences of specific given names).
+     * Count the number of distinct given names (or the number of occurrences of specific given names).
      *
      * @param array<string> ...$params
      *
@@ -459,7 +458,7 @@ class IndividualRepository implements IndividualRepositoryInterface
                 ->where('n_givn', '<>', Individual::PRAENOMEN_NESCIO)
                 ->whereNotNull('n_givn');
         } else {
-            // Count number of occurences of specific given names.
+            // Count number of occurrences of specific given names.
             $query->whereIn('n_givn', $params);
         }
 
@@ -485,7 +484,7 @@ class IndividualRepository implements IndividualRepositoryInterface
             $query->distinct()
                 ->whereNotNull('n_surn');
         } else {
-            // Count number of occurences of specific surnames.
+            // Count number of occurrences of specific surnames.
             $query->whereIn('n_surn', $params);
         }
 
@@ -724,7 +723,7 @@ class IndividualRepository implements IndividualRepositoryInterface
      *
      * @return string
      */
-    public function statsBirth(string $color_from = null, string $color_to = null): string
+    public function statsBirth(string|null $color_from = null, string|null $color_to = null): string
     {
         return (new ChartBirth($this->century_service, $this->color_service, $this->tree))
             ->chartBirth($color_from, $color_to);
@@ -782,7 +781,7 @@ class IndividualRepository implements IndividualRepositoryInterface
      *
      * @return string
      */
-    public function statsDeath(string $color_from = null, string $color_to = null): string
+    public function statsDeath(string|null $color_from = null, string|null $color_to = null): string
     {
         return (new ChartDeath($this->century_service, $this->color_service, $this->tree))
             ->chartDeath($color_from, $color_to);
@@ -796,12 +795,10 @@ class IndividualRepository implements IndividualRepositoryInterface
      * @param int    $year1
      * @param int    $year2
      *
-     * @return array<stdClass>
+     * @return array<object>
      */
     public function statsAgeQuery(string $related = 'BIRT', string $sex = 'BOTH', int $year1 = -1, int $year2 = -1): array
     {
-        $prefix = DB::connection()->getTablePrefix();
-
         $query = $this->birthAndDeathQuery($sex);
 
         if ($year1 >= 0 && $year2 >= 0) {
@@ -817,7 +814,7 @@ class IndividualRepository implements IndividualRepositoryInterface
         }
 
         return $query
-            ->select([new Expression($prefix . 'death.d_julianday2 - ' . $prefix . 'birth.d_julianday1 AS days')])
+            ->select([new Expression(DB::prefix('death.d_julianday2') . ' - ' . DB::prefix('birth.d_julianday1') . ' AS days')])
             ->orderBy('days', 'desc')
             ->get()
             ->all();
@@ -843,18 +840,15 @@ class IndividualRepository implements IndividualRepositoryInterface
      */
     private function longlifeQuery(string $type, string $sex): string
     {
-        $prefix = DB::connection()->getTablePrefix();
-
         $row = $this->birthAndDeathQuery($sex)
             ->orderBy('days', 'desc')
-            ->select(['individuals.*', new Expression($prefix . 'death.d_julianday2 - ' . $prefix . 'birth.d_julianday1 AS days')])
+            ->select(['individuals.*', new Expression(DB::prefix('death.d_julianday2') . ' - ' . DB::prefix('birth.d_julianday1') . ' AS days')])
             ->first();
 
         if ($row === null) {
             return '';
         }
 
-        /** @var Individual $individual */
         $individual = Registry::individualFactory()->mapper($this->tree)($row);
 
         if ($type !== 'age' && !$individual->canShow()) {
@@ -997,18 +991,15 @@ class IndividualRepository implements IndividualRepositoryInterface
      */
     private function topTenOldestQuery(string $sex, int $total): array
     {
-        $prefix = DB::connection()->getTablePrefix();
-
         $rows = $this->birthAndDeathQuery($sex)
             ->groupBy(['i_id', 'i_file'])
             ->orderBy('days', 'desc')
-            ->select(['individuals.*', new Expression('MAX(' . $prefix . 'death.d_julianday2 - ' . $prefix . 'birth.d_julianday1) AS days')])
+            ->select(['individuals.*', new Expression('MAX(' . DB::prefix('death.d_julianday2') . ' - ' . DB::prefix('birth.d_julianday1') . ') AS days')])
             ->take($total)
             ->get();
 
         $top10 = [];
         foreach ($rows as $row) {
-            /** @var Individual $individual */
             $individual = Registry::individualFactory()->mapper($this->tree)($row);
 
             if ($individual->canShow()) {
@@ -1153,12 +1144,10 @@ class IndividualRepository implements IndividualRepositoryInterface
             ->get()
             ->map(Registry::individualFactory()->mapper($this->tree))
             ->filter(GedcomRecord::accessFilter())
-            ->map(function (Individual $individual): array {
-                return [
-                    'person' => $individual,
-                    'age'    => $this->calculateAge(Registry::timestampFactory()->now()->julianDay() - $individual->getBirthDate()->minimumJulianDay()),
-                ];
-            })
+            ->map(fn (Individual $individual): array => [
+                'person' => $individual,
+                'age'    => $this->calculateAge(Registry::timestampFactory()->now()->julianDay() - $individual->getBirthDate()->minimumJulianDay()),
+            ])
             ->all();
     }
 
@@ -1292,10 +1281,8 @@ class IndividualRepository implements IndividualRepositoryInterface
      */
     private function averageLifespanQuery(string $sex, bool $show_years): string
     {
-        $prefix = DB::connection()->getTablePrefix();
-
         $days = (int) $this->birthAndDeathQuery($sex)
-            ->select([new Expression('AVG(' . $prefix . 'death.d_julianday2 - ' . $prefix . 'birth.d_julianday1) AS days')])
+            ->select([new Expression('AVG(' . DB::prefix('death.d_julianday2') . ' - ' . DB::prefix('birth.d_julianday1') . ') AS days')])
             ->value('days');
 
         if ($show_years) {
@@ -1819,8 +1806,8 @@ class IndividualRepository implements IndividualRepositoryInterface
      * @return string
      */
     public function chartCommonGiven(
-        string $color_from = null,
-        string $color_to = null,
+        string|null $color_from = null,
+        string|null $color_to = null,
         int $maxtoshow = 7
     ): string {
         $tot_indi = $this->totalIndividualsQuery();
@@ -1844,8 +1831,8 @@ class IndividualRepository implements IndividualRepositoryInterface
      * @return string
      */
     public function chartCommonSurnames(
-        string $color_from = null,
-        string $color_to = null,
+        string|null $color_from = null,
+        string|null $color_to = null,
         int $number_of_surnames = 10
     ): string {
         $tot_indi     = $this->totalIndividualsQuery();
@@ -1870,7 +1857,7 @@ class IndividualRepository implements IndividualRepositoryInterface
      *
      * @return string
      */
-    public function chartMortality(string $color_living = null, string $color_dead = null): string
+    public function chartMortality(string|null $color_living = null, string|null $color_dead = null): string
     {
         $tot_l = $this->totalLivingQuery();
         $tot_d = $this->totalDeceasedQuery();
@@ -1888,8 +1875,8 @@ class IndividualRepository implements IndividualRepositoryInterface
      * @return string
      */
     public function chartIndisWithSources(
-        string $color_from = null,
-        string $color_to = null
+        string|null $color_from = null,
+        string|null $color_to = null
     ): string {
         $tot_indi        = $this->totalIndividualsQuery();
         $tot_indi_source = $this->totalIndisWithSourcesQuery();
@@ -1907,8 +1894,8 @@ class IndividualRepository implements IndividualRepositoryInterface
      * @return string
      */
     public function chartFamsWithSources(
-        string $color_from = null,
-        string $color_to = null
+        string|null $color_from = null,
+        string|null $color_to = null
     ): string {
         $tot_fam        = $this->totalFamiliesQuery();
         $tot_fam_source = $this->totalFamsWithSourcesQuery();
@@ -1925,9 +1912,9 @@ class IndividualRepository implements IndividualRepositoryInterface
      * @return string
      */
     public function chartSex(
-        string $color_female = null,
-        string $color_male = null,
-        string $color_unknown = null
+        string|null $color_female = null,
+        string|null $color_male = null,
+        string|null $color_unknown = null
     ): string {
         $tot_m = $this->totalSexMalesQuery();
         $tot_f = $this->totalSexFemalesQuery();

@@ -25,20 +25,14 @@ use Fisharebest\Webtrees\GuestUser;
 use Fisharebest\Webtrees\Http\Exceptions\HttpAccessDeniedException;
 use Fisharebest\Webtrees\TestCase;
 use Fisharebest\Webtrees\User;
+use PHPUnit\Framework\Attributes\CoversClass;
 use Psr\Http\Server\RequestHandlerInterface;
 
 use function response;
 
-/**
- * Test the AuthAdministrator middleware.
- *
- * @covers \Fisharebest\Webtrees\Http\Middleware\AuthAdministrator
- */
+#[CoversClass(AuthAdministrator::class)]
 class AuthAdministratorTest extends TestCase
 {
-    /**
-     * @return void
-     */
     public function testAllowed(): void
     {
         $handler = $this->createMock(RequestHandlerInterface::class);
@@ -55,9 +49,6 @@ class AuthAdministratorTest extends TestCase
         self::assertSame('lorem ipsum', (string) $response->getBody());
     }
 
-    /**
-     * @return void
-     */
     public function testNotAllowed(): void
     {
         $this->expectException(HttpAccessDeniedException::class);
@@ -75,9 +66,6 @@ class AuthAdministratorTest extends TestCase
         $middleware->process($request, $handler);
     }
 
-    /**
-     * @return void
-     */
     public function testNotLoggedIn(): void
     {
         $handler = $this->createMock(RequestHandlerInterface::class);

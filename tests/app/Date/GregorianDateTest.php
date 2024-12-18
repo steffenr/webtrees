@@ -20,19 +20,14 @@ declare(strict_types=1);
 namespace Fisharebest\Webtrees\Date;
 
 use Fisharebest\Webtrees\TestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-/**
- * Test harness for the class GregorianDate
- *
- * @covers \Fisharebest\Webtrees\Date\AbstractGregorianJulianDate
- * @covers \Fisharebest\Webtrees\Date\GregorianDate
- */
+#[CoversClass(AbstractGregorianJulianDate::class)]
+#[CoversClass(GregorianDate::class)]
 class GregorianDateTest extends TestCase
 {
     /**
      * Test that the class exists
-     *
-     * @return void
      */
     public function testClassExists(): void
     {

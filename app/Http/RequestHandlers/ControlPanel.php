@@ -19,6 +19,7 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Http\RequestHandlers;
 
+use Fisharebest\Webtrees\DB;
 use Fisharebest\Webtrees\Http\ViewResponseTrait;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Module\FamilyListModule;
@@ -60,7 +61,6 @@ use Fisharebest\Webtrees\Services\UpgradeService;
 use Fisharebest\Webtrees\Services\UserService;
 use Fisharebest\Webtrees\Submitter;
 use Fisharebest\Webtrees\Webtrees;
-use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Collection;
@@ -94,8 +94,6 @@ class ControlPanel implements RequestHandlerInterface
     private UserService $user_service;
 
     /**
-     * ControlPanel constructor.
-     *
      * @param AdminService        $admin_service
      * @param HousekeepingService $housekeeping_service
      * @param MessageService      $message_service
@@ -139,9 +137,7 @@ class ControlPanel implements RequestHandlerInterface
 
         $custom_updates = $this->module_service
             ->findByInterface(ModuleCustomInterface::class)
-            ->filter(static function (ModuleCustomInterface $module): bool {
-                return version_compare($module->customModuleLatestVersion(), $module->customModuleVersion()) > 0;
-            });
+            ->filter(static fn (ModuleCustomInterface $module): bool => version_compare($module->customModuleLatestVersion(), $module->customModuleVersion()) > 0);
 
         $multiple_tree_threshold = $this->admin_service->multipleTreeThreshold();
         $gedcom_file_count       = $this->admin_service->gedcomFiles(Registry::filesystem()->data())->count();
@@ -169,7 +165,7 @@ class ControlPanel implements RequestHandlerInterface
             'repositories'                      => $this->totalRepositories(),
             'notes'                             => $this->totalNotes(),
             'submitters'                        => $this->totalSubmitters(),
-            'individual_list_module'            => $this->module_service->findByInterface(IndividualListModule::class)->last(),
+            'individual_list_module'            => $this->module_service->findByInterface(IndividualListModule::class)->first(),
             'family_list_module'                => $this->module_service->findByInterface(FamilyListModule::class)->first(),
             'media_list_module'                 => $this->module_service->findByInterface(MediaListModule::class)->first(),
             'note_list_module'                  => $this->module_service->findByInterface(NoteListModule::class)->first(),
@@ -225,7 +221,7 @@ class ControlPanel implements RequestHandlerInterface
     /**
      * Count the number of pending changes in each tree.
      *
-     * @return array<string>
+     * @return array<int>
      */
     private function totalChanges(): array
     {

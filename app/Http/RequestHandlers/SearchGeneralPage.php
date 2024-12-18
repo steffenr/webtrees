@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace Fisharebest\Webtrees\Http\RequestHandlers;
 
 use Fisharebest\Webtrees\Auth;
+use Fisharebest\Webtrees\DB;
 use Fisharebest\Webtrees\Family;
 use Fisharebest\Webtrees\Http\ViewResponseTrait;
 use Fisharebest\Webtrees\I18N;
@@ -32,7 +33,6 @@ use Fisharebest\Webtrees\Services\TreeService;
 use Fisharebest\Webtrees\Site;
 use Fisharebest\Webtrees\Tree;
 use Fisharebest\Webtrees\Validator;
-use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Support\Collection;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -57,8 +57,6 @@ class SearchGeneralPage implements RequestHandlerInterface
     private TreeService $tree_service;
 
     /**
-     * SearchController constructor.
-     *
      * @param SearchService $search_service
      * @param TreeService   $tree_service
      */
@@ -156,9 +154,7 @@ class SearchGeneralPage implements RequestHandlerInterface
                 $tmp1 = $this->search_service->searchFamilies($search_trees->all(), $search_terms);
                 $tmp2 = $this->search_service->searchFamilyNames($search_trees->all(), $search_terms);
 
-                $families = $tmp1->merge($tmp2)->unique(static function (Family $family): string {
-                    return $family->xref() . '@' . $family->tree()->id();
-                });
+                $families = $tmp1->merge($tmp2)->unique(static fn (Family $family): string => $family->xref() . '@' . $family->tree()->id());
             }
 
             if ($search_repositories) {

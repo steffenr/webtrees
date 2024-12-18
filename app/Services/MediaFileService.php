@@ -19,13 +19,13 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Services;
 
+use Fisharebest\Webtrees\DB;
 use Fisharebest\Webtrees\Exceptions\FileUploadException;
 use Fisharebest\Webtrees\FlashMessages;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Tree;
 use Fisharebest\Webtrees\Validator;
-use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Collection;
@@ -50,7 +50,6 @@ use function pathinfo;
 use function sha1;
 use function sort;
 use function str_contains;
-use function strlen;
 use function strtoupper;
 use function strtr;
 use function substr;
@@ -65,7 +64,7 @@ use const UPLOAD_ERR_OK;
  */
 class MediaFileService
 {
-    private const IGNORE_FOLDERS = [
+    private const array IGNORE_FOLDERS = [
         // Old versions of webtrees
         'thumbs',
         'watermarks',
@@ -362,9 +361,7 @@ class MediaFileService
             ->where('multimedia_file_refn', 'NOT LIKE', 'http://%')
             ->where('multimedia_file_refn', 'NOT LIKE', 'https://%')
             ->pluck(new Expression("COALESCE(setting_value, 'media/') || multimedia_file_refn AS path"))
-            ->map(static function (string $path): string {
-                return dirname($path) . '/';
-            });
+            ->map(static fn (string $path): string => dirname($path) . '/');
 
         $media_roots = DB::table('gedcom')
             ->leftJoin('gedcom_setting', static function (JoinClause $join): void {
@@ -392,9 +389,7 @@ class MediaFileService
         return $disk_folders->concat($db_folders)
             ->uniqueStrict()
             ->sort(I18N::comparator())
-            ->mapWithKeys(static function (string $folder): array {
-                return [$folder => $folder];
-            });
+            ->mapWithKeys(static fn (string $folder): array => [$folder => $folder]);
     }
 
     /**

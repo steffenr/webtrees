@@ -20,12 +20,12 @@ declare(strict_types=1);
 namespace Fisharebest\Webtrees\Http\RequestHandlers;
 
 use Fisharebest\Algorithm\ConnectedComponent;
+use Fisharebest\Webtrees\DB;
 use Fisharebest\Webtrees\Http\ViewResponseTrait;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Validator;
-use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Support\Collection;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -75,9 +75,7 @@ class UnconnectedPage implements RequestHandlerInterface
         $graph = DB::table('individuals')
             ->where('i_file', '=', $tree->id())
             ->pluck('i_id')
-            ->mapWithKeys(static function (string $xref): array {
-                return [$xref => []];
-            })
+            ->mapWithKeys(static fn (string $xref): array => [$xref => []])
             ->all();
 
         foreach ($rows as $row) {

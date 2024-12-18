@@ -21,19 +21,13 @@ namespace Fisharebest\Webtrees\Http\RequestHandlers;
 
 use Fig\Http\Message\StatusCodeInterface;
 use Fisharebest\Webtrees\TestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-/**
- * Test UserAddPageTest class.
- *
- * @covers \Fisharebest\Webtrees\Http\RequestHandlers\UserAddPage
- */
+#[CoversClass(UserAddPage::class)]
 class UserAddPageTest extends TestCase
 {
     protected static bool $uses_database = true;
 
-    /**
-     * @return void
-     */
     public function testHandler(): void
     {
         $handler  = new UserAddPage();

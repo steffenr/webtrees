@@ -19,12 +19,10 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Elements;
 
-/**
- * Test harness for the class LdsEndowmentDateStatus
- *
- * @covers \Fisharebest\Webtrees\Elements\AbstractElement
- * @covers \Fisharebest\Webtrees\Elements\LdsEndowmentDateStatus
- */
+use PHPUnit\Framework\Attributes\CoversClass;
+
+#[CoversClass(AbstractElement::class)]
+#[CoversClass(LdsEndowmentDateStatus::class)]
 class LdsEndowmentDateStatusTest extends AbstractElementTestCase
 {
     /**
@@ -37,9 +35,6 @@ class LdsEndowmentDateStatusTest extends AbstractElementTestCase
         self::$element = new LdsEndowmentDateStatus('label');
     }
 
-    /**
-     * @return void
-     */
     public function testCanonical(): void
     {
         self::assertSame('FOO BAR BAZ', self::$element->canonical('Foo  bAr  baZ'));

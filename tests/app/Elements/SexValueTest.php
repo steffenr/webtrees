@@ -19,12 +19,10 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Elements;
 
-/**
- * Test harness for the class SexValue
- *
- * @covers \Fisharebest\Webtrees\Elements\AbstractElement
- * @covers \Fisharebest\Webtrees\Elements\SexValue
- */
+use PHPUnit\Framework\Attributes\CoversClass;
+
+#[CoversClass(AbstractElement::class)]
+#[CoversClass(SexValue::class)]
 class SexValueTest extends AbstractElementTestCase
 {
     /**
@@ -37,9 +35,6 @@ class SexValueTest extends AbstractElementTestCase
         self::$element = new SexValue('label');
     }
 
-    /**
-     * @return void
-     */
     public function testCanonical(): void
     {
         self::assertSame('FOO BAR BAZ', self::$element->canonical('Foo  bAr  baZ'));

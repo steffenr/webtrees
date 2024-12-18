@@ -46,13 +46,13 @@ use function view;
  */
 class PasswordRequestAction implements RequestHandlerInterface, StatusCodeInterface
 {
-    private const TOKEN_LENGTH = 40;
+    private const int TOKEN_LENGTH = 40;
 
-    private const TOKEN_VALIDITY_SECONDS = 3600;
+    private const int TOKEN_VALIDITY_SECONDS = 3600;
 
-    private const RATE_LIMIT_REQUESTS = 5;
+    private const int RATE_LIMIT_REQUESTS = 5;
 
-    private const RATE_LIMIT_SECONDS = 300;
+    private const int RATE_LIMIT_SECONDS = 300;
 
     private EmailService $email_service;
 
@@ -61,8 +61,6 @@ class PasswordRequestAction implements RequestHandlerInterface, StatusCodeInterf
     private UserService $user_service;
 
     /**
-     * PasswordRequestForm constructor.
-     *
      * @param EmailService     $email_service
      * @param RateLimitService $rate_limit_service
      * @param UserService      $user_service

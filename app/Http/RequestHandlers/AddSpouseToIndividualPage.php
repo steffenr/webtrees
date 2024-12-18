@@ -39,7 +39,7 @@ class AddSpouseToIndividualPage implements RequestHandlerInterface
     use ViewResponseTrait;
 
     // Create mixed-sex couples by default
-    private const OPPOSITE_SEX = [
+    private const array OPPOSITE_SEX = [
         'F' => 'M',
         'M' => 'F',
         'U' => 'U',
@@ -49,8 +49,6 @@ class AddSpouseToIndividualPage implements RequestHandlerInterface
     private GedcomEditService $gedcom_edit_service;
 
     /**
-     * LinkSpouseToIndividualPage constructor.
-     *
      * @param GedcomEditService $gedcom_edit_service
      */
     public function __construct(GedcomEditService $gedcom_edit_service)

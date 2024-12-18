@@ -27,18 +27,14 @@ use Fisharebest\Webtrees\Services\TreeService;
 use Fisharebest\Webtrees\Services\UserService;
 use Fisharebest\Webtrees\TestCase;
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\CoversClass;
 use Psr\Http\Server\RequestHandlerInterface;
 
-/**
- * Test the HandleExceptions middleware.
- *
- * @covers \Fisharebest\Webtrees\Http\Middleware\HandleExceptions
- */
+#[CoversClass(HandleExceptions::class)]
 class HandleExceptionsTest extends TestCase
 {
-    /**
-     * @return void
-     */
+    protected static bool $uses_database = true;
+
     public function testMiddleware(): void
     {
         $tree_service = $this->createMock(TreeService::class);

@@ -24,18 +24,17 @@ use Fig\Http\Message\RequestMethodInterface;
 use Fisharebest\Algorithm\Dijkstra;
 use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Contracts\UserInterface;
+use Fisharebest\Webtrees\DB;
 use Fisharebest\Webtrees\FlashMessages;
 use Fisharebest\Webtrees\GedcomRecord;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\Menu;
 use Fisharebest\Webtrees\Registry;
-use Fisharebest\Webtrees\Services\ModuleService;
 use Fisharebest\Webtrees\Services\RelationshipService;
 use Fisharebest\Webtrees\Services\TreeService;
 use Fisharebest\Webtrees\Tree;
 use Fisharebest\Webtrees\Validator;
-use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Collection;
 use Psr\Http\Message\ResponseInterface;
@@ -69,17 +68,17 @@ class RelationshipsChartModule extends AbstractModule implements ModuleChartInte
     use ModuleChartTrait;
     use ModuleConfigTrait;
 
-    protected const ROUTE_URL = '/tree/{tree}/relationships-{ancestors}-{recursion}/{xref}{/xref2}';
+    protected const string ROUTE_URL = '/tree/{tree}/relationships-{ancestors}-{recursion}/{xref}{/xref2}';
 
     /** It would be more correct to use PHP_INT_MAX, but this isn't friendly in URLs */
-    public const UNLIMITED_RECURSION = 99;
+    public const int UNLIMITED_RECURSION = 99;
 
     /** By default new trees allow unlimited recursion */
-    public const DEFAULT_RECURSION = '99';
+    public const string DEFAULT_RECURSION = '99';
 
     /** By default new trees search for all relationships (not via ancestors) */
-    public const DEFAULT_ANCESTORS  = '0';
-    public const DEFAULT_PARAMETERS = [
+    public const string DEFAULT_ANCESTORS  = '0';
+    public const array  DEFAULT_PARAMETERS = [
         'ancestors' => self::DEFAULT_ANCESTORS,
         'recursion' => self::DEFAULT_RECURSION,
     ];
@@ -114,11 +113,6 @@ class RelationshipsChartModule extends AbstractModule implements ModuleChartInte
             ]);
     }
 
-    /**
-     * A sentence describing what this module does.
-     *
-     * @return string
-     */
     public function description(): string
     {
         /* I18N: Description of the “RelationshipsChart” module */
@@ -132,7 +126,7 @@ class RelationshipsChartModule extends AbstractModule implements ModuleChartInte
      *
      * @return Menu|null
      */
-    public function chartBoxMenu(Individual $individual): ?Menu
+    public function chartBoxMenu(Individual $individual): Menu|null
     {
         return $this->chartMenu($individual);
     }
@@ -200,10 +194,17 @@ class RelationshipsChartModule extends AbstractModule implements ModuleChartInte
      */
     public function chartUrl(Individual $individual, array $parameters = []): string
     {
+        $tree           = $individual->tree();
+        $ancestors_only = (int) $tree->getPreference('RELATIONSHIP_ANCESTORS', static::DEFAULT_ANCESTORS);
+        $max_recursion  = (int) $tree->getPreference('RELATIONSHIP_RECURSION', static::DEFAULT_RECURSION);
+
+
         return route(static::class, [
-                'xref' => $individual->xref(),
-                'tree' => $individual->tree()->name(),
-            ] + $parameters + self::DEFAULT_PARAMETERS);
+            'xref'      => $individual->xref(),
+            'tree'      => $individual->tree()->name(),
+            'ancestors' => $ancestors_only,
+            'recursion' => $max_recursion,
+        ] + $parameters);
     }
 
     /**
@@ -586,9 +587,7 @@ class RelationshipsChartModule extends AbstractModule implements ModuleChartInte
      */
     private function stringMapper(): Closure
     {
-        return static function ($xref) {
-            return (string) $xref;
-        };
+        return static fn ($xref) => (string) $xref;
     }
 
     /**

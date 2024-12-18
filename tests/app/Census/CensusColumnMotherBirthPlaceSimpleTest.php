@@ -24,19 +24,12 @@ use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\Place;
 use Fisharebest\Webtrees\TestCase;
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-/**
- * Test harness for the class CensusColumnMotherBirthPlaceSimple
- */
+#[CoversClass(CensusColumnMotherBirthPlaceSimple::class)]
+#[CoversClass(AbstractCensusColumn::class)]
 class CensusColumnMotherBirthPlaceSimpleTest extends TestCase
 {
-    /**
-     * Get place mock.
-     *
-     * @param string $place Gedcom Place
-     *
-     * @return Place
-     */
     private function getPlaceMock(string $place): Place
     {
         $placeParts = explode(', ', $place);
@@ -48,12 +41,6 @@ class CensusColumnMotherBirthPlaceSimpleTest extends TestCase
         return $placeMock;
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Census\CensusColumnMotherBirthPlaceSimple
-     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
-     *
-     * @return void
-     */
     public function testKnownStateAndTown(): void
     {
         $father = $this->createMock(Individual::class);

@@ -19,12 +19,10 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Elements;
 
-/**
- * Test harness for the class OrdinanceProcessFlag
- *
- * @covers \Fisharebest\Webtrees\Elements\AbstractElement
- * @covers \Fisharebest\Webtrees\Elements\OrdinanceProcessFlag
- */
+use PHPUnit\Framework\Attributes\CoversClass;
+
+#[CoversClass(AbstractElement::class)]
+#[CoversClass(OrdinanceProcessFlag::class)]
 class OrdinanceProcessFlagTest extends AbstractElementTestCase
 {
     /**
@@ -37,9 +35,6 @@ class OrdinanceProcessFlagTest extends AbstractElementTestCase
         self::$element = new OrdinanceProcessFlag('label');
     }
 
-    /**
-     * @return void
-     */
     public function testCanonical(): void
     {
         self::assertSame('FOO BAR BAZ', self::$element->canonical('Foo  bAr  baZ'));

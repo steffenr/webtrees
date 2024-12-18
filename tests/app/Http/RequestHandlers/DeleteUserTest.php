@@ -26,24 +26,20 @@ use Fisharebest\Webtrees\Http\Exceptions\HttpNotFoundException;
 use Fisharebest\Webtrees\Services\UserService;
 use Fisharebest\Webtrees\TestCase;
 use Fisharebest\Webtrees\User;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-/**
- * @covers \Fisharebest\Webtrees\Http\RequestHandlers\DeleteUser
- */
+#[CoversClass(DeleteUser::class)]
 class DeleteUserTest extends TestCase
 {
     protected static bool $uses_database = true;
 
-    /**
-     * @return void
-     */
     public function testDeleteUser(): void
     {
         $user = $this->createMock(User::class);
         $user->method('id')->willReturn(1);
 
         $user_service = $this->createMock(UserService::class);
-        $user_service->expects(self::once())->method('find')->willReturn($user);
+        $user_service->expects($this->once())->method('find')->willReturn($user);
 
         $request  = self::createRequest()
             ->withAttribute('user_id', $user->id());
@@ -53,16 +49,13 @@ class DeleteUserTest extends TestCase
         self::assertSame(StatusCodeInterface::STATUS_NO_CONTENT, $response->getStatusCode());
     }
 
-    /**
-     * @return void
-     */
     public function testDeleteNonExistingUser(): void
     {
         $this->expectException(HttpNotFoundException::class);
         $this->expectExceptionMessage('User ID 98765 not found');
 
         $user_service = $this->createMock(UserService::class);
-        $user_service->expects(self::once())->method('find')->willReturn(null);
+        $user_service->expects($this->once())->method('find')->willReturn(null);
 
         $request  = self::createRequest()
             ->withAttribute('user_id', 98765);
@@ -70,9 +63,6 @@ class DeleteUserTest extends TestCase
         $handler->handle($request);
     }
 
-    /**
-     * @return void
-     */
     public function testCannotDeleteAdministrator(): void
     {
         $this->expectException(HttpAccessDeniedException::class);
@@ -80,10 +70,10 @@ class DeleteUserTest extends TestCase
 
         $user = $this->createMock(User::class);
         $user->method('id')->willReturn(1);
-        $user->expects(self::once())->method('getPreference')->with(UserInterface::PREF_IS_ADMINISTRATOR)->willReturn('1');
+        $user->expects($this->once())->method('getPreference')->with(UserInterface::PREF_IS_ADMINISTRATOR)->willReturn('1');
 
         $user_service = $this->createMock(UserService::class);
-        $user_service->expects(self::once())->method('find')->willReturn($user);
+        $user_service->expects($this->once())->method('find')->willReturn($user);
 
         $request  = self::createRequest()
             ->withAttribute('user_id', $user->id());

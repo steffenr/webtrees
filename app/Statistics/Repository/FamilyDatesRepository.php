@@ -20,13 +20,13 @@ declare(strict_types=1);
 namespace Fisharebest\Webtrees\Statistics\Repository;
 
 use Fisharebest\Webtrees\Date;
+use Fisharebest\Webtrees\DB;
 use Fisharebest\Webtrees\Fact;
 use Fisharebest\Webtrees\GedcomRecord;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Statistics\Repository\Interfaces\FamilyDatesRepositoryInterface;
 use Fisharebest\Webtrees\Tree;
-use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Query\Builder;
 
 use function abs;
@@ -40,16 +40,16 @@ class FamilyDatesRepository implements FamilyDatesRepositoryInterface
     /**
      * Sorting directions.
      */
-    private const SORT_MIN = 'MIN';
-    private const SORT_MAX = 'MAX';
+    private const string SORT_MIN = 'MIN';
+    private const string SORT_MAX = 'MAX';
 
     /**
      * Event facts.
      */
-    private const EVENT_BIRTH    = 'BIRT';
-    private const EVENT_DEATH    = 'DEAT';
-    private const EVENT_MARRIAGE = 'MARR';
-    private const EVENT_DIVORCE  = 'DIV';
+    private const string EVENT_BIRTH    = 'BIRT';
+    private const string EVENT_DEATH    = 'DEAT';
+    private const string EVENT_MARRIAGE = 'MARR';
+    private const string EVENT_DIVORCE  = 'DIV';
 
     private Tree $tree;
 
@@ -67,9 +67,9 @@ class FamilyDatesRepository implements FamilyDatesRepositoryInterface
      * @param string $fact
      * @param string $operation
      *
-     * @return object|null
+     * @return object{id:string,year:int,fact:string,type:string}|null
      */
-    private function eventQuery(string $fact, string $operation): ?object
+    private function eventQuery(string $fact, string $operation): object|null
     {
         return DB::table('dates')
             ->select(['d_gid as id', 'd_year as year', 'd_fact AS fact', 'd_type AS type'])
@@ -82,11 +82,19 @@ class FamilyDatesRepository implements FamilyDatesRepositoryInterface
                     ->where('d_fact', '=', $fact)
                     ->where('d_julianday1', '<>', 0);
             })
+            ->limit(1)
+            ->get()
+            ->map(static fn (object $row): object => (object) [
+                'id'   => $row->id,
+                'year' => (int) $row->year,
+                'fact' => $row->fact,
+                'type' => $row->type,
+            ])
             ->first();
     }
 
     /**
-     * Returns the formatted year of the first/last occuring event.
+     * Returns the formatted year of the first/last occurring event.
      *
      * @param string $type      The fact to query
      * @param string $operation The sorting operation
@@ -176,7 +184,7 @@ class FamilyDatesRepository implements FamilyDatesRepositoryInterface
     }
 
     /**
-     * Returns the formatted year of the first/last occuring event.
+     * Returns the formatted year of the first/last occurring event.
      *
      * @param string $type      The fact to query
      * @param string $operation The sorting operation
@@ -264,7 +272,7 @@ class FamilyDatesRepository implements FamilyDatesRepositoryInterface
     }
 
     /**
-     * Returns the formatted name of the first/last occuring event.
+     * Returns the formatted name of the first/last occurring event.
      *
      * @param string $type      The fact to query
      * @param string $operation The sorting operation
@@ -351,7 +359,7 @@ class FamilyDatesRepository implements FamilyDatesRepositoryInterface
     }
 
     /**
-     * Returns the formatted place of the first/last occuring event.
+     * Returns the formatted place of the first/last occurring event.
      *
      * @param string $type      The fact to query
      * @param string $operation The sorting operation

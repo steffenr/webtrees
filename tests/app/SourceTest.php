@@ -19,17 +19,13 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees;
 
-/**
- * Test harness for the class Source
- *
- * @covers \Fisharebest\Webtrees\Source
- */
+use PHPUnit\Framework\Attributes\CoversClass;
+
+#[CoversClass(Source::class)]
 class SourceTest extends TestCase
 {
     /**
      * Test that the class exists
-     *
-     * @return void
      */
     public function testClassExists(): void
     {

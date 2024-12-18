@@ -23,21 +23,16 @@ use Fisharebest\Webtrees\Fact;
 use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\TestCase;
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-/**
- * Test harness for the class PolishSurnameTradition
- */
+#[CoversClass(PolishSurnameTradition::class)]
+#[CoversClass(PatrilinealSurnameTradition::class)]
 class PolishSurnameTraditionTest extends TestCase
 {
     private SurnameTraditionInterface $surname_tradition;
 
     /**
      * Test whether surnames are used
-     *
-     * @covers \Fisharebest\Webtrees\SurnameTradition\PolishSurnameTradition
-     * @covers \Fisharebest\Webtrees\SurnameTradition\PatrilinealSurnameTradition
-     *
-     * @return void
      */
     public function testSurnames(): void
     {
@@ -46,24 +41,19 @@ class PolishSurnameTraditionTest extends TestCase
 
     /**
      * Test new son names
-     *
-     * @covers \Fisharebest\Webtrees\SurnameTradition\PolishSurnameTradition
-     * @covers \Fisharebest\Webtrees\SurnameTradition\PatrilinealSurnameTradition
-     *
-     * @return void
      */
     public function testNewSonNames(): void
     {
-        $father_fact = $this->createStub(Fact::class);
+        $father_fact = $this->createMock(Fact::class);
         $father_fact->method('value')->willReturn('John /White/');
 
-        $father = $this->createStub(Individual::class);
+        $father = $this->createMock(Individual::class);
         $father->method('facts')->willReturn(new Collection([$father_fact]));
 
-        $mother_fact = $this->createStub(Fact::class);
+        $mother_fact = $this->createMock(Fact::class);
         $mother_fact->method('value')->willReturn('Mary /Black/');
 
-        $mother = $this->createStub(Individual::class);
+        $mother = $this->createMock(Individual::class);
         $mother->method('facts')->willReturn(new Collection([$mother_fact]));
 
         self::assertSame(
@@ -74,24 +64,19 @@ class PolishSurnameTraditionTest extends TestCase
 
     /**
      * Test new daughter names
-     *
-     * @covers \Fisharebest\Webtrees\SurnameTradition\PolishSurnameTradition
-     * @covers \Fisharebest\Webtrees\SurnameTradition\PatrilinealSurnameTradition
-     *
-     * @return void
      */
     public function testNewDaughterNames(): void
     {
-        $father_fact = $this->createStub(Fact::class);
+        $father_fact = $this->createMock(Fact::class);
         $father_fact->method('value')->willReturn('John /White/');
 
-        $father = $this->createStub(Individual::class);
+        $father = $this->createMock(Individual::class);
         $father->method('facts')->willReturn(new Collection([$father_fact]));
 
-        $mother_fact = $this->createStub(Fact::class);
+        $mother_fact = $this->createMock(Fact::class);
         $mother_fact->method('value')->willReturn('Mary /Black/');
 
-        $mother = $this->createStub(Individual::class);
+        $mother = $this->createMock(Individual::class);
         $mother->method('facts')->willReturn(new Collection([$mother_fact]));
 
         self::assertSame(
@@ -102,24 +87,19 @@ class PolishSurnameTraditionTest extends TestCase
 
     /**
      * Test new daughter names
-     *
-     * @covers \Fisharebest\Webtrees\SurnameTradition\PolishSurnameTradition
-     * @covers \Fisharebest\Webtrees\SurnameTradition\PatrilinealSurnameTradition
-     *
-     * @return void
      */
     public function testNewDaughterNamesInflected(): void
     {
-        $father_fact = $this->createStub(Fact::class);
+        $father_fact = $this->createMock(Fact::class);
         $father_fact->method('value')->willReturn('John /Whitecki/');
 
-        $father = $this->createStub(Individual::class);
+        $father = $this->createMock(Individual::class);
         $father->method('facts')->willReturn(new Collection([$father_fact]));
 
-        $mother_fact = $this->createStub(Fact::class);
+        $mother_fact = $this->createMock(Fact::class);
         $mother_fact->method('value')->willReturn('Mary /Black/');
 
-        $mother = $this->createStub(Individual::class);
+        $mother = $this->createMock(Individual::class);
         $mother->method('facts')->willReturn(new Collection([$mother_fact]));
 
         self::assertSame(
@@ -127,16 +107,16 @@ class PolishSurnameTraditionTest extends TestCase
             $this->surname_tradition->newChildNames($father, $mother, 'F')
         );
 
-        $father_fact = $this->createStub(Fact::class);
+        $father_fact = $this->createMock(Fact::class);
         $father_fact->method('value')->willReturn('John /Whitedzki/');
 
-        $father = $this->createStub(Individual::class);
+        $father = $this->createMock(Individual::class);
         $father->method('facts')->willReturn(new Collection([$father_fact]));
 
-        $mother_fact = $this->createStub(Fact::class);
+        $mother_fact = $this->createMock(Fact::class);
         $mother_fact->method('value')->willReturn('Mary /Black/');
 
-        $mother = $this->createStub(Individual::class);
+        $mother = $this->createMock(Individual::class);
         $mother->method('facts')->willReturn(new Collection([$mother_fact]));
 
         self::assertSame(
@@ -144,16 +124,16 @@ class PolishSurnameTraditionTest extends TestCase
             $this->surname_tradition->newChildNames($father, $mother, 'F')
         );
 
-        $father_fact = $this->createStub(Fact::class);
+        $father_fact = $this->createMock(Fact::class);
         $father_fact->method('value')->willReturn('John /Whiteski/');
 
-        $father = $this->createStub(Individual::class);
+        $father = $this->createMock(Individual::class);
         $father->method('facts')->willReturn(new Collection([$father_fact]));
 
-        $mother_fact = $this->createStub(Fact::class);
+        $mother_fact = $this->createMock(Fact::class);
         $mother_fact->method('value')->willReturn('Mary /Black/');
 
-        $mother = $this->createStub(Individual::class);
+        $mother = $this->createMock(Individual::class);
         $mother->method('facts')->willReturn(new Collection([$mother_fact]));
 
         self::assertSame(
@@ -161,16 +141,16 @@ class PolishSurnameTraditionTest extends TestCase
             $this->surname_tradition->newChildNames($father, $mother, 'F')
         );
 
-        $father_fact = $this->createStub(Fact::class);
+        $father_fact = $this->createMock(Fact::class);
         $father_fact->method('value')->willReturn('John /Whiteżki/');
 
-        $father = $this->createStub(Individual::class);
+        $father = $this->createMock(Individual::class);
         $father->method('facts')->willReturn(new Collection([$father_fact]));
 
-        $mother_fact = $this->createStub(Fact::class);
+        $mother_fact = $this->createMock(Fact::class);
         $mother_fact->method('value')->willReturn('Mary /Black/');
 
-        $mother = $this->createStub(Individual::class);
+        $mother = $this->createMock(Individual::class);
         $mother->method('facts')->willReturn(new Collection([$mother_fact]));
 
         self::assertSame(
@@ -181,24 +161,19 @@ class PolishSurnameTraditionTest extends TestCase
 
     /**
      * Test new child names
-     *
-     * @covers \Fisharebest\Webtrees\SurnameTradition\PolishSurnameTradition
-     * @covers \Fisharebest\Webtrees\SurnameTradition\PatrilinealSurnameTradition
-     *
-     * @return void
      */
     public function testNewChildNames(): void
     {
-        $father_fact = $this->createStub(Fact::class);
+        $father_fact = $this->createMock(Fact::class);
         $father_fact->method('value')->willReturn('John /White/');
 
-        $father = $this->createStub(Individual::class);
+        $father = $this->createMock(Individual::class);
         $father->method('facts')->willReturn(new Collection([$father_fact]));
 
-        $mother_fact = $this->createStub(Fact::class);
+        $mother_fact = $this->createMock(Fact::class);
         $mother_fact->method('value')->willReturn('Mary /Black/');
 
-        $mother = $this->createStub(Individual::class);
+        $mother = $this->createMock(Individual::class);
         $mother->method('facts')->willReturn(new Collection([$mother_fact]));
 
         self::assertSame(
@@ -209,11 +184,6 @@ class PolishSurnameTraditionTest extends TestCase
 
     /**
      * Test new child names
-     *
-     * @covers \Fisharebest\Webtrees\SurnameTradition\PolishSurnameTradition
-     * @covers \Fisharebest\Webtrees\SurnameTradition\PatrilinealSurnameTradition
-     *
-     * @return void
      */
     public function testNewChildNamesWithNoParentsNames(): void
     {
@@ -225,18 +195,13 @@ class PolishSurnameTraditionTest extends TestCase
 
     /**
      * Test new father names
-     *
-     * @covers \Fisharebest\Webtrees\SurnameTradition\PolishSurnameTradition
-     * @covers \Fisharebest\Webtrees\SurnameTradition\PatrilinealSurnameTradition
-     *
-     * @return void
      */
     public function testNewFatherNames(): void
     {
-        $fact = $this->createStub(Fact::class);
+        $fact = $this->createMock(Fact::class);
         $fact->method('value')->willReturn('Chris /White/');
 
-        $individual = $this->createStub(Individual::class);
+        $individual = $this->createMock(Individual::class);
         $individual->method('facts')->willReturn(new Collection([$fact]));
 
         self::assertSame(
@@ -247,18 +212,13 @@ class PolishSurnameTraditionTest extends TestCase
 
     /**
      * Test new father names
-     *
-     * @covers \Fisharebest\Webtrees\SurnameTradition\PolishSurnameTradition
-     * @covers \Fisharebest\Webtrees\SurnameTradition\PatrilinealSurnameTradition
-     *
-     * @return void
      */
     public function testNewFatherNamesInflected(): void
     {
-        $fact = $this->createStub(Fact::class);
+        $fact = $this->createMock(Fact::class);
         $fact->method('value')->willReturn('Chris /Whitecka/');
 
-        $individual = $this->createStub(Individual::class);
+        $individual = $this->createMock(Individual::class);
         $individual->method('facts')->willReturn(new Collection([$fact]));
 
         self::assertSame(
@@ -266,10 +226,10 @@ class PolishSurnameTraditionTest extends TestCase
             $this->surname_tradition->newParentNames($individual, 'M')
         );
 
-        $fact = $this->createStub(Fact::class);
+        $fact = $this->createMock(Fact::class);
         $fact->method('value')->willReturn('Chris /Whitedzka/');
 
-        $individual = $this->createStub(Individual::class);
+        $individual = $this->createMock(Individual::class);
         $individual->method('facts')->willReturn(new Collection([$fact]));
 
         self::assertSame(
@@ -277,10 +237,10 @@ class PolishSurnameTraditionTest extends TestCase
             $this->surname_tradition->newParentNames($individual, 'M')
         );
 
-        $fact = $this->createStub(Fact::class);
+        $fact = $this->createMock(Fact::class);
         $fact->method('value')->willReturn('Chris /Whiteska/');
 
-        $individual = $this->createStub(Individual::class);
+        $individual = $this->createMock(Individual::class);
         $individual->method('facts')->willReturn(new Collection([$fact]));
 
         self::assertSame(
@@ -288,10 +248,10 @@ class PolishSurnameTraditionTest extends TestCase
             $this->surname_tradition->newParentNames($individual, 'M')
         );
 
-        $fact = $this->createStub(Fact::class);
+        $fact = $this->createMock(Fact::class);
         $fact->method('value')->willReturn('Chris /Whiteżka/');
 
-        $individual = $this->createStub(Individual::class);
+        $individual = $this->createMock(Individual::class);
         $individual->method('facts')->willReturn(new Collection([$fact]));
 
         self::assertSame(
@@ -302,18 +262,13 @@ class PolishSurnameTraditionTest extends TestCase
 
     /**
      * Test new mother names
-     *
-     * @covers \Fisharebest\Webtrees\SurnameTradition\PolishSurnameTradition
-     * @covers \Fisharebest\Webtrees\SurnameTradition\PatrilinealSurnameTradition
-     *
-     * @return void
      */
     public function testNewMotherNames(): void
     {
-        $fact = $this->createStub(Fact::class);
+        $fact = $this->createMock(Fact::class);
         $fact->method('value')->willReturn('Chris /White/');
 
-        $individual = $this->createStub(Individual::class);
+        $individual = $this->createMock(Individual::class);
         $individual->method('facts')->willReturn(new Collection([$fact]));
 
         self::assertSame(
@@ -324,18 +279,13 @@ class PolishSurnameTraditionTest extends TestCase
 
     /**
      * Test new parent names
-     *
-     * @covers \Fisharebest\Webtrees\SurnameTradition\PolishSurnameTradition
-     * @covers \Fisharebest\Webtrees\SurnameTradition\PatrilinealSurnameTradition
-     *
-     * @return void
      */
     public function testNewParentNames(): void
     {
-        $fact = $this->createStub(Fact::class);
+        $fact = $this->createMock(Fact::class);
         $fact->method('value')->willReturn('Chris /White/');
 
-        $individual = $this->createStub(Individual::class);
+        $individual = $this->createMock(Individual::class);
         $individual->method('facts')->willReturn(new Collection([$fact]));
 
         self::assertSame(
@@ -346,18 +296,13 @@ class PolishSurnameTraditionTest extends TestCase
 
     /**
      * Test new spouse names
-     *
-     * @covers \Fisharebest\Webtrees\SurnameTradition\PolishSurnameTradition
-     * @covers \Fisharebest\Webtrees\SurnameTradition\PatrilinealSurnameTradition
-     *
-     * @return void
      */
     public function testNewSpouseNames(): void
     {
-        $fact = $this->createStub(Fact::class);
+        $fact = $this->createMock(Fact::class);
         $fact->method('value')->willReturn('Chris /White/');
 
-        $individual = $this->createStub(Individual::class);
+        $individual = $this->createMock(Individual::class);
         $individual->method('facts')->willReturn(new Collection([$fact]));
 
         self::assertSame(
@@ -378,8 +323,6 @@ class PolishSurnameTraditionTest extends TestCase
 
     /**
      * Prepare the environment for these tests
-     *
-     * @return void
      */
     protected function setUp(): void
     {

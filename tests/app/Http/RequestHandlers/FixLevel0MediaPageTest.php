@@ -21,17 +21,13 @@ namespace Fisharebest\Webtrees\Http\RequestHandlers;
 
 use Fig\Http\Message\StatusCodeInterface;
 use Fisharebest\Webtrees\TestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-/**
- * Test FixLevel0MediaPageTest class.
- *
- * @covers \Fisharebest\Webtrees\Http\RequestHandlers\FixLevel0MediaPageTest
- */
+#[CoversClass(FixLevel0MediaPageTest::class)]
 class FixLevel0MediaPageTest extends TestCase
 {
-    /**
-     * @return void
-     */
+    protected static bool $uses_database = true;
+
     public function testFixLevel0Media(): void
     {
         $handler  = new FixLevel0MediaPage();

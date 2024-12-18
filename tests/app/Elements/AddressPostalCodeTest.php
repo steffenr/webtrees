@@ -19,12 +19,10 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Elements;
 
-/**
- * Test harness for the class AddressPostalCode
- *
- * @covers \Fisharebest\Webtrees\Elements\AbstractElement
- * @covers \Fisharebest\Webtrees\Elements\AddressPostalCode
- */
+use PHPUnit\Framework\Attributes\CoversClass;
+
+#[CoversClass(AbstractElement::class)]
+#[CoversClass(AddressPostalCode::class)]
 class AddressPostalCodeTest extends AbstractElementTestCase
 {
     /**
@@ -37,9 +35,6 @@ class AddressPostalCodeTest extends AbstractElementTestCase
         self::$element = new AddressPostalCode('label');
     }
 
-    /**
-     * @return void
-     */
     public function testCanonical(): void
     {
         self::assertSame('FOO BAR BAZ', self::$element->canonical('Foo  bAr  baZ'));

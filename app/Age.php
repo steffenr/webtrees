@@ -39,8 +39,6 @@ class Age
     private bool $is_valid;
 
     /**
-     * Age constructor.
-     *
      * @param Date $x The first date
      * @param Date $y The second date
      */
@@ -148,7 +146,6 @@ class Age
         if ($this->years < 0) {
             return view('icons/warning');
         }
-
 
         return I18N::number($this->years);
     }

@@ -23,22 +23,16 @@ use Fisharebest\Webtrees\GuestUser;
 use Fisharebest\Webtrees\Http\Exceptions\HttpTooManyRequestsException;
 use Fisharebest\Webtrees\TestCase;
 use LogicException;
+use PHPUnit\Framework\Attributes\CoversClass;
 
 use function explode;
 use function implode;
 use function range;
 use function time;
 
-/**
- * Test harness for the class RateLimitService
- */
+#[CoversClass(RateLimitService::class)]
 class RateLimitServiceTest extends TestCase
 {
-    /**
-     * @covers \Fisharebest\Webtrees\Services\RateLimitService
-     *
-     * @return void
-     */
     public function testTooMuchHistory(): void
     {
         $rate_limit_service = new RateLimitService();
@@ -50,11 +44,6 @@ class RateLimitServiceTest extends TestCase
         $rate_limit_service->limitRateForUser($user, 1000, 30, 'rate-limit');
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Services\RateLimitService
-     *
-     * @return void
-     */
     public function testLimitNotReached(): void
     {
         $rate_limit_service = new RateLimitService();
@@ -74,11 +63,6 @@ class RateLimitServiceTest extends TestCase
         static::assertCount(3, explode(',', $history));
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Services\RateLimitService
-     *
-     * @return void
-     */
     public function testOldEventsIgnored(): void
     {
         $rate_limit_service = new RateLimitService();
@@ -93,11 +77,6 @@ class RateLimitServiceTest extends TestCase
         static::assertCount(6, explode(',', $history));
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Services\RateLimitService
-     *
-     * @return void
-     */
     public function testLimitReached(): void
     {
         $rate_limit_service = new RateLimitService();

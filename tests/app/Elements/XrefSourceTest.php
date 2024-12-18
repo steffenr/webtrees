@@ -25,20 +25,16 @@ use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Source;
 use Fisharebest\Webtrees\TestCase;
 use Fisharebest\Webtrees\Tree;
+use PHPUnit\Framework\Attributes\CoversClass;
 use Psr\Http\Message\ServerRequestInterface;
 
-/**
- * Test harness for the class XrefSource
- *
- * @covers \Fisharebest\Webtrees\Elements\AbstractElement
- * @covers \Fisharebest\Webtrees\Elements\AbstractXrefElement
- * @covers \Fisharebest\Webtrees\Elements\XrefSource
- */
+#[CoversClass(AbstractElement::class)]
+#[CoversClass(AbstractXrefElement::class)]
+#[CoversClass(XrefSource::class)]
 class XrefSourceTest extends TestCase
 {
-    /**
-     * @return void
-     */
+    protected static bool $uses_database = true;
+
     public function testEdit(): void
     {
         $element = new XrefSource('');
@@ -47,7 +43,7 @@ class XrefSourceTest extends TestCase
 
         $factory = $this->createMock(SourceFactory::class);
 
-        $factory->expects(self::once())
+        $factory->expects($this->once())
             ->method('make')
             ->willReturn(null);
 
@@ -68,9 +64,6 @@ class XrefSourceTest extends TestCase
         self::assertEquals(1, $option_nodes->count());
     }
 
-    /**
-     * @return void
-     */
     public function testEditInlineSource(): void
     {
         $element = new XrefSource('');
@@ -89,9 +82,6 @@ class XrefSourceTest extends TestCase
         self::assertEquals(1, $textarea_nodes->count());
     }
 
-    /**
-     * @return void
-     */
     public function testEscape(): void
     {
         $element = new XrefSource('');
@@ -99,20 +89,17 @@ class XrefSourceTest extends TestCase
         self::assertSame('@X123@', $element->escape('@X123@'));
     }
 
-    /**
-     * @return void
-     */
     public function testValueXrefLink(): void
     {
         $element = new XrefSource('');
 
         $record = $this->createMock(Source::class);
 
-        $record->expects(self::once())
+        $record->expects($this->once())
             ->method('fullName')
             ->willReturn('Full Name');
 
-        $record->expects(self::once())
+        $record->expects($this->once())
             ->method('url')
             ->willReturn('https://url');
 
@@ -120,19 +107,15 @@ class XrefSourceTest extends TestCase
 
         $factory = $this->createMock(SourceFactory::class);
 
-        $factory->expects(self::once())
+        $factory->expects($this->once())
             ->method('make')
             ->willReturn($record);
-
 
         Registry::sourceFactory($factory);
 
         self::assertSame('<a href="https://url">Full Name</a>', $element->value('@X123@', $tree));
     }
 
-    /**
-     * @return void
-     */
     public function testValueXrefLinkWithInvalidXref(): void
     {
         $element = new XrefSource('');
@@ -142,9 +125,6 @@ class XrefSourceTest extends TestCase
         self::assertSame('<span class="error">@invalid@</span>', $element->value('@invalid@', $tree));
     }
 
-    /**
-     * @return void
-     */
     public function testValueXrefLinkWithInlineData(): void
     {
         $element = new XrefSource('');
@@ -154,9 +134,6 @@ class XrefSourceTest extends TestCase
         self::assertSame('<p>invalid</p>', $element->value('invalid', $tree));
     }
 
-    /**
-     * @return void
-     */
     public function testValueXrefLinkWithMissingRecord(): void
     {
         $element = new XrefSource('');
@@ -165,7 +142,7 @@ class XrefSourceTest extends TestCase
 
         $factory = $this->createMock(SourceFactory::class);
 
-        $factory->expects(self::once())
+        $factory->expects($this->once())
             ->method('make')
             ->willReturn(null);
 

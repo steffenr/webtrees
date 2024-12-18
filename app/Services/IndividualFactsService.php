@@ -59,7 +59,7 @@ class IndividualFactsService
      * @param Individual             $individual
      * @param Collection<int,string> $exclude_facts
      *
-     * @return Collection<Fact>
+     * @return Collection<int,Fact>
      */
     public function individualFacts(Individual $individual, Collection $exclude_facts): Collection
     {
@@ -73,7 +73,7 @@ class IndividualFactsService
      * @param Individual             $individual
      * @param Collection<int,string> $exclude_facts
      *
-     * @return Collection<Fact>
+     * @return Collection<int,Fact>
      */
     public function familyFacts(Individual $individual, Collection $exclude_facts): Collection
     {
@@ -167,9 +167,7 @@ class IndividualFactsService
     public function historicFacts(Individual $individual): Collection
     {
         return $this->module_service->findByInterface(ModuleHistoricEventsInterface::class)
-            ->map(static function (ModuleHistoricEventsInterface $module) use ($individual): Collection {
-                return $module->historicEventsForIndividual($individual);
-            })
+            ->map(static fn (ModuleHistoricEventsInterface $module): Collection => $module->historicEventsForIndividual($individual))
             ->flatten();
     }
 

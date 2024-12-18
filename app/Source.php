@@ -20,16 +20,15 @@ declare(strict_types=1);
 namespace Fisharebest\Webtrees;
 
 use Fisharebest\Webtrees\Http\RequestHandlers\SourcePage;
-use Illuminate\Database\Capsule\Manager as DB;
 
 /**
  * A GEDCOM source (SOUR) object.
  */
 class Source extends GedcomRecord
 {
-    public const RECORD_TYPE = 'SOUR';
+    public const string RECORD_TYPE = 'SOUR';
 
-    protected const ROUTE_NAME = SourcePage::class;
+    protected const string ROUTE_NAME = SourcePage::class;
 
     /**
      * Each object type may have its own special rules, and re-implement this function.

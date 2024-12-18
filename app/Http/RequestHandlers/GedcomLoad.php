@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace Fisharebest\Webtrees\Http\RequestHandlers;
 
 use Exception;
+use Fisharebest\Webtrees\DB;
 use Fisharebest\Webtrees\Encodings\UTF8;
 use Fisharebest\Webtrees\Exceptions\GedcomErrorException;
 use Fisharebest\Webtrees\Http\ViewResponseTrait;
@@ -27,7 +28,6 @@ use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Services\GedcomImportService;
 use Fisharebest\Webtrees\Services\TimeoutService;
 use Fisharebest\Webtrees\Validator;
-use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\DetectsConcurrencyErrors;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -52,8 +52,6 @@ class GedcomLoad implements RequestHandlerInterface
     private TimeoutService $timeout_service;
 
     /**
-     * GedcomLoad constructor.
-     *
      * @param GedcomImportService $gedcom_import_service
      * @param TimeoutService      $timeout_service
      */
@@ -215,13 +213,13 @@ class GedcomLoad implements RequestHandlerInterface
                 'tree'     => $tree,
             ]);
         } catch (Exception $ex) {
-            DB::connection()->rollBack();
+            DB::rollBack();
 
             // Deadlock? Try again.
             if ($this->causedByConcurrencyError($ex)) {
                 return $this->viewResponse('admin/import-progress', [
                     'errors'   => '',
-                    'progress' => $progress ?? 0.0,
+                    'progress' => $progress,
                     'status'   => e($ex->getMessage()),
                     'tree'     => $tree,
                 ]);

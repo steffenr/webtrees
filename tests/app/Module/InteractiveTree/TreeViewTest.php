@@ -20,18 +20,13 @@ declare(strict_types=1);
 namespace Fisharebest\Webtrees\Module\InteractiveTree;
 
 use Fisharebest\Webtrees\TestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-/**
- * Test harness for the class TreeView
- *
- * @covers \Fisharebest\Webtrees\Module\InteractiveTree\TreeView
- */
+#[CoversClass(TreeView::class)]
 class TreeViewTest extends TestCase
 {
     /**
      * Test that the class exists
-     *
-     * @return void
      */
     public function testClassExists(): void
     {

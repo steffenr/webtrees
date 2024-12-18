@@ -20,12 +20,13 @@ declare(strict_types=1);
 namespace Fisharebest\Webtrees\Statistics\Repository;
 
 use Exception;
+use Fisharebest\Webtrees\DB;
 use Fisharebest\Webtrees\Fact;
 use Fisharebest\Webtrees\Header;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Statistics\Repository\Interfaces\GedcomRepositoryInterface;
 use Fisharebest\Webtrees\Tree;
-use Illuminate\Database\Capsule\Manager as DB;
+use InvalidArgumentException;
 
 use function e;
 use function str_contains;
@@ -143,7 +144,11 @@ class GedcomRepository implements GedcomRepositoryInterface
             $fact = $head->facts(['DATE'])->first();
 
             if ($fact instanceof Fact) {
-                return Registry::timestampFactory()->fromString($fact->value(), 'j M Y')->isoFormat('LL');
+                try {
+                    return Registry::timestampFactory()->fromString($fact->value(), 'j M Y')->isoFormat('LL');
+                } catch (InvalidArgumentException) {
+                    // HEAD:DATE invalid.
+                }
             }
         }
 

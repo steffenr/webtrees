@@ -25,20 +25,14 @@ use Fisharebest\Webtrees\Location;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\TestCase;
 use Fisharebest\Webtrees\Tree;
+use PHPUnit\Framework\Attributes\CoversClass;
 use Psr\Http\Message\ServerRequestInterface;
 
-/**
- * Test harness for the class XrefLocation
- *
- * @covers \Fisharebest\Webtrees\Elements\AbstractElement
- * @covers \Fisharebest\Webtrees\Elements\AbstractXrefElement
- * @covers \Fisharebest\Webtrees\Elements\XrefLocation
- */
+#[CoversClass(AbstractElement::class)]
+#[CoversClass(AbstractXrefElement::class)]
+#[CoversClass(XrefLocation::class)]
 class XrefLocationTest extends TestCase
 {
-    /**
-     * @return void
-     */
     public function testEdit(): void
     {
         $element = new XrefLocation('');
@@ -47,7 +41,7 @@ class XrefLocationTest extends TestCase
 
         $factory = $this->createMock(LocationFactory::class);
 
-        $factory->expects(self::once())
+        $factory->expects($this->once())
             ->method('make')
             ->willReturn(null);
 
@@ -68,9 +62,6 @@ class XrefLocationTest extends TestCase
         self::assertEquals(1, $option_nodes->count());
     }
 
-    /**
-     * @return void
-     */
     public function testEscape(): void
     {
         $element = new XrefLocation('');
@@ -78,20 +69,17 @@ class XrefLocationTest extends TestCase
         self::assertSame('@X123@', $element->escape('@X123@'));
     }
 
-    /**
-     * @return void
-     */
     public function testValueXrefLink(): void
     {
         $element = new XrefLocation('');
 
         $record = $this->createMock(Location::class);
 
-        $record->expects(self::once())
+        $record->expects($this->once())
             ->method('fullName')
             ->willReturn('Full Name');
 
-        $record->expects(self::once())
+        $record->expects($this->once())
             ->method('url')
             ->willReturn('https://url');
 
@@ -99,19 +87,15 @@ class XrefLocationTest extends TestCase
 
         $factory = $this->createMock(LocationFactory::class);
 
-        $factory->expects(self::once())
+        $factory->expects($this->once())
             ->method('make')
             ->willReturn($record);
-
 
         Registry::locationFactory($factory);
 
         self::assertSame('<a href="https://url">Full Name</a>', $element->value('@X123@', $tree));
     }
 
-    /**
-     * @return void
-     */
     public function testValueXrefLinkWithInvalidXref(): void
     {
         $element = new XrefLocation('');
@@ -121,9 +105,6 @@ class XrefLocationTest extends TestCase
         self::assertSame('<span class="error">invalid</span>', $element->value('invalid', $tree));
     }
 
-    /**
-     * @return void
-     */
     public function testValueXrefLinkWithMissingRecord(): void
     {
         $element = new XrefLocation('');
@@ -132,7 +113,7 @@ class XrefLocationTest extends TestCase
 
         $factory = $this->createMock(LocationFactory::class);
 
-        $factory->expects(self::once())
+        $factory->expects($this->once())
             ->method('make')
             ->willReturn(null);
 

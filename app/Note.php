@@ -21,7 +21,6 @@ namespace Fisharebest\Webtrees;
 
 use Fisharebest\Webtrees\Factories\MarkdownFactory;
 use Fisharebest\Webtrees\Http\RequestHandlers\NotePage;
-use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Support\Str;
 
 use function explode;
@@ -37,9 +36,9 @@ use const ENT_QUOTES;
  */
 class Note extends GedcomRecord
 {
-    public const RECORD_TYPE = 'NOTE';
+    public const string RECORD_TYPE = 'NOTE';
 
-    protected const ROUTE_NAME = NotePage::class;
+    protected const string ROUTE_NAME = NotePage::class;
 
     /**
      * Get the text contents of the note

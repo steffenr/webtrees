@@ -37,8 +37,6 @@ class TomSelectIndividual extends AbstractTomSelectHandler
     protected SearchService $search_service;
 
     /**
-     * TomSelectIndividual constructor.
-     *
      * @param SearchService $search_service
      */
     public function __construct(SearchService $search_service)
@@ -69,11 +67,9 @@ class TomSelectIndividual extends AbstractTomSelectHandler
             $results = $this->search_service->searchIndividualNames([$tree], $search, $offset, $limit);
         }
 
-        return $results->map(static function (Individual $individual) use ($at): array {
-            return [
-                'text'  => view('selects/individual', ['individual' => $individual]),
-                'value' => $at . $individual->xref() . $at,
-            ];
-        });
+        return $results->map(static fn (Individual $individual): array => [
+            'text'  => view('selects/individual', ['individual' => $individual]),
+            'value' => $at . $individual->xref() . $at,
+        ]);
     }
 }

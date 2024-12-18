@@ -26,15 +26,13 @@ use Fisharebest\Webtrees\Services\UserService;
 use Fisharebest\Webtrees\Session;
 use Fisharebest\Webtrees\TestCase;
 use Fisharebest\Webtrees\User;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-/**
- * @covers \Fisharebest\Webtrees\Http\RequestHandlers\Masquerade
- */
+#[CoversClass(Masquerade::class)]
 class MasqueradeTest extends TestCase
 {
-    /**
-     * @return void
-     */
+    protected static bool $uses_database = true;
+
     public function testMasqueradeAsUser(): void
     {
         $user1 = $this->createMock(User::class);
@@ -44,7 +42,7 @@ class MasqueradeTest extends TestCase
         $user2->method('id')->willReturn(2);
 
         $user_service = $this->createMock(UserService::class);
-        $user_service->expects(self::once())->method('find')->willReturn($user2);
+        $user_service->expects($this->once())->method('find')->willReturn($user2);
 
         $request = self::createRequest()
             ->withAttribute('user', $user1)
@@ -58,16 +56,13 @@ class MasqueradeTest extends TestCase
         self::assertSame('1', Session::get('masquerade'));
     }
 
-    /**
-     * @return void
-     */
     public function testCannotMasqueradeAsSelf(): void
     {
         $user = $this->createMock(User::class);
         $user->method('id')->willReturn(1);
 
         $user_service = $this->createMock(UserService::class);
-        $user_service->expects(self::once())->method('find')->willReturn($user);
+        $user_service->expects($this->once())->method('find')->willReturn($user);
 
         $request = self::createRequest()
             ->withAttribute('user', $user)
@@ -80,9 +75,6 @@ class MasqueradeTest extends TestCase
         self::assertNull(Session::get('masquerade'));
     }
 
-    /**
-     * @return void
-     */
     public function testMasqueradeAsNonExistingUser(): void
     {
         $this->expectException(HttpNotFoundException::class);
@@ -92,7 +84,7 @@ class MasqueradeTest extends TestCase
         $user->method('id')->willReturn(1);
 
         $user_service = $this->createMock(UserService::class);
-        $user_service->expects(self::once())->method('find')->willReturn(null);
+        $user_service->expects($this->once())->method('find')->willReturn(null);
 
         $request = self::createRequest()
             ->withAttribute('user', $user)

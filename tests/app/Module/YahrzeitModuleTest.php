@@ -20,18 +20,13 @@ declare(strict_types=1);
 namespace Fisharebest\Webtrees\Module;
 
 use Fisharebest\Webtrees\TestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-/**
- * Test harness for the class YahrzeitModule
- *
- * @covers \Fisharebest\Webtrees\Module\YahrzeitModule
- */
+#[CoversClass(YahrzeitModule::class)]
 class YahrzeitModuleTest extends TestCase
 {
     /**
      * Test that the class exists
-     *
-     * @return void
      */
     public function testClassExists(): void
     {

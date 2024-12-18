@@ -39,8 +39,6 @@ class MediaTabModule extends AbstractModule implements ModuleTabInterface
     private ClipboardService $clipboard_service;
 
     /**
-     * NotesTabModule constructor.
-     *
      * @param ClipboardService $clipboard_service
      */
     public function __construct(ClipboardService $clipboard_service)
@@ -59,11 +57,6 @@ class MediaTabModule extends AbstractModule implements ModuleTabInterface
         return I18N::translate('Media');
     }
 
-    /**
-     * A sentence describing what this module does.
-     *
-     * @return string
-     */
     public function description(): string
     {
         /* I18N: Description of the “Media” module */
@@ -140,9 +133,7 @@ class MediaTabModule extends AbstractModule implements ModuleTabInterface
                 }
             }
 
-            $facts = $facts->filter(static function (Fact $fact): bool {
-                return preg_match('/(?:^1|\n\d) OBJE @' . Gedcom::REGEX_XREF . '@/', $fact->gedcom()) === 1;
-            });
+            $facts = $facts->filter(static fn (Fact $fact): bool => preg_match('/(?:^1|\n\d) OBJE @' . Gedcom::REGEX_XREF . '@/', $fact->gedcom()) === 1);
 
             return Fact::sortFacts($facts);
         });

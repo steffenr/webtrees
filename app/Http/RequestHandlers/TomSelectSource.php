@@ -37,8 +37,6 @@ class TomSelectSource extends AbstractTomSelectHandler
     protected SearchService $search_service;
 
     /**
-     * TomSelectSource constructor.
-     *
      * @param SearchService $search_service
      */
     public function __construct(
@@ -70,11 +68,9 @@ class TomSelectSource extends AbstractTomSelectHandler
             $results = $this->search_service->searchSourcesByName([$tree], $search, $offset, $limit);
         }
 
-        return $results->map(static function (Source $source) use ($at): array {
-            return [
-                'text'  => view('selects/source', ['source' => $source]),
-                'value' => $at . $source->xref() . $at,
-            ];
-        });
+        return $results->map(static fn (Source $source): array => [
+            'text'  => view('selects/source', ['source' => $source]),
+            'value' => $at . $source->xref() . $at,
+        ]);
     }
 }

@@ -19,6 +19,7 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Http\RequestHandlers;
 
+use Fisharebest\Webtrees\DB;
 use Fisharebest\Webtrees\Http\Exceptions\HttpNotFoundException;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Media;
@@ -29,7 +30,6 @@ use Fisharebest\Webtrees\Services\LinkedRecordService;
 use Fisharebest\Webtrees\Services\MediaFileService;
 use Fisharebest\Webtrees\Services\TreeService;
 use Fisharebest\Webtrees\Validator;
-use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\JoinClause;
@@ -67,8 +67,6 @@ class ManageMediaData implements RequestHandlerInterface
     private TreeService $tree_service;
 
     /**
-     * MediaController constructor.
-     *
      * @param DatatablesService   $datatables_service
      * @param LinkedRecordService $linked_record_service
      * @param MediaFileService    $media_file_service
@@ -98,7 +96,8 @@ class ManageMediaData implements RequestHandlerInterface
         $files = Validator::queryParams($request)->isInArray(['local', 'external', 'unused'])->string('files');
 
         // Files within this folder
-        $media_folder = Validator::queryParams($request)->string('media_folder');
+        $media_folders = $this->media_file_service->allMediaFolders($data_filesystem)->all();
+        $media_folder  = Validator::queryParams($request)->isInArray($media_folders)->string('media_folder');
 
         // Show sub-folders within $media_folder
         $subfolders = Validator::queryParams($request)->isInArray(['include', 'exclude'])->string('subfolders');
@@ -221,9 +220,7 @@ class ManageMediaData implements RequestHandlerInterface
 
                 // All unused files
                 $unused_files = $disk_files->diff($db_files)
-                    ->map(static function (string $file): array {
-                        return (array) $file;
-                    });
+                    ->map(static fn (string $file): array => (array) $file);
 
                 $search_columns = [0];
                 $sort_columns   = [0 => 0];
@@ -234,7 +231,6 @@ class ManageMediaData implements RequestHandlerInterface
                     } catch (FilesystemException | UnableToRetrieveMetadata) {
                         $mime_type = Mime::DEFAULT_TYPE;
                     }
-
 
                     if (str_starts_with($mime_type, 'image/')) {
                         $url = route(AdminMediaFileThumbnail::class, ['path' => $row[0]]);
@@ -252,7 +248,7 @@ class ManageMediaData implements RequestHandlerInterface
                         if (str_starts_with($row[0], $media_directory)) {
                             $tmp = substr($row[0], strlen($media_directory));
                             $create_form .=
-                                '<p><a href="#" data-bs-toggle="modal" data-bs-backdrop="static" data-bs-target="#modal-create-media-from-file" data-file="' . e($tmp) . '" data-url="' . e(route(CreateMediaObjectFromFile::class, ['tree' => $media_tree])) . '" onclick="document.getElementById(\'modal-create-media-from-file-form\').action=this.dataset.url; document.getElementById(\'file\').value=this.dataset.file;">' . I18N::translate('Create') . '</a> — ' . e($media_tree) . '<p>';
+                                '<p><a href="#" data-bs-toggle="modal" data-bs-target="#modal-create-media-from-file" data-file="' . e($tmp) . '" data-url="' . e(route(CreateMediaObjectFromFile::class, ['tree' => $media_tree])) . '" onclick="document.getElementById(\'modal-create-media-from-file-form\').action=this.dataset.url; document.getElementById(\'file\').value=this.dataset.file;">' . I18N::translate('Create') . '</a> — ' . e($media_tree) . '<p>';
                         }
                     }
 

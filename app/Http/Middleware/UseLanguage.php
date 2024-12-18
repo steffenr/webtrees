@@ -43,8 +43,6 @@ class UseLanguage implements MiddlewareInterface
     private ModuleService $module_service;
 
     /**
-     * UseTheme constructor.
-     *
      * @param ModuleService $module_service
      */
     public function __construct(ModuleService $module_service)
@@ -89,9 +87,7 @@ class UseLanguage implements MiddlewareInterface
 
         // Browser negotiation
         $locales = $this->module_service->findByInterface(ModuleLanguageInterface::class, true)
-            ->map(static function (ModuleLanguageInterface $module): LocaleInterface {
-                return $module->locale();
-            });
+            ->map(static fn (ModuleLanguageInterface $module): LocaleInterface => $module->locale());
 
         $default = Locale::create(Site::getPreference('LANGUAGE'));
         $locale  = Locale::httpAcceptLanguage($request->getServerParams(), $locales->all(), $default);

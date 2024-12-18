@@ -39,8 +39,6 @@ class TreesMenuModule extends AbstractModule implements ModuleMenuInterface
     private TreeService $tree_service;
 
     /**
-     * TreesMenuModule constructor.
-     *
      * @param TreeService $tree_service
      */
     public function __construct(TreeService $tree_service)
@@ -59,11 +57,6 @@ class TreesMenuModule extends AbstractModule implements ModuleMenuInterface
         return I18N::translate('Family trees');
     }
 
-    /**
-     * A sentence describing what this module does.
-     *
-     * @return string
-     */
     public function description(): string
     {
         /* I18N: Description of the “Family trees” module */
@@ -87,7 +80,7 @@ class TreesMenuModule extends AbstractModule implements ModuleMenuInterface
      *
      * @return Menu|null
      */
-    public function getMenu(Tree $tree): ?Menu
+    public function getMenu(Tree $tree): Menu|null
     {
         $trees = $this->tree_service->all();
 

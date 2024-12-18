@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
+use Fisharebest\Webtrees\DB;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Source;
 use Fisharebest\Webtrees\Tree;
-use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Collection;
@@ -151,7 +151,7 @@ $count_notes = DB::table('other')
                 </td>
 
                 <!-- Last change -->
-                <td data-sort="<?= $source->lastChangeTimestamp()->timestamp() ?>">
+                <td data-sort="<?= sprintf('x%07d', $source->lastChangeTimestamp()->timestamp()) ?>">
                     <?= view('components/datetime', ['timestamp' => $source->lastChangeTimestamp()]) ?>
                 </td>
             </tr>

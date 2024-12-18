@@ -37,8 +37,6 @@ class TomSelectNote extends AbstractTomSelectHandler
     protected SearchService $search_service;
 
     /**
-     * TomSelectNote constructor.
-     *
      * @param SearchService $search_service
      */
     public function __construct(
@@ -70,11 +68,9 @@ class TomSelectNote extends AbstractTomSelectHandler
             $results = $this->search_service->searchNotes([$tree], $search, $offset, $limit);
         }
 
-        return $results->map(static function (Note $note) use ($at): array {
-            return [
-                'text'  => view('selects/shared-note', ['note' => $note]),
-                'value' => $at . $note->xref() . $at,
-            ];
-        });
+        return $results->map(static fn (Note $note): array => [
+            'text'  => view('selects/shared-note', ['note' => $note]),
+            'value' => $at . $note->xref() . $at,
+        ]);
     }
 }

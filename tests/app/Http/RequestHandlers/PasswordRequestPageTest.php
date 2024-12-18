@@ -22,15 +22,13 @@ namespace Fisharebest\Webtrees\Http\RequestHandlers;
 use Fig\Http\Message\StatusCodeInterface;
 use Fisharebest\Webtrees\TestCase;
 use Fisharebest\Webtrees\User;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-/**
- * @covers \Fisharebest\Webtrees\Http\RequestHandlers\PasswordRequestPage
- */
+#[CoversClass(PasswordRequestPage::class)]
 class PasswordRequestPageTest extends TestCase
 {
-    /**
-     * @return void
-     */
+    protected static bool $uses_database = true;
+
     public function testPasswordRequestPage(): void
     {
         $request  = self::createRequest();
@@ -40,9 +38,6 @@ class PasswordRequestPageTest extends TestCase
         self::assertSame(StatusCodeInterface::STATUS_OK, $response->getStatusCode());
     }
 
-    /**
-     * @return void
-     */
     public function testPasswordRequestPageAlreadyLoggedIn(): void
     {
         $user     = $this->createMock(User::class);

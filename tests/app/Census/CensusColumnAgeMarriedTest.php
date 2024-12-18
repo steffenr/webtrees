@@ -25,18 +25,12 @@ use Fisharebest\Webtrees\Family;
 use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\TestCase;
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-/**
- * Test harness for the class CensusColumnAgeMarried
- */
+#[CoversClass(CensusColumnAgeMarried::class)]
+#[CoversClass(AbstractCensusColumn::class)]
 class CensusColumnAgeMarriedTest extends TestCase
 {
-    /**
-     * @covers \Fisharebest\Webtrees\Census\CensusColumnAgeMarried
-     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
-     *
-     * @return void
-     */
     public function testAgeMarried(): void
     {
         $fact = $this->createMock(Fact::class);
@@ -57,12 +51,6 @@ class CensusColumnAgeMarriedTest extends TestCase
         self::assertSame('19', $column->generate($individual, $individual));
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Census\CensusColumnAgeMarried
-     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
-     *
-     * @return void
-     */
     public function testNoBirthDate(): void
     {
         $individual = $this->createMock(Individual::class);
@@ -77,12 +65,6 @@ class CensusColumnAgeMarriedTest extends TestCase
         self::assertSame('', $column->generate($individual, $individual));
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Census\CensusColumnAgeMarried
-     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
-     *
-     * @return void
-     */
     public function testNoMarriage(): void
     {
         $family = $this->createMock(Family::class);
@@ -100,12 +82,6 @@ class CensusColumnAgeMarriedTest extends TestCase
         self::assertSame('', $column->generate($individual, $individual));
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Census\CensusColumnAgeMarried
-     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
-     *
-     * @return void
-     */
     public function testNoSpouseFamily(): void
     {
         $individual = $this->createMock(Individual::class);

@@ -19,82 +19,34 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Module;
 
-use Fig\Http\Message\StatusCodeInterface;
-use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\I18N;
-use Fisharebest\Webtrees\Registry;
-use Fisharebest\Webtrees\Validator;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
 
-/**
- * Class FamilyListModule
- */
-class FamilyListModule extends IndividualListModule
+class FamilyListModule extends AbstractIndividualListModule
 {
-    protected const ROUTE_URL = '/tree/{tree}/family-list';
-
-    /**
-     * How should this module be identified in the control panel, etc.?
-     *
-     * @return string
-     */
     public function title(): string
     {
         /* I18N: Name of a module/list */
         return I18N::translate('Families');
     }
 
-    /**
-     * A sentence describing what this module does.
-     *
-     * @return string
-     */
     public function description(): string
     {
         /* I18N: Description of the “Families” module */
         return I18N::translate('A list of families.');
     }
 
-    /**
-     * CSS class for the URL.
-     *
-     * @return string
-     */
     public function listMenuClass(): string
     {
         return 'menu-list-fam';
     }
 
-    /**
-     * @param ServerRequestInterface $request
-     *
-     * @return ResponseInterface
-     */
-    public function handle(ServerRequestInterface $request): ResponseInterface
+    protected function showFamilies(): bool
     {
-        $tree = Validator::attributes($request)->tree();
-        $user = Validator::attributes($request)->user();
+        return true;
+    }
 
-        Auth::checkComponentAccess($this, ModuleListInterface::class, $tree, $user);
-
-        $surname_param = Validator::queryParams($request)->string('surname', '');
-        $surname       = I18N::strtoupper(I18N::language()->normalize($surname_param));
-
-        $params = [
-            'alpha'               => Validator::queryParams($request)->string('alpha', ''),
-            'falpha'              => Validator::queryParams($request)->string('falpha', ''),
-            'show'                => Validator::queryParams($request)->string('show', 'surn'),
-            'show_all'            => Validator::queryParams($request)->string('show_all', 'no'),
-            'show_all_firstnames' => Validator::queryParams($request)->string('show_all_firstnames', 'no'),
-            'show_marnm'          => Validator::queryParams($request)->string('show_marnm', ''),
-            'surname'             => $surname,
-        ];
-
-        if ($surname_param !== $surname) {
-            return Registry::responseFactory()->redirectUrl($this->listUrl($tree, $params), StatusCodeInterface::STATUS_MOVED_PERMANENTLY);
-        }
-
-        return $this->createResponse($tree, $user, $params, true);
+    protected function routeUrl(): string
+    {
+        return '/tree/{tree}/family-list';
     }
 }

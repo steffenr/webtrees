@@ -22,7 +22,6 @@ namespace Fisharebest\Webtrees;
 use Closure;
 use Fisharebest\Webtrees\Contracts\UserInterface;
 use Fisharebest\Webtrees\Services\PendingChangesService;
-use Illuminate\Database\Capsule\Manager as DB;
 use InvalidArgumentException;
 use League\Flysystem\FilesystemOperator;
 
@@ -38,16 +37,15 @@ use function substr_replace;
  */
 class Tree
 {
-    private const RESN_PRIVACY = [
+    private const array RESN_PRIVACY = [
         'none'         => Auth::PRIV_PRIVATE,
         'privacy'      => Auth::PRIV_USER,
         'confidential' => Auth::PRIV_NONE,
         'hidden'       => Auth::PRIV_HIDE,
     ];
 
-
     // Default values for some tree preferences.
-    protected const DEFAULT_PREFERENCES = [
+    protected const array DEFAULT_PREFERENCES = [
         'CALENDAR_FORMAT'              => 'gregorian',
         'CHART_BOX_TAGS'               => '',
         'EXPAND_SOURCES'               => '0',
@@ -197,7 +195,7 @@ class Tree
      *
      * @return string
      */
-    public function getPreference(string $setting_name, string $default = null): string
+    public function getPreference(string $setting_name, string|null $default = null): string
     {
         if ($this->preferences === []) {
             $this->preferences = DB::table('gedcom_setting')
@@ -376,6 +374,7 @@ class Tree
             'xref'       => $xref,
             'old_gedcom' => '',
             'new_gedcom' => $gedcom,
+            'status'     => 'pending',
             'user_id'    => Auth::id(),
         ]);
 
@@ -420,6 +419,7 @@ class Tree
             'xref'       => $xref,
             'old_gedcom' => '',
             'new_gedcom' => $gedcom,
+            'status'     => 'pending',
             'user_id'    => Auth::id(),
         ]);
 
@@ -464,6 +464,7 @@ class Tree
             'xref'       => $xref,
             'old_gedcom' => '',
             'new_gedcom' => $gedcom,
+            'status'     => 'pending',
             'user_id'    => Auth::id(),
         ]);
 
@@ -508,6 +509,7 @@ class Tree
             'xref'       => $xref,
             'old_gedcom' => '',
             'new_gedcom' => $gedcom,
+            'status'     => 'pending',
             'user_id'    => Auth::id(),
         ]);
 

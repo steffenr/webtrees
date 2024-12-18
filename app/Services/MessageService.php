@@ -21,12 +21,12 @@ namespace Fisharebest\Webtrees\Services;
 
 use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Contracts\UserInterface;
+use Fisharebest\Webtrees\DB;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\SiteUser;
 use Fisharebest\Webtrees\Tree;
 use Fisharebest\Webtrees\User;
-use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Support\Collection;
 
 use function array_filter;
@@ -39,23 +39,21 @@ use function view;
 class MessageService
 {
     // Users can be contacted by various methods
-    public const CONTACT_METHOD_INTERNAL           = 'messaging';
-    public const CONTACT_METHOD_INTERNAL_AND_EMAIL = 'messaging2';
-    public const CONTACT_METHOD_EMAIL              = 'messaging3';
-    public const CONTACT_METHOD_MAILTO             = 'mailto';
-    public const CONTACT_METHOD_NONE               = 'none';
+    public const string CONTACT_METHOD_INTERNAL           = 'messaging';
+    public const string CONTACT_METHOD_INTERNAL_AND_EMAIL = 'messaging2';
+    public const string CONTACT_METHOD_EMAIL              = 'messaging3';
+    public const string CONTACT_METHOD_MAILTO             = 'mailto';
+    public const string CONTACT_METHOD_NONE               = 'none';
 
-    private const BROADCAST_ALL   = 'all';
-    private const BROADCAST_NEVER = 'never';
-    private const BROADCAST_GONE  = 'gone';
+    private const string BROADCAST_ALL   = 'all';
+    private const string BROADCAST_NEVER = 'never';
+    private const string BROADCAST_GONE  = 'gone';
 
     private EmailService $email_service;
 
     private UserService $user_service;
 
     /**
-     * MessageService constructor.
-     *
      * @param EmailService $email_service
      * @param UserService  $user_service
      */
@@ -192,9 +190,8 @@ class MessageService
             case self::BROADCAST_ALL:
                 return $this->user_service->all();
             case self::BROADCAST_NEVER:
-                return $this->user_service->all()->filter(static function (UserInterface $user): bool {
-                    return $user->getPreference(UserInterface::PREF_IS_ACCOUNT_APPROVED) === '1' && $user->getPreference(UserInterface::PREF_TIMESTAMP_REGISTERED) > $user->getPreference(UserInterface::PREF_TIMESTAMP_ACTIVE);
-                });
+                return $this->user_service->all()
+                    ->filter(static fn (UserInterface $user): bool => $user->getPreference(UserInterface::PREF_IS_ACCOUNT_APPROVED) === '1' && $user->getPreference(UserInterface::PREF_TIMESTAMP_REGISTERED) > $user->getPreference(UserInterface::PREF_TIMESTAMP_ACTIVE));
             case self::BROADCAST_GONE:
                 $six_months_ago = Registry::timestampFactory()->now()->subtractMonths(6)->timestamp();
 

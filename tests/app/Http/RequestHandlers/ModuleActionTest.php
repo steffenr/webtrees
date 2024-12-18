@@ -27,23 +27,19 @@ use Fisharebest\Webtrees\Module\AbstractModule;
 use Fisharebest\Webtrees\Module\ModuleInterface;
 use Fisharebest\Webtrees\Services\ModuleService;
 use Fisharebest\Webtrees\TestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 use Psr\Http\Message\ResponseInterface;
 
 use function response;
 
-/**
- * @covers \Fisharebest\Webtrees\Http\RequestHandlers\ModuleAction
- */
+#[CoversClass(ModuleAction::class)]
 class ModuleActionTest extends TestCase
 {
-    /**
-     * @return void
-     */
     public function testModuleAction(): void
     {
         $module_service = $this->createMock(ModuleService::class);
         $module_service
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('findByName')
             ->with('test')
             ->willReturn($this->fooModule());
@@ -60,9 +56,6 @@ class ModuleActionTest extends TestCase
         self::assertSame('It works!', (string) $response->getBody());
     }
 
-    /**
-     * @return void
-     */
     public function testNonExistingAction(): void
     {
         $this->expectException(HttpNotFoundException::class);
@@ -70,7 +63,7 @@ class ModuleActionTest extends TestCase
 
         $module_service = $this->createMock(ModuleService::class);
         $module_service
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('findByName')
             ->with('test')
             ->willReturn($this->fooModule());
@@ -84,9 +77,6 @@ class ModuleActionTest extends TestCase
         $handler->handle($request);
     }
 
-    /**
-     * @return void
-     */
     public function testNonExistingModule(): void
     {
         $this->expectException(HttpNotFoundException::class);
@@ -94,7 +84,7 @@ class ModuleActionTest extends TestCase
 
         $module_service = $this->createMock(ModuleService::class);
         $module_service
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('findByName')
             ->with('test')
             ->willReturn(null);
@@ -108,9 +98,6 @@ class ModuleActionTest extends TestCase
         $handler->handle($request);
     }
 
-    /**
-     * @return void
-     */
     public function testAdminAction(): void
     {
         $this->expectException(HttpAccessDeniedException::class);
@@ -118,7 +105,7 @@ class ModuleActionTest extends TestCase
 
         $module_service = $this->createMock(ModuleService::class);
         $module_service
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('findByName')
             ->with('test')
             ->willReturn($this->fooModule());
@@ -132,15 +119,9 @@ class ModuleActionTest extends TestCase
         $handler->handle($request);
     }
 
-    /**
-     * @return ModuleInterface
-     */
     private function fooModule(): ModuleInterface
     {
         return new class () extends AbstractModule {
-            /**
-             * @return ResponseInterface
-             */
             public function getTestAction(): ResponseInterface
             {
                 return response('It works!');

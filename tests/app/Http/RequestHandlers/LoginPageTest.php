@@ -24,15 +24,13 @@ use Fisharebest\Webtrees\Services\GedcomImportService;
 use Fisharebest\Webtrees\Services\TreeService;
 use Fisharebest\Webtrees\TestCase;
 use Fisharebest\Webtrees\User;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-/**
- * @covers \Fisharebest\Webtrees\Http\RequestHandlers\LoginPage
- */
+#[CoversClass(LoginPage::class)]
 class LoginPageTest extends TestCase
 {
-    /**
-     * @return void
-     */
+    protected static bool $uses_database = true;
+
     public function testLoginPage(): void
     {
         $gedcom_import_service = new GedcomImportService();
@@ -44,9 +42,6 @@ class LoginPageTest extends TestCase
         self::assertSame(StatusCodeInterface::STATUS_OK, $response->getStatusCode());
     }
 
-    /**
-     * @return void
-     */
     public function testLoginPageAlreadyLoggedIn(): void
     {
         $gedcom_import_service = new GedcomImportService();

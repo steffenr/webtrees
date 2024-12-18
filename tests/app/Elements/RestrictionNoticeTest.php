@@ -19,12 +19,10 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Elements;
 
-/**
- * Test harness for the class RestrictionNotice
- *
- * @covers \Fisharebest\Webtrees\Elements\AbstractElement
- * @covers \Fisharebest\Webtrees\Elements\RestrictionNotice
- */
+use PHPUnit\Framework\Attributes\CoversClass;
+
+#[CoversClass(AbstractElement::class)]
+#[CoversClass(RestrictionNotice::class)]
 class RestrictionNoticeTest extends AbstractElementTestCase
 {
     /**
@@ -37,9 +35,6 @@ class RestrictionNoticeTest extends AbstractElementTestCase
         self::$element = new RestrictionNotice('label');
     }
 
-    /**
-     * @return void
-     */
     public function testCanonical(): void
     {
         self::assertSame('PRIVACY', self::$element->canonical('pRiVacy'));

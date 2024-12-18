@@ -21,17 +21,11 @@ namespace Fisharebest\Webtrees\Http\RequestHandlers;
 
 use Fig\Http\Message\StatusCodeInterface;
 use Fisharebest\Webtrees\TestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-/**
- * Test UpgradeController class.
- *
- * @covers \Fisharebest\Webtrees\Http\RequestHandlers\UpgradeWizardConfirm
- */
+#[CoversClass(UpgradeWizardConfirm::class)]
 class UpgradeWizardConfirmTest extends TestCase
 {
-    /**
-     * @return void
-     */
     public function testWizardContinue(): void
     {
         $handler  = new UpgradeWizardConfirm();

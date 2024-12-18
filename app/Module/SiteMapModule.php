@@ -21,6 +21,7 @@ namespace Fisharebest\Webtrees\Module;
 
 use Fig\Http\Message\StatusCodeInterface;
 use Fisharebest\Webtrees\Auth;
+use Fisharebest\Webtrees\DB;
 use Fisharebest\Webtrees\Family;
 use Fisharebest\Webtrees\FlashMessages;
 use Fisharebest\Webtrees\GedcomRecord;
@@ -37,7 +38,6 @@ use Fisharebest\Webtrees\Source;
 use Fisharebest\Webtrees\Submitter;
 use Fisharebest\Webtrees\Tree;
 use Fisharebest\Webtrees\Validator;
-use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Collection;
 use Psr\Http\Message\ResponseInterface;
@@ -57,10 +57,10 @@ class SiteMapModule extends AbstractModule implements ModuleConfigInterface, Req
 {
     use ModuleConfigTrait;
 
-    private const RECORDS_PER_VOLUME = 500; // Keep sitemap files small, for memory, CPU and max_allowed_packet limits.
-    private const CACHE_LIFE         = 209600; // Two weeks
+    private const int RECORDS_PER_VOLUME = 500; // Keep sitemap files small, for memory, CPU and max_allowed_packet limits.
+    private const int CACHE_LIFE         = 209600; // Two weeks
 
-    private const PRIORITY = [
+    private const array PRIORITY = [
         Family::RECORD_TYPE     => 0.7,
         Individual::RECORD_TYPE => 0.9,
         Media::RECORD_TYPE      => 0.5,
@@ -73,8 +73,6 @@ class SiteMapModule extends AbstractModule implements ModuleConfigInterface, Req
     private TreeService $tree_service;
 
     /**
-     * TreesMenuModule constructor.
-     *
      * @param TreeService $tree_service
      */
     public function __construct(TreeService $tree_service)
@@ -99,11 +97,6 @@ class SiteMapModule extends AbstractModule implements ModuleConfigInterface, Req
             ->get('sitemap-file', '/sitemap-{tree}-{type}-{page}.xml', $this);
     }
 
-    /**
-     * A sentence describing what this module does.
-     *
-     * @return string
-     */
     public function description(): string
     {
         /* I18N: Description of the “Sitemaps” module */
@@ -131,16 +124,9 @@ class SiteMapModule extends AbstractModule implements ModuleConfigInterface, Req
 
         $sitemap_url = route('sitemap-index');
 
-        // This list comes from https://en.wikipedia.org/wiki/Sitemaps
-        $submit_urls = [
-            'Bing/Yahoo' => Html::url('https://www.bing.com/webmaster/ping.aspx', ['siteMap' => $sitemap_url]),
-            'Google'     => Html::url('https://www.google.com/webmasters/tools/ping', ['sitemap' => $sitemap_url]),
-        ];
-
         return $this->viewResponse('modules/sitemap/config', [
             'all_trees'   => $this->tree_service->all(),
             'sitemap_url' => $sitemap_url,
-            'submit_urls' => $submit_urls,
             'title'       => $this->title(),
         ]);
     }
@@ -206,11 +192,9 @@ class SiteMapModule extends AbstractModule implements ModuleConfigInterface, Req
     {
         $content = Registry::cache()->file()->remember('sitemap.xml', function (): string {
             // Which trees have sitemaps enabled?
-            $tree_ids = $this->tree_service->all()->filter(static function (Tree $tree): bool {
-                return $tree->getPreference('include_in_sitemap') === '1';
-            })->map(static function (Tree $tree): int {
-                return $tree->id();
-            });
+            $tree_ids = $this->tree_service->all()
+                ->filter(static fn (Tree $tree): bool => $tree->getPreference('include_in_sitemap') === '1')
+                ->map(static fn (Tree $tree): int => $tree->id());
 
             $count_families = DB::table('families')
                 ->join('gedcom', 'f_file', '=', 'gedcom_id')
@@ -359,9 +343,7 @@ class SiteMapModule extends AbstractModule implements ModuleConfigInterface, Req
         }
 
         // Skip private records.
-        $records = $records->filter(static function (GedcomRecord $record): bool {
-            return $record->canShow(Auth::PRIV_PRIVATE);
-        });
+        $records = $records->filter(static fn (GedcomRecord $record): bool => $record->canShow(Auth::PRIV_PRIVATE));
 
         return $records;
     }

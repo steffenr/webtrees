@@ -19,13 +19,11 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Elements;
 
-/**
- * Test harness for the class AncestralFileNumber
- *
- * @covers \Fisharebest\Webtrees\Elements\AbstractElement
- * @covers \Fisharebest\Webtrees\Elements\AbstractExternalLink
- * @covers \Fisharebest\Webtrees\Elements\AncestralFileNumber
- */
+use PHPUnit\Framework\Attributes\CoversClass;
+
+#[CoversClass(AbstractElement::class)]
+#[CoversClass(AbstractExternalLink::class)]
+#[CoversClass(AncestralFileNumber::class)]
 class AncestralFileNumberTest extends AbstractElementTestCase
 {
     /**
@@ -38,9 +36,6 @@ class AncestralFileNumberTest extends AbstractElementTestCase
         self::$element = new AncestralFileNumber('label');
     }
 
-    /**
-     * @return void
-     */
     public function testCanonical(): void
     {
         self::assertSame('FOO BAR BAZ', self::$element->canonical('Foo  bAr  baZ'));

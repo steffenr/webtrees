@@ -32,7 +32,6 @@ use Fisharebest\Webtrees\Services\MigrationService;
 use Fisharebest\Webtrees\Services\ModuleService;
 use Fisharebest\Webtrees\Services\TimeoutService;
 use Fisharebest\Webtrees\Services\TreeService;
-use Illuminate\Database\Capsule\Manager as DB;
 use PHPUnit\Framework\Constraint\Callback;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestFactoryInterface;
@@ -55,9 +54,6 @@ use function substr;
 
 use const UPLOAD_ERR_OK;
 
-/**
- * Base class for unit tests
- */
 class TestCase extends \PHPUnit\Framework\TestCase
 {
     public static ?object $mock_functions = null;
@@ -65,64 +61,23 @@ class TestCase extends \PHPUnit\Framework\TestCase
     protected static bool $uses_database = false;
 
     /**
-     * Things to run once, before all the tests.
-     */
-    public static function setUpBeforeClass(): void
-    {
-        parent::setUpBeforeClass();
-
-        $webtrees = new Webtrees();
-        $webtrees->bootstrap();
-
-        // This is normally set in middleware.
-        Registry::container()->set(ModuleThemeInterface::class, new WebtreesTheme());
-
-        // Need the routing table, to generate URLs.
-        $router_container = new RouterContainer('/');
-        (new WebRoutes())->load($router_container->getMap());
-        Registry::container()->set(RouterContainer::class, $router_container);
-
-        if (static::$uses_database) {
-            static::createTestDatabase();
-
-            I18N::init('en-US');
-
-            // This is normally set in middleware.
-            (new Gedcom())->registerTags(Registry::elementFactory(), true);
-
-            // Boot modules
-            (new ModuleService())->bootModules(new WebtreesTheme());
-        } else {
-            I18N::init('en-US', true);
-        }
-
-        self::createRequest();
-    }
-
-    /**
-     * Things to run once, AFTER all the tests.
-     */
-    public static function tearDownAfterClass(): void
-    {
-        if (static::$uses_database) {
-            $pdo = DB::connection()->getPdo();
-            unset($pdo);
-        }
-
-        parent::tearDownAfterClass();
-    }
-
-    /**
      * Create an SQLite in-memory database for testing
      */
-    protected static function createTestDatabase(): void
+    private static function createTestDatabase(): void
     {
-        $capsule = new DB();
-        $capsule->addConnection([
-            'driver'   => 'sqlite',
-            'database' => ':memory:',
-        ]);
-        $capsule->setAsGlobal();
+        DB::connect(
+            driver: DB::SQLITE,
+            host: '',
+            port: '',
+            database: ':memory:',
+            username: '',
+            password: '',
+            prefix: 'wt_',
+            key: '',
+            certificate: '',
+            ca: '',
+            verify_certificate: false,
+        );
 
         // Create tables
         $migration_service = new MigrationService();
@@ -135,13 +90,10 @@ class TestCase extends \PHPUnit\Framework\TestCase
     /**
      * Create a request and bind it into the container.
      *
-     * @param string                       $method
      * @param array<string>                $query
      * @param array<string>                $params
      * @param array<UploadedFileInterface> $files
-     * @param array<string>                $attributes
-     *
-     * @return ServerRequestInterface
+     * @param array<string|Tree>           $attributes
      */
     protected static function createRequest(
         string $method = RequestMethodInterface::METHOD_GET,
@@ -184,9 +136,32 @@ class TestCase extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
+        $webtrees = new Webtrees();
+        $webtrees->bootstrap();
+
+        // This is normally set in middleware.
+        Registry::container()->set(ModuleThemeInterface::class, new WebtreesTheme());
+
+        // Need the routing table, to generate URLs.
+        $router_container = new RouterContainer('/');
+        (new WebRoutes())->load($router_container->getMap());
+        Registry::container()->set(RouterContainer::class, $router_container);
+
         if (static::$uses_database) {
-            DB::connection()->beginTransaction();
+            self::createTestDatabase();
+
+            // This is normally set in middleware.
+            (new Gedcom())->registerTags(Registry::elementFactory(), true);
+
+            // Boot modules
+            (new ModuleService())->bootModules(new WebtreesTheme());
+
+            I18N::init('en-US');
+        } else {
+            I18N::init('en-US', true);
         }
+
+        self::createRequest();
     }
 
     /**
@@ -195,21 +170,13 @@ class TestCase extends \PHPUnit\Framework\TestCase
     protected function tearDown(): void
     {
         if (static::$uses_database) {
-            DB::connection()->rollBack();
+            DB::connection()->disconnect();
         }
 
-        Site::$preferences = [];
-
-        Auth::logout();
+        Session::clear(); // Session data is stored in the super-global
+        Site::$preferences = []; // These are cached from the database
     }
 
-    /**
-     * Import a GEDCOM file into the test database.
-     *
-     * @param string $gedcom_file
-     *
-     * @return Tree
-     */
     protected function importTree(string $gedcom_file): Tree
     {
         $gedcom_import_service = new GedcomImportService();
@@ -232,14 +199,6 @@ class TestCase extends \PHPUnit\Framework\TestCase
         return $tree;
     }
 
-    /**
-     * Create an uploaded file for a request.
-     *
-     * @param string $filename
-     * @param string $mime_type
-     *
-     * @return UploadedFileInterface
-     */
     protected function createUploadedFile(string $filename, string $mime_type): UploadedFileInterface
     {
         $stream_factory        = Registry::container()->get(StreamFactoryInterface::class);
@@ -253,11 +212,6 @@ class TestCase extends \PHPUnit\Framework\TestCase
         return $uploaded_file_factory->createUploadedFile($stream, $size, $status, $client_name, $mime_type);
     }
 
-    /**
-     * Assert that a response contains valid HTML - either a full page or a fragment.
-     *
-     * @param ResponseInterface $response
-     */
     protected function validateHtmlResponse(ResponseInterface $response): void
     {
         self::assertSame(StatusCodeInterface::STATUS_OK, $response->getStatusCode());
@@ -271,11 +225,6 @@ class TestCase extends \PHPUnit\Framework\TestCase
         $this->validateHtml(substr($html, strlen('<DOCTYPE html>')));
     }
 
-    /**
-     * Assert that a response contains valid HTML - either a full page or a fragment.
-     *
-     * @param string $html
-     */
     protected function validateHtml(string $html): void
     {
         $stack = [];
@@ -334,8 +283,6 @@ class TestCase extends \PHPUnit\Framework\TestCase
      * Workaround for removal of withConsecutive in phpunit 10.
      *
      * @param array<int,mixed> $parameters
-     *
-     * @return Callback
      */
     protected static function withConsecutive(array $parameters): Callback
     {

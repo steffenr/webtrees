@@ -19,11 +19,11 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Http\RequestHandlers;
 
+use Fisharebest\Webtrees\DB;
 use Fisharebest\Webtrees\Http\ViewResponseTrait;
 use Fisharebest\Webtrees\Module\ModuleBlockInterface;
 use Fisharebest\Webtrees\Services\HomePageService;
 use Fisharebest\Webtrees\Validator;
-use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Expression;
 use Psr\Http\Message\ResponseInterface;
@@ -67,7 +67,7 @@ class TreePage implements RequestHandlerInterface
             $this->home_page_service->checkDefaultTreeBlocksExist();
 
             // Copy the defaults
-            (new Builder(DB::connection()))->from('block')->insertUsing(
+            DB::query()->from('block')->insertUsing(
                 ['gedcom_id', 'location', 'block_order', 'module_name'],
                 static function (Builder $query) use ($tree): void {
                     $query

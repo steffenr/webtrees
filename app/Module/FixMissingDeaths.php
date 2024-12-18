@@ -37,8 +37,6 @@ class FixMissingDeaths extends AbstractModule implements ModuleDataFixInterface
     private DataFixService $data_fix_service;
 
     /**
-     * FixMissingDeaths constructor.
-     *
      * @param DataFixService $data_fix_service
      */
     public function __construct(DataFixService $data_fix_service)
@@ -57,11 +55,6 @@ class FixMissingDeaths extends AbstractModule implements ModuleDataFixInterface
         return I18N::translate('Add missing death records');
     }
 
-    /**
-     * A sentence describing what this module does.
-     *
-     * @return string
-     */
     public function description(): string
     {
         /* I18N: Description of a “Data fix” module */
@@ -77,7 +70,7 @@ class FixMissingDeaths extends AbstractModule implements ModuleDataFixInterface
      *
      * @return Collection<int,string>|null
      */
-    protected function individualsToFix(Tree $tree, array $params): ?Collection
+    protected function individualsToFix(Tree $tree, array $params): Collection|null
     {
         $query = $this->individualsToFixQuery($tree, $params);
 

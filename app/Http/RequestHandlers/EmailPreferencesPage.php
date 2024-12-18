@@ -45,8 +45,6 @@ class EmailPreferencesPage implements RequestHandlerInterface
     private EmailService $email_service;
 
     /**
-     * AdminSiteController constructor.
-     *
      * @param EmailService $email_service
      */
     public function __construct(EmailService $email_service)
@@ -91,7 +89,6 @@ class EmailPreferencesPage implements RequestHandlerInterface
         $SMTP_HELO      = $SMTP_HELO ?: $hostname;
         $SMTP_FROM_NAME = $SMTP_FROM_NAME ?: ('no-reply@' . $SMTP_HELO);
         $SMTP_DISP_NAME = $SMTP_DISP_NAME ?: Webtrees::NAME;
-
 
         $smtp_from_name_valid = $this->email_service->isValidEmail($SMTP_FROM_NAME);
         $smtp_helo_valid      = filter_var($SMTP_HELO, FILTER_VALIDATE_DOMAIN);

@@ -19,12 +19,10 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Elements;
 
-/**
- * Test harness for the class SourceMediaType
- *
- * @covers \Fisharebest\Webtrees\Elements\AbstractElement
- * @covers \Fisharebest\Webtrees\Elements\SourceMediaType
- */
+use PHPUnit\Framework\Attributes\CoversClass;
+
+#[CoversClass(AbstractElement::class)]
+#[CoversClass(SourceMediaType::class)]
 class SourceMediaTypeTest extends AbstractElementTestCase
 {
     /**
@@ -37,9 +35,6 @@ class SourceMediaTypeTest extends AbstractElementTestCase
         self::$element = new SourceMediaType('label');
     }
 
-    /**
-     * @return void
-     */
     public function testCanonical(): void
     {
         self::assertSame('FOO BAR BAZ', self::$element->canonical('Foo  bAr  baZ'));

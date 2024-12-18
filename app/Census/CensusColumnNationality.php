@@ -28,11 +28,12 @@ use Fisharebest\Webtrees\Individual;
 class CensusColumnNationality extends AbstractCensusColumn implements CensusColumnInterface
 {
     // Convert a country name to a nationality
-    private const NATIONALITIES = [
+    private const array NATIONALITIES = [
         'England'     => 'British',
         'Scotland'    => 'British',
         'Wales'       => 'British',
         'Deutschland' => 'Deutsch',
+        'Canada'      => 'Canadian',
     ];
 
     /**

@@ -17,23 +17,16 @@
 
 declare(strict_types=1);
 
-namespace Fisharebest\Webtrees\Elements;
+namespace Fisharebest\Webtrees\CustomTags;
 
-/**
- * Test harness for the class AbstractXrefElement
- *
- * @covers \Fisharebest\Webtrees\Elements\AbstractElement
- * @covers \Fisharebest\Webtrees\Elements\AbstractXrefElement
- */
-class AbstractXrefElementTest extends AbstractElementTestCase
+use Fisharebest\Webtrees\TestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+
+#[CoversClass(TheNextGeneration::class)]
+class TheNextGenerationTest extends TestCase
 {
-    /**
-     * Standard tests for all elements.
-     */
-    public static function setupBeforeClass(): void
+    public function testClass(): void
     {
-        parent::setUpBeforeClass();
-
-        self::$element = new AbstractXrefElement('label');
+        self::assertTrue(class_exists(TheNextGeneration::class));
     }
 }

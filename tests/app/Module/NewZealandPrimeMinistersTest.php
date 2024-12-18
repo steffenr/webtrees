@@ -17,23 +17,25 @@
 
 declare(strict_types=1);
 
-namespace Fisharebest\Webtrees\Elements;
+namespace Fisharebest\Webtrees\Module;
 
-/**
- * Test harness for the class AbstractEventElement
- *
- * @covers \Fisharebest\Webtrees\Elements\AbstractElement
- * @covers \Fisharebest\Webtrees\Elements\AbstractEventElement
- */
-class AbstractEventElementTest extends AbstractElementTestCase
+use Fisharebest\Webtrees\Fact;
+use Fisharebest\Webtrees\Individual;
+use Fisharebest\Webtrees\TestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+
+#[CoversClass(NewZealandPrimeMinisters::class)]
+class NewZealandPrimeMinistersTest extends TestCase
 {
-    /**
-     * Standard tests for all elements.
-     */
-    public static function setupBeforeClass(): void
+    public function testEventsHaveValidDate(): void
     {
-        parent::setUpBeforeClass();
+        $module = new NewZealandPrimeMinisters();
 
-        self::$element = new AbstractEventElement('label');
+        $individual = $this->createMock(Individual::class);
+
+        foreach ($module->historicEventsAll(language_tag: 'en-AU') as $gedcom) {
+            $fact = new Fact(gedcom: $gedcom, parent: $individual, id: 'test');
+            self::assertTrue($fact->date()->isOK(), 'No date found in: ' . $gedcom);
+        }
     }
 }

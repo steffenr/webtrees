@@ -19,14 +19,14 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Schema;
 
-use Illuminate\Database\Capsule\Manager as DB;
+use Fisharebest\Webtrees\DB;
 
 /**
  * Populate the default_resn table
  */
 class SeedDefaultResnTable implements SeedInterface
 {
-    private const DEFAULT_RESTRICTIONS = [
+    private const array DEFAULT_RESTRICTIONS = [
         'SSN'  => 'confidential',
         'SOUR' => 'privacy',
         'REPO' => 'privacy',

@@ -30,16 +30,11 @@ use Fisharebest\Webtrees\SurnameTradition\PatrilinealSurnameTradition;
 use Fisharebest\Webtrees\SurnameTradition\PolishSurnameTradition;
 use Fisharebest\Webtrees\SurnameTradition\PortugueseSurnameTradition;
 use Fisharebest\Webtrees\SurnameTradition\SpanishSurnameTradition;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-/**
- * Test harness for the class SurnameTradition
- */
+#[CoversClass(SurnameTraditionFactory::class)]
 class SurnameTraditionFactoryTest extends TestCase
 {
-    /**
-     * @covers \Fisharebest\Webtrees\Factories\SurnameTraditionFactory::make
-     * @return void
-     */
     public function testCreate(): void
     {
         $factory = new SurnameTraditionFactory();
@@ -57,9 +52,6 @@ class SurnameTraditionFactoryTest extends TestCase
 
     /**
      * Test create() with invalid input
-     *
-     * @covers \Fisharebest\Webtrees\Factories\SurnameTraditionFactory::make
-     * @return void
      */
     public function testCreateInvalid(): void
     {
@@ -70,9 +62,6 @@ class SurnameTraditionFactoryTest extends TestCase
 
     /**
      * Test allDescriptions()
-     *
-     * @covers \Fisharebest\Webtrees\Factories\SurnameTraditionFactory::list
-     * @return void
      */
     public function testAllDescriptions(): void
     {

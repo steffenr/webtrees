@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
+use Fisharebest\Webtrees\DB;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Media;
 use Fisharebest\Webtrees\Tree;
-use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Collection;
@@ -118,7 +118,7 @@ $count_sources = DB::table('sources')
                 </td>
 
                 <!-- Last change -->
-                <td data-sort="<?= $media_object->lastChangeTimestamp()->timestamp() ?>">
+                <td data-sort="<?= sprintf('x%07d', $media_object->lastChangeTimestamp()->timestamp()) ?>">
                     <?= view('components/datetime', ['timestamp' => $media_object->lastChangeTimestamp()]) ?>
                 </td>
             </tr>

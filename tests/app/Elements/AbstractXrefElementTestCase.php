@@ -17,29 +17,21 @@
 
 declare(strict_types=1);
 
-namespace Fisharebest\Webtrees\Http\RequestHandlers;
+namespace Fisharebest\Webtrees\Elements;
 
-use Fig\Http\Message\StatusCodeInterface;
-use Fisharebest\Webtrees\TestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-/**
- * Test ImportThumbnailsData class.
- *
- * @covers \Fisharebest\Webtrees\Http\RequestHandlers\ImportThumbnailsPage
- */
-class ImportThumbnailsPageTest extends TestCase
+#[CoversClass(AbstractElement::class)]
+#[CoversClass(AbstractXrefElement::class)]
+class AbstractXrefElementTestCase extends AbstractElementTestCase
 {
-    protected static bool $uses_database = true;
-
     /**
-     * @return void
+     * Standard tests for all elements.
      */
-    public function testWebtrees1Thumbnails(): void
+    public static function setupBeforeClass(): void
     {
-        $handler  = new ImportThumbnailsPage();
-        $request  = self::createRequest();
-        $response = $handler->handle($request);
+        parent::setUpBeforeClass();
 
-        self::assertSame(StatusCodeInterface::STATUS_OK, $response->getStatusCode());
+        self::$element = new AbstractXrefElement('label');
     }
 }

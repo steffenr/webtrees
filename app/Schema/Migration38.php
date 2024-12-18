@@ -19,19 +19,11 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Schema;
 
-use Illuminate\Database\Capsule\Manager as DB;
-use Illuminate\Database\Schema\Blueprint;
-
 /**
  * Upgrade the database schema from version 38 to version 39.
  */
 class Migration38 implements MigrationInterface
 {
-    /**
-     * Upgrade to the next version
-     *
-     * @return void
-     */
     public function upgrade(): void
     {
         // This module previously created the table placelocation - which is now deleted in migration 44.

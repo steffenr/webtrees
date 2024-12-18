@@ -19,20 +19,15 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Tests\Encodings;
 
+use Fisharebest\Webtrees\Encodings\AbstractEncoding;
 use Fisharebest\Webtrees\Encodings\MacRoman;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * Tests for class MacRoman.
- */
+#[CoversClass(AbstractEncoding::class)]
+#[CoversClass(MacRoman::class)]
 class MacRomanTest extends TestCase
 {
-    /**
-     * @covers \Fisharebest\Webtrees\Encodings\AbstractEncoding
-     * @covers \Fisharebest\Webtrees\Encodings\MacRoman
-     *
-     * @return void
-     */
     public function testToUtf8HexStrings(): void
     {
         $encoding = new MacRoman();
@@ -95,12 +90,6 @@ class MacRomanTest extends TestCase
         );
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Encodings\AbstractEncoding
-     * @covers \Fisharebest\Webtrees\Encodings\MacRoman
-     *
-     * @return void
-     */
     public function testToUtf8StringLiterals(): void
     {
         $encoding = new MacRoman();

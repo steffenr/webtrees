@@ -21,6 +21,7 @@ namespace Fisharebest\Webtrees\Module;
 
 use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Contracts\UserInterface;
+use Fisharebest\Webtrees\DB;
 use Fisharebest\Webtrees\Http\RequestHandlers\PendingChanges;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Registry;
@@ -33,7 +34,6 @@ use Fisharebest\Webtrees\SiteUser;
 use Fisharebest\Webtrees\Tree;
 use Fisharebest\Webtrees\TreeUser;
 use Fisharebest\Webtrees\Validator;
-use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Str;
@@ -55,8 +55,6 @@ class ReviewChangesModule extends AbstractModule implements ModuleBlockInterface
     private TreeService $tree_service;
 
     /**
-     * ReviewChangesModule constructor.
-     *
      * @param EmailService $email_service
      * @param TreeService  $tree_service
      * @param UserService  $user_service
@@ -82,11 +80,6 @@ class ReviewChangesModule extends AbstractModule implements ModuleBlockInterface
         return I18N::translate('Pending changes');
     }
 
-    /**
-     * A sentence describing what this module does.
-     *
-     * @return string
-     */
     public function description(): string
     {
         /* I18N: Description of the “Pending changes” module */

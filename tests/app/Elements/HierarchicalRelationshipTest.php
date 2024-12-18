@@ -19,12 +19,10 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Elements;
 
-/**
- * Test harness for the class HierarchicalRelationship
- *
- * @covers \Fisharebest\Webtrees\Elements\AbstractElement
- * @covers \Fisharebest\Webtrees\Elements\HierarchicalRelationship
- */
+use PHPUnit\Framework\Attributes\CoversClass;
+
+#[CoversClass(AbstractElement::class)]
+#[CoversClass(HierarchicalRelationship::class)]
 class HierarchicalRelationshipTest extends AbstractElementTestCase
 {
     /**
@@ -37,9 +35,6 @@ class HierarchicalRelationshipTest extends AbstractElementTestCase
         self::$element = new HierarchicalRelationship('label');
     }
 
-    /**
-     * @return void
-     */
     public function testCanonical(): void
     {
         self::assertSame('FOO BAR BAZ', self::$element->canonical('Foo  bAr  baZ'));

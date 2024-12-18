@@ -19,7 +19,7 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Http\Middleware;
 
-use Illuminate\Database\Capsule\Manager as DB;
+use Fisharebest\Webtrees\DB;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -31,7 +31,7 @@ use Psr\Http\Server\RequestHandlerInterface;
 class UseTransaction implements MiddlewareInterface
 {
     // If a transaction deadlock occurs, try again.
-    private const DEADLOCK_RETRY_ATTEMPTS = 3;
+    private const int DEADLOCK_RETRY_ATTEMPTS = 3;
 
     /**
      * @param ServerRequestInterface  $request

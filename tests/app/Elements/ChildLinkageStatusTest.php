@@ -19,12 +19,10 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Elements;
 
-/**
- * Test harness for the class ChildLinkageStatus
- *
- * @covers \Fisharebest\Webtrees\Elements\AbstractElement
- * @covers \Fisharebest\Webtrees\Elements\ChildLinkageStatus
- */
+use PHPUnit\Framework\Attributes\CoversClass;
+
+#[CoversClass(AbstractElement::class)]
+#[CoversClass(ChildLinkageStatus::class)]
 class ChildLinkageStatusTest extends AbstractElementTestCase
 {
     /**
@@ -37,9 +35,6 @@ class ChildLinkageStatusTest extends AbstractElementTestCase
         self::$element = new ChildLinkageStatus('label');
     }
 
-    /**
-     * @return void
-     */
     public function testCanonical(): void
     {
         self::assertSame('FOO BAR BAZ', self::$element->canonical('Foo  bAr  baZ'));

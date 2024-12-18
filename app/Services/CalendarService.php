@@ -28,13 +28,13 @@ use Fisharebest\Webtrees\Date\HijriDate;
 use Fisharebest\Webtrees\Date\JalaliDate;
 use Fisharebest\Webtrees\Date\JewishDate;
 use Fisharebest\Webtrees\Date\JulianDate;
+use Fisharebest\Webtrees\DB;
 use Fisharebest\Webtrees\Fact;
 use Fisharebest\Webtrees\Family;
 use Fisharebest\Webtrees\GedcomRecord;
 use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Tree;
-use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Collection;
@@ -51,7 +51,7 @@ use function range;
 class CalendarService
 {
     // If no facts specified, get all except these
-    protected const SKIP_FACTS = ['CHAN', 'BAPL', 'SLGC', 'SLGS', 'ENDL', 'CENS', 'RESI', 'NOTE', 'ADDR', 'OBJE', 'SOUR', '_TODO'];
+    protected const array SKIP_FACTS = ['CHAN', 'BAPL', 'SLGC', 'SLGS', 'ENDL', 'CENS', 'RESI', 'NOTE', 'ADDR', 'OBJE', 'SOUR', '_TODO'];
 
     /**
      * List all the months in a given year.
@@ -236,21 +236,15 @@ class CalendarService
         switch ($sort_by) {
             case 'anniv':
             case 'anniv_asc':
-                $facts = $facts->sort(static function (Fact $x, Fact $y): int {
-                    return $x->jd <=> $y->jd ?: $x->date()->minimumJulianDay() <=> $y->date()->minimumJulianDay();
-                });
+                $facts = $facts->sort(static fn (Fact $x, Fact $y): int => $x->jd <=> $y->jd ?: $x->date()->minimumJulianDay() <=> $y->date()->minimumJulianDay());
                 break;
 
             case 'anniv_desc':
-                $facts = $facts->sort(static function (Fact $x, Fact $y): int {
-                    return $x->jd <=> $y->jd ?: $y->date()->minimumJulianDay() <=> $x->date()->minimumJulianDay();
-                });
+                $facts = $facts->sort(static fn (Fact $x, Fact $y): int => $x->jd <=> $y->jd ?: $y->date()->minimumJulianDay() <=> $x->date()->minimumJulianDay());
                 break;
 
             case 'alpha':
-                $facts = $facts->sort(static function (Fact $x, Fact $y): int {
-                    return GedcomRecord::nameComparator()($x->record(), $y->record());
-                });
+                $facts = $facts->sort(static fn (Fact $x, Fact $y): int => GedcomRecord::nameComparator()($x->record(), $y->record()));
                 break;
         }
 

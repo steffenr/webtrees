@@ -19,12 +19,10 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Elements;
 
-/**
- * Test harness for the class LanguageId
- *
- * @covers \Fisharebest\Webtrees\Elements\AbstractElement
- * @covers \Fisharebest\Webtrees\Elements\LanguageId
- */
+use PHPUnit\Framework\Attributes\CoversClass;
+
+#[CoversClass(AbstractElement::class)]
+#[CoversClass(LanguageId::class)]
 class LanguageIdTest extends AbstractElementTestCase
 {
     /**
@@ -37,9 +35,6 @@ class LanguageIdTest extends AbstractElementTestCase
         static::$element = new LanguageId('label');
     }
 
-    /**
-     * @return void
-     */
     public function testCanonical(): void
     {
         self::assertSame('ENGLISH', self::$element->canonical("\t English\t "));

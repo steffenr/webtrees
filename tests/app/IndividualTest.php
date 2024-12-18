@@ -19,17 +19,13 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees;
 
-/**
- * Test harness for the class Individual
- *
- * @covers \Fisharebest\Webtrees\Individual
- */
+use PHPUnit\Framework\Attributes\CoversClass;
+
+#[CoversClass(Individual::class)]
 class IndividualTest extends TestCase
 {
     /**
      * Test that the class exists
-     *
-     * @return void
      */
     public function testClassExists(): void
     {

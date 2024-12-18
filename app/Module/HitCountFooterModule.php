@@ -19,6 +19,7 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Module;
 
+use Fisharebest\Webtrees\DB;
 use Fisharebest\Webtrees\Http\RequestHandlers\FamilyPage;
 use Fisharebest\Webtrees\Http\RequestHandlers\IndividualPage;
 use Fisharebest\Webtrees\Http\RequestHandlers\MediaPage;
@@ -32,7 +33,6 @@ use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Session;
 use Fisharebest\Webtrees\Tree;
 use Fisharebest\Webtrees\Validator;
-use Illuminate\Database\Capsule\Manager as DB;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -47,7 +47,7 @@ class HitCountFooterModule extends AbstractModule implements ModuleFooterInterfa
 
     // Which routes do we count?
     // For historical reasons, we record the names of the original webtrees script and parameter.
-    protected const PAGE_NAMES = [
+    protected const array PAGE_NAMES = [
         FamilyPage::class     => 'family.php',
         IndividualPage::class => 'individual.php',
         MediaPage::class      => 'mediaviewer.php',
@@ -73,11 +73,6 @@ class HitCountFooterModule extends AbstractModule implements ModuleFooterInterfa
         return I18N::translate('Hit counters');
     }
 
-    /**
-     * A sentence describing what this module does.
-     *
-     * @return string
-     */
     public function description(): string
     {
         /* I18N: Description of the “Hit counters” module */

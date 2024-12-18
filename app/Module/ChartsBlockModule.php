@@ -47,8 +47,6 @@ class ChartsBlockModule extends AbstractModule implements ModuleBlockInterface
     private ModuleService $module_service;
 
     /**
-     * ChartsBlockModule constructor.
-     *
      * @param ModuleService $module_service
      */
     public function __construct(ModuleService $module_service)
@@ -67,11 +65,6 @@ class ChartsBlockModule extends AbstractModule implements ModuleBlockInterface
         return I18N::translate('Charts');
     }
 
-    /**
-     * A sentence describing what this module does.
-     *
-     * @return string
-     */
     public function description(): string
     {
         /* I18N: Description of the “Charts” module */

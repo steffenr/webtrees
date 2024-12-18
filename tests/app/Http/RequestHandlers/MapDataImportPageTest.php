@@ -21,19 +21,13 @@ namespace Fisharebest\Webtrees\Http\RequestHandlers;
 
 use Fig\Http\Message\StatusCodeInterface;
 use Fisharebest\Webtrees\TestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-/**
- * Test the location import.
- *
- * @covers \Fisharebest\Webtrees\Http\RequestHandlers\MapDataImportPage
- */
+#[CoversClass(MapDataImportPage::class)]
 class MapDataImportPageTest extends TestCase
 {
     protected static bool $uses_database = true;
 
-    /**
-     * @return void
-     */
     public function testImportPage(): void
     {
         $handler  = new MapDataImportPage();

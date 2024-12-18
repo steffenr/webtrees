@@ -19,12 +19,12 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Module;
 
+use Fisharebest\Webtrees\DB;
 use Fisharebest\Webtrees\GedcomRecord;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Tree;
 use Fisharebest\Webtrees\Validator;
-use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Support\Str;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -37,9 +37,9 @@ class TopPageViewsModule extends AbstractModule implements ModuleBlockInterface
 {
     use ModuleBlockTrait;
 
-    private const DEFAULT_NUMBER_TO_SHOW = '10';
+    private const string DEFAULT_NUMBER_TO_SHOW = '10';
 
-    private const PAGES = ['individual.php', 'family.php', 'source.php', 'repo.php', 'note.php', 'mediaviewer.php'];
+    private const array PAGES = ['individual.php', 'family.php', 'source.php', 'repo.php', 'note.php', 'mediaviewer.php'];
 
     /**
      * How should this module be identified in the control panel, etc.?
@@ -52,11 +52,6 @@ class TopPageViewsModule extends AbstractModule implements ModuleBlockInterface
         return I18N::translate('Most viewed pages');
     }
 
-    /**
-     * A sentence describing what this module does.
-     *
-     * @return string
-     */
     public function description(): string
     {
         /* I18N: Description of the “Most viewed pages” module */

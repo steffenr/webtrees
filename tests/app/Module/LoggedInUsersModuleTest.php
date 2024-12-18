@@ -20,18 +20,13 @@ declare(strict_types=1);
 namespace Fisharebest\Webtrees\Module;
 
 use Fisharebest\Webtrees\TestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-/**
- * Test harness for the class LoggedInUsersModule
- *
- * @covers \Fisharebest\Webtrees\Module\LoggedInUsersModule
- */
+#[CoversClass(LoggedInUsersModule::class)]
 class LoggedInUsersModuleTest extends TestCase
 {
     /**
      * Test that the class exists
-     *
-     * @return void
      */
     public function testClassExists(): void
     {

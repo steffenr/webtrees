@@ -24,22 +24,20 @@ use Fisharebest\Webtrees\Http\RequestHandlers\PasswordResetPage;
 use Fisharebest\Webtrees\Services\UserService;
 use Fisharebest\Webtrees\TestCase;
 use Fisharebest\Webtrees\User;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-/**
- * @covers \Fisharebest\Webtrees\Http\RequestHandlers\PasswordResetPage
- */
+#[CoversClass(PasswordResetPage::class)]
 class PasswordResetPageTest extends TestCase
 {
-    /**
-     * @return void
-     */
+    protected static bool $uses_database = true;
+
     public function testPasswordResetPageWithValidToken(): void
     {
         $user = $this->createMock(User::class);
 
         $user_service = $this->createMock(UserService::class);
         $user_service
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('findByToken')
             ->with('1234')
             ->willReturn($user);
@@ -52,14 +50,11 @@ class PasswordResetPageTest extends TestCase
         self::assertSame(StatusCodeInterface::STATUS_OK, $response->getStatusCode());
     }
 
-    /**
-     * @return void
-     */
     public function testPasswordResetPageWithoutValidToken(): void
     {
         $user_service = $this->createMock(UserService::class);
         $user_service
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('findByToken')
             ->with('4321')
             ->willReturn(null);

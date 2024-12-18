@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace Fisharebest\Webtrees\Statistics\Repository;
 
 use Exception;
+use Fisharebest\Webtrees\DB;
 use Fisharebest\Webtrees\Family;
 use Fisharebest\Webtrees\GedcomRecord;
 use Fisharebest\Webtrees\I18N;
@@ -34,11 +35,9 @@ use Fisharebest\Webtrees\Statistics\Google\ChartNoChildrenFamilies;
 use Fisharebest\Webtrees\Statistics\Service\CenturyService;
 use Fisharebest\Webtrees\Statistics\Service\ColorService;
 use Fisharebest\Webtrees\Tree;
-use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\JoinClause;
-use stdClass;
 
 use function arsort;
 use function asort;
@@ -90,7 +89,6 @@ class FamilyRepository
             return '';
         }
 
-        /** @var Family $family */
         $family = Registry::familyFactory()->mapper($this->tree)($row);
 
         if (!$family->canShow()) {
@@ -259,7 +257,6 @@ class FamilyRepository
 
         $top10 = [];
 
-        /** @var Family $family */
         foreach ($families as $family) {
             if ($type === 'list') {
                 $top10[] = '<li><a href="' . e($family->url()) . '">' . $family->fullName() . '</a></li>';
@@ -273,7 +270,6 @@ class FamilyRepository
         } else {
             $top10 = implode('; ', $top10);
         }
-
 
         if ($type === 'list') {
             return '<ul>' . $top10 . '</ul>';
@@ -307,8 +303,6 @@ class FamilyRepository
      */
     private function ageBetweenSiblingsQuery(int $total): array
     {
-        $prefix = DB::connection()->getTablePrefix();
-
         return DB::table('link AS link1')
             ->join('link AS link2', static function (JoinClause $join): void {
                 $join
@@ -333,7 +327,7 @@ class FamilyRepository
             ->where('link1.l_type', '=', 'CHIL')
             ->where('link1.l_file', '=', $this->tree->id())
             ->distinct()
-            ->select(['link1.l_from AS family', 'link1.l_to AS ch1', 'link2.l_to AS ch2', new Expression($prefix . 'child2.d_julianday2 - ' . $prefix . 'child1.d_julianday1 AS age')])
+            ->select(['link1.l_from AS family', 'link1.l_to AS ch1', 'link2.l_to AS ch2', new Expression(DB::prefix('child2.d_julianday2') . ' - ' . DB::prefix('child1.d_julianday1') . ' AS age')])
             ->orderBy('age', 'DESC')
             ->take($total)
             ->get()
@@ -553,12 +547,12 @@ class FamilyRepository
     }
 
     /**
-     * General query on familes/children.
+     * General query on families/children.
      *
      * @param int    $year1
      * @param int    $year2
      *
-     * @return array<stdClass>
+     * @return array<object>
      */
     public function statsChildrenQuery(int $year1 = -1, int $year2 = -1): array
     {
@@ -637,12 +631,10 @@ class FamilyRepository
             ->get()
             ->map(Registry::familyFactory()->mapper($this->tree))
             ->filter(GedcomRecord::accessFilter())
-            ->map(static function (Family $family): array {
-                return [
-                    'family' => $family,
-                    'count'  => $family->numberOfChildren(),
-                ];
-            })
+            ->map(static fn (Family $family): array => [
+                'family' => $family,
+                'count'  => $family->numberOfChildren(),
+            ])
             ->all();
     }
 
@@ -688,8 +680,8 @@ class FamilyRepository
      * @return string
      */
     public function chartLargestFamilies(
-        string $color_from = null,
-        string $color_to = null,
+        string|null $color_from = null,
+        string|null $color_to = null,
         int $total = 10
     ): string {
         return (new ChartFamilyLargest($this->color_service, $this->tree))
@@ -816,8 +808,6 @@ class FamilyRepository
             $age_dir = 'DESC';
         }
 
-        $prefix = DB::connection()->getTablePrefix();
-
         $row = DB::table('link AS parentfamily')
             ->join('link AS childfamily', static function (JoinClause $join): void {
                 $join
@@ -840,8 +830,8 @@ class FamilyRepository
             })
             ->where('childfamily.l_file', '=', $this->tree->id())
             ->where('parentfamily.l_type', '=', $sex_field)
-            ->where('childbirth.d_julianday2', '>', 'birth.d_julianday1')
-            ->select(['parentfamily.l_to AS id', new Expression($prefix . 'childbirth.d_julianday2 - ' . $prefix . 'birth.d_julianday1 AS age')])
+            ->where('childbirth.d_julianday2', '>', new Expression(DB::prefix('birth.d_julianday1')))
+            ->select(['parentfamily.l_to AS id', new Expression(DB::prefix('childbirth.d_julianday2') . ' - ' . DB::prefix('birth.d_julianday1') . ' AS age')])
             ->take(1)
             ->orderBy('age', $age_dir)
             ->get()
@@ -1021,8 +1011,6 @@ class FamilyRepository
      */
     private function ageOfMarriageQuery(string $type, string $age_dir, int $total): string
     {
-        $prefix = DB::connection()->getTablePrefix();
-
         $hrows = DB::table('families')
             ->where('f_file', '=', $this->tree->id())
             ->join('dates AS married', static function (JoinClause $join): void {
@@ -1040,7 +1028,7 @@ class FamilyRepository
             })
             ->whereColumn('married.d_julianday1', '<', 'husbdeath.d_julianday2')
             ->groupBy(['f_id'])
-            ->select(['f_id AS family', new Expression('MIN(' . $prefix . 'husbdeath.d_julianday2 - ' . $prefix . 'married.d_julianday1) AS age')])
+            ->select(['f_id AS family', new Expression('MIN(' . DB::prefix('husbdeath.d_julianday2') . ' - ' . DB::prefix('married.d_julianday1') . ') AS age')])
             ->get()
             ->all();
 
@@ -1061,7 +1049,7 @@ class FamilyRepository
             })
             ->whereColumn('married.d_julianday1', '<', 'wifedeath.d_julianday2')
             ->groupBy(['f_id'])
-            ->select(['f_id AS family', new Expression('MIN(' . $prefix . 'wifedeath.d_julianday2 - ' . $prefix . 'married.d_julianday1) AS age')])
+            ->select(['f_id AS family', new Expression('MIN(' . DB::prefix('wifedeath.d_julianday2') . ' - ' . DB::prefix('married.d_julianday1') . ') AS age')])
             ->get()
             ->all();
 
@@ -1082,7 +1070,7 @@ class FamilyRepository
             })
             ->whereColumn('married.d_julianday1', '<', 'divorced.d_julianday2')
             ->groupBy(['f_id'])
-            ->select(['f_id AS family', new Expression('MIN(' . $prefix . 'divorced.d_julianday2 - ' . $prefix . 'married.d_julianday1) AS age')])
+            ->select(['f_id AS family', new Expression('MIN(' . DB::prefix('divorced.d_julianday2') . ' - ' . DB::prefix('married.d_julianday1') . ') AS age')])
             ->get()
             ->all();
 
@@ -1274,8 +1262,6 @@ class FamilyRepository
      */
     private function ageBetweenSpousesQuery(string $age_dir, int $total): array
     {
-        $prefix = DB::connection()->getTablePrefix();
-
         $query = DB::table('families')
             ->where('f_file', '=', $this->tree->id())
             ->join('dates AS wife', static function (JoinClause $join): void {
@@ -1296,11 +1282,11 @@ class FamilyRepository
         if ($age_dir === 'DESC') {
             $query
                 ->whereColumn('wife.d_julianday1', '>=', 'husb.d_julianday1')
-                ->orderBy(new Expression('MIN(' . $prefix . 'wife.d_julianday1) - MIN(' . $prefix . 'husb.d_julianday1)'), 'DESC');
+                ->orderBy(new Expression('MIN(' . DB::prefix('wife.d_julianday1') . ') - MIN(' . DB::prefix('husb.d_julianday1') . ')'), 'DESC');
         } else {
             $query
                 ->whereColumn('husb.d_julianday1', '>=', 'wife.d_julianday1')
-                ->orderBy(new Expression('MIN(' . $prefix . 'husb.d_julianday1) - MIN(' . $prefix . 'wife.d_julianday1)'), 'DESC');
+                ->orderBy(new Expression('MIN(' . DB::prefix('husb.d_julianday1') . ') - MIN(' . DB::prefix('wife.d_julianday1') . ')'), 'DESC');
         }
 
         return $query
@@ -1399,12 +1385,10 @@ class FamilyRepository
      * @param int    $year1
      * @param int    $year2
      *
-     * @return array<stdClass>
+     * @return array<object>
      */
     public function statsMarrAgeQuery(string $sex, int $year1 = -1, int $year2 = -1): array
     {
-        $prefix = DB::connection()->getTablePrefix();
-
         $query = DB::table('dates AS married')
             ->join('families', static function (JoinClause $join): void {
                 $join
@@ -1423,7 +1407,7 @@ class FamilyRepository
             ->where('married.d_fact', '=', 'MARR')
             ->whereIn('married.d_type', ['@#DGREGORIAN@', '@#DJULIAN@'])
             ->whereColumn('married.d_julianday1', '>', 'birth.d_julianday1')
-            ->select(['f_id', 'birth.d_gid', new Expression($prefix . 'married.d_julianday2 - ' . $prefix . 'birth.d_julianday1 AS age')]);
+            ->select(['f_id', 'birth.d_gid', new Expression(DB::prefix('married.d_julianday2') . ' - ' . DB::prefix('birth.d_julianday1') . ' AS age')]);
 
         if ($year1 >= 0 && $year2 >= 0) {
             $query->whereBetween('married.d_year', [$year1, $year2]);
@@ -1431,7 +1415,7 @@ class FamilyRepository
 
         return $query
             ->get()
-            ->map(static function (stdClass $row): stdClass {
+            ->map(static function (object $row): object {
                 $row->age = (int) $row->age;
 
                 return $row;
@@ -1472,8 +1456,6 @@ class FamilyRepository
             $age_dir = 'DESC';
         }
 
-        $prefix = DB::connection()->getTablePrefix();
-
         $row = DB::table('families')
             ->join('dates AS married', static function (JoinClause $join): void {
                 $join
@@ -1495,9 +1477,9 @@ class FamilyRepository
                     ->where('birth.d_julianday1', '<>', 0);
             })
             ->where('f_file', '=', $this->tree->id())
-            ->where('married.d_julianday2', '>', 'birth.d_julianday1')
-            ->orderBy(new Expression($prefix . 'married.d_julianday2 - ' . $prefix . 'birth.d_julianday1'), $age_dir)
-            ->select(['f_id AS famid', $sex_field, new Expression($prefix . 'married.d_julianday2 - ' . $prefix . 'birth.d_julianday1 AS age'), 'i_id'])
+            ->where('married.d_julianday2', '>', new Expression(DB::prefix('birth.d_julianday1')))
+            ->orderBy(new Expression(DB::prefix('married.d_julianday2') . ' - ' . DB::prefix('birth.d_julianday1')), $age_dir)
+            ->select(['f_id AS famid', $sex_field, new Expression(DB::prefix('married.d_julianday2') . ' - ' . DB::prefix('birth.d_julianday1') . ' AS age'), 'i_id'])
             ->take(1)
             ->get()
             ->first();
@@ -1727,7 +1709,7 @@ class FamilyRepository
      *
      * @return string
      */
-    public function statsMarr(string $color_from = null, string $color_to = null): string
+    public function statsMarr(string|null $color_from = null, string|null $color_to = null): string
     {
         return (new ChartMarriage($this->century_service, $this->color_service, $this->tree))
             ->chartMarriage($color_from, $color_to);
@@ -1741,7 +1723,7 @@ class FamilyRepository
      *
      * @return string
      */
-    public function statsDiv(string $color_from = null, string $color_to = null): string
+    public function statsDiv(string|null $color_from = null, string|null $color_to = null): string
     {
         return (new ChartDivorce($this->century_service, $this->color_service, $this->tree))
             ->chartDivorce($color_from, $color_to);

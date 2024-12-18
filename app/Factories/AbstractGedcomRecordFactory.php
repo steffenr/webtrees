@@ -20,10 +20,10 @@ declare(strict_types=1);
 namespace Fisharebest\Webtrees\Factories;
 
 use Fisharebest\Webtrees\Auth;
+use Fisharebest\Webtrees\DB;
 use Fisharebest\Webtrees\Gedcom;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Tree;
-use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Support\Collection;
 
 use function str_starts_with;
@@ -46,13 +46,13 @@ abstract class AbstractGedcomRecordFactory
         }
 
         // Caution - this cache can be overwritten by GedcomExportService
-        return Registry::cache()->array()->remember(self::class . $tree->id(), static function () use ($tree): Collection {
-            return DB::table('change')
+        return Registry::cache()
+            ->array()
+            ->remember(self::class . $tree->id(), static fn (): Collection => DB::table('change')
                 ->where('gedcom_id', '=', $tree->id())
                 ->where('status', '=', 'pending')
                 ->orderBy('change_id')
-                ->pluck('new_gedcom', 'xref');
-        });
+                ->pluck('new_gedcom', 'xref'));
     }
 
     /**

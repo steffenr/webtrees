@@ -21,6 +21,7 @@ namespace Fisharebest\Webtrees\Factories;
 
 use Closure;
 use Fisharebest\Webtrees\Contracts\GedcomRecordFactoryInterface;
+use Fisharebest\Webtrees\DB;
 use Fisharebest\Webtrees\Family;
 use Fisharebest\Webtrees\Gedcom;
 use Fisharebest\Webtrees\GedcomRecord;
@@ -35,7 +36,6 @@ use Fisharebest\Webtrees\Source;
 use Fisharebest\Webtrees\Submission;
 use Fisharebest\Webtrees\Submitter;
 use Fisharebest\Webtrees\Tree;
-use Illuminate\Database\Capsule\Manager as DB;
 use InvalidArgumentException;
 
 /**
@@ -45,14 +45,8 @@ class GedcomRecordFactory extends AbstractGedcomRecordFactory implements GedcomR
 {
     /**
      * Create a GedcomRecord object.
-     *
-     * @param string      $xref
-     * @param Tree        $tree
-     * @param string|null $gedcom
-     *
-     * @return GedcomRecord|null
      */
-    public function make(string $xref, Tree $tree, string $gedcom = null): ?GedcomRecord
+    public function make(string $xref, Tree $tree, string|null $gedcom = null): GedcomRecord|null
     {
         // We know the type of the record.  Return it directly.
         if ($gedcom !== null && preg_match('/^0(?: @[^@]+@)? ([A-Z_]+)/', $gedcom, $match)) {
@@ -119,7 +113,7 @@ class GedcomRecordFactory extends AbstractGedcomRecordFactory implements GedcomR
      *
      * @return GedcomRecord
      */
-    public function new(string $xref, string $gedcom, ?string $pending, Tree $tree): GedcomRecord
+    public function new(string $xref, string $gedcom, string|null $pending, Tree $tree): GedcomRecord
     {
         return new GedcomRecord($xref, $gedcom, $pending, $tree);
     }
@@ -145,7 +139,7 @@ class GedcomRecordFactory extends AbstractGedcomRecordFactory implements GedcomR
      *
      * @return GedcomRecord
      */
-    private function newGedcomRecord(string $type, string $xref, string $gedcom, ?string $pending, Tree $tree): GedcomRecord
+    private function newGedcomRecord(string $type, string $xref, string $gedcom, string|null $pending, Tree $tree): GedcomRecord
     {
         switch ($type) {
             case Family::RECORD_TYPE:
@@ -205,7 +199,7 @@ class GedcomRecordFactory extends AbstractGedcomRecordFactory implements GedcomR
      *
      * @return string|null
      */
-    private function gedcom(string $xref, Tree $tree): ?string
+    private function gedcom(string $xref, Tree $tree): string|null
     {
         return DB::table('other')
             ->where('o_id', '=', $xref)

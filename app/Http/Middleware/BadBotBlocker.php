@@ -52,47 +52,69 @@ use function str_ends_with;
  */
 class BadBotBlocker implements MiddlewareInterface
 {
-    private const REGEX_OCTET = '(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)';
-    private const REGEX_IPV4  = '/\\b' . self::REGEX_OCTET . '(?:\\.' . self::REGEX_OCTET . '){3}\\b/';
+    private const string REGEX_OCTET = '(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)';
+    private const string REGEX_IPV4  = '/\\b' . self::REGEX_OCTET . '(?:\\.' . self::REGEX_OCTET . '){3}\\b/';
 
     // Cache whois requests.  Try to avoid all caches expiring at the same time.
-    private const WHOIS_TTL_MIN = 28 * 86400;
-    private const WHOIS_TTL_MAX = 35 * 86400;
-    private const WHOIS_TIMEOUT = 5;
+    private const int WHOIS_TTL_MIN = 28 * 86400;
+    private const int WHOIS_TTL_MAX = 35 * 86400;
+    private const int WHOIS_TIMEOUT = 5;
 
     // Bad robots - SEO optimisers, advertisers, etc.  This list is shared with robots.txt.
-    public const BAD_ROBOTS = [
+    public const array BAD_ROBOTS = [
         'admantx',
         'Adsbot',
         'AhrefsBot',
         'Amazonbot', // Until it understands crawl-delay and noindex / nofollow
+        'AntBot', // Aggressive crawler
         'AspiegelBot',
         'Awario', // Brand management
-        'Barkrowler',
+        'Barkrowler', // Crawler for babbar.tech
         'BLEXBot',
-        'Bytespider',
-        'DataForSEO',
+        'Bytespider', // Aggressive crawler from Bytedance/TikTok
+        'CCBot', // Used to train a number of LLMs
+        'CensysInspect', // Vulnerability scanner
+        'ChatGPT-User', // Used by ChatGPT during operation
+        'ClaudeBot', // Collects training data for LLMs
         'DataForSeoBot', // https://dataforseo.com/dataforseo-bot
         'DotBot',
+        'Expanse', // Another pointless crawler
+        'FacebookBot', // Collects training data for Facebook's LLM translator.
+        'fidget-spinner-bot', // Agressive crawler
+        'Foregenix', // Vulnerability scanner
+        'FriendlyCrawler', // Collects training data for LLMs
+        'Go-http-client', // Crawler library used by many bots
+        'Google-Extended', // Collects training data for Google Bard
+        'GPTBot', // Collects training data for ChatGPT
         'Grapeshot',
         'Honolulu-bot', // Aggressive crawer, no info available
         'ia_archiver',
+        'internet-measurement', // Driftnet
+        'IonCrawl',
+        'Java', // Crawler library used by many bots
         'linabot', // Aggressive crawer, no info available
         'Linguee',
         'MegaIndex.ru',
         'MJ12bot',
         'netEstate NE',
+        'Omgilibot', // Collects training data for LLMs
         'panscient',
         'PetalBot',
+        'phxbot', // Badly written crawler
         'proximic',
+        'python-requests', // Crawler library used by many bots
+        'Scrapy', // Scraping tool
         'SeekportBot', // Pretends to be a search engine - but isn't
         'SemrushBot',
         'serpstatbot',
         'SEOkicks',
         'SiteKiosk',
+        'test-bot', // Agressive crawler
+        'TinyTestBot',
         'Turnitin',
         'wp_is_mobile', // Nothing to do with wordpress
         'XoviBot',
+        'YisouSpider',
         'ZoominfoBot',
     ];
 
@@ -107,7 +129,7 @@ class BadBotBlocker implements MiddlewareInterface
      * @see https://www.mojeek.com/bot.html
      * @see https://support.apple.com/en-gb/HT204683
      */
-    private const ROBOT_REV_FWD_DNS = [
+    private const array ROBOT_REV_FWD_DNS = [
         'Amazonbot'        => ['.crawl.amazon.com'],
         'Applebot'         => ['.applebot.apple.com'],
         'BingPreview'      => ['.search.msn.com'],
@@ -115,7 +137,7 @@ class BadBotBlocker implements MiddlewareInterface
         'Mail.RU_Bot'      => ['.mail.ru'],
         'MicrosoftPreview' => ['.search.msn.com'],
         'MojeekBot'        => ['.mojeek.com'],
-        'Qwantify'         => ['.search.qwant.com'],
+        'Qwantify'         => ['.qwant.com'],
         'Sogou'            => ['.crawl.sogou.com'],
         'Yahoo'            => ['.crawl.yahoo.net'],
         'Yandex'           => ['.yandex.ru', '.yandex.net', '.yandex.com'],
@@ -130,7 +152,7 @@ class BadBotBlocker implements MiddlewareInterface
      * @see https://napoveda.seznam.cz/en/full-text-search/seznambot-crawler
      * @see https://www.ionos.de/terms-gtc/faq-crawler
      */
-    private const ROBOT_REV_ONLY_DNS = [
+    private const array ROBOT_REV_ONLY_DNS = [
         'Baiduspider' => ['.baidu.com', '.baidu.jp'],
         'FreshBot'    => ['.seznam.cz'],
         'IonCrawl'    => ['.1und1.org'],
@@ -144,7 +166,7 @@ class BadBotBlocker implements MiddlewareInterface
      * @see https://www.apple.com/go/applebot
      * @see https://help.duckduckgo.com/duckduckgo-help-pages/results/duckduckbot
      */
-    private const ROBOT_IPS = [
+    private const array ROBOT_IPS = [
         'AppleBot'    => [
             '17.0.0.0/8',
         ],
@@ -181,7 +203,7 @@ class BadBotBlocker implements MiddlewareInterface
      *
      * @see https://bot.seekport.com/
      */
-    private const ROBOT_IP_FILES = [
+    private const array ROBOT_IP_FILES = [
         'SeekportBot' => 'https://bot.seekport.com/seekportbot_ips.txt',
     ];
 
@@ -191,7 +213,7 @@ class BadBotBlocker implements MiddlewareInterface
      * @see https://developers.facebook.com/docs/sharing/webmasters/crawler
      * @see https://www.facebook.com/peering/
      */
-    private const ROBOT_ASNS = [
+    private const array ROBOT_ASNS = [
         'facebook' => ['AS32934', 'AS63293'],
         'twitter'  => ['AS13414'],
     ];
@@ -322,7 +344,7 @@ class BadBotBlocker implements MiddlewareInterface
     private function fetchIpRangesForAsn(string $asn): array
     {
         return Registry::cache()->file()->remember('whois-asn-' . $asn, static function () use ($asn): array {
-            $mapper = static fn (AsnRouteInfo $route_info): ?RangeInterface => IPFactory::parseRangeString($route_info->route ?: $route_info->route6);
+            $mapper = static fn (AsnRouteInfo $route_info): RangeInterface|null => IPFactory::parseRangeString($route_info->route ?: $route_info->route6);
 
             try {
                 $loader = new CurlLoader(self::WHOIS_TIMEOUT);

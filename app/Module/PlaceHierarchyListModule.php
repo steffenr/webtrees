@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace Fisharebest\Webtrees\Module;
 
 use Fisharebest\Webtrees\Auth;
+use Fisharebest\Webtrees\DB;
 use Fisharebest\Webtrees\Family;
 use Fisharebest\Webtrees\Http\RequestHandlers\MapDataEdit;
 use Fisharebest\Webtrees\I18N;
@@ -33,7 +34,6 @@ use Fisharebest\Webtrees\Services\ModuleService;
 use Fisharebest\Webtrees\Services\SearchService;
 use Fisharebest\Webtrees\Tree;
 use Fisharebest\Webtrees\Validator;
-use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\JoinClause;
 use Psr\Http\Message\ResponseInterface;
@@ -56,7 +56,7 @@ class PlaceHierarchyListModule extends AbstractModule implements ModuleListInter
 {
     use ModuleListTrait;
 
-    protected const ROUTE_URL = '/tree/{tree}/place-list{/place_id}';
+    protected const string ROUTE_URL = '/tree/{tree}/place-list{/place_id}';
 
     /** @var int The default access level for this module.  It can be changed in the control panel. */
     protected int $access_level = Auth::PRIV_USER;
@@ -68,8 +68,6 @@ class PlaceHierarchyListModule extends AbstractModule implements ModuleListInter
     private SearchService $search_service;
 
     /**
-     * PlaceHierarchy constructor.
-     *
      * @param LeafletJsService $leaflet_js_service
      * @param ModuleService    $module_service
      * @param SearchService    $search_service
@@ -103,11 +101,6 @@ class PlaceHierarchyListModule extends AbstractModule implements ModuleListInter
         return I18N::translate('Place hierarchy');
     }
 
-    /**
-     * A sentence describing what this module does.
-     *
-     * @return string
-     */
     public function description(): string
     {
         /* I18N: Description of the “Place hierarchy” module */
@@ -321,9 +314,7 @@ class PlaceHierarchyListModule extends AbstractModule implements ModuleListInter
     private function getList(Tree $tree): array
     {
         $places = $this->search_service->searchPlaces($tree, '')
-            ->sort(static function (Place $x, Place $y): int {
-                return I18N::comparator()($x->gedcomName(), $y->gedcomName());
-            })
+            ->sort(static fn (Place $x, Place $y): int => I18N::comparator()($x->gedcomName(), $y->gedcomName()))
             ->all();
 
         $count = count($places);
@@ -342,7 +333,7 @@ class PlaceHierarchyListModule extends AbstractModule implements ModuleListInter
      *
      * @return array{columns:array<array<Place>>,place:Place,tree:Tree,col_class:string}|null
      */
-    private function getHierarchy(Place $place): ?array
+    private function getHierarchy(Place $place): array|null
     {
         $child_places = $place->getChildPlaces();
         $numfound     = count($child_places);

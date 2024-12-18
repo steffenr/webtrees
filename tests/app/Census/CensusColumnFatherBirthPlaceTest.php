@@ -24,19 +24,12 @@ use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\Place;
 use Fisharebest\Webtrees\TestCase;
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-/**
- * Test harness for the class CensusColumnFatherBirthPlace
- */
+#[CoversClass(CensusColumnFatherBirthPlace::class)]
+#[CoversClass(AbstractCensusColumn::class)]
 class CensusColumnFatherBirthPlaceTest extends TestCase
 {
-    /**
-     * Get place mock.
-     *
-     * @param string $place Gedcom Place
-     *
-     * @return Place
-     */
     private function getPlaceMock(string $place): Place
     {
         $placeParts = explode(', ', $place);
@@ -48,12 +41,6 @@ class CensusColumnFatherBirthPlaceTest extends TestCase
         return $placeMock;
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Census\CensusColumnFatherBirthPlace
-     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
-     *
-     * @return void
-     */
     public function testSameCountry(): void
     {
         $father = $this->createMock(Individual::class);
@@ -73,12 +60,6 @@ class CensusColumnFatherBirthPlaceTest extends TestCase
         self::assertSame('London', $column->generate($individual, $individual));
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Census\CensusColumnFatherBirthPlace
-     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
-     *
-     * @return void
-     */
     public function testDifferentCountry(): void
     {
         $father = $this->createMock(Individual::class);
@@ -98,12 +79,6 @@ class CensusColumnFatherBirthPlaceTest extends TestCase
         self::assertSame('London, England', $column->generate($individual, $individual));
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Census\CensusColumnFatherBirthPlace
-     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
-     *
-     * @return void
-     */
     public function testPlaceNoParent(): void
     {
         $family = $this->createMock(Family::class);
@@ -120,12 +95,6 @@ class CensusColumnFatherBirthPlaceTest extends TestCase
         self::assertSame('', $column->generate($individual, $individual));
     }
 
-    /**
-     * @covers \Fisharebest\Webtrees\Census\CensusColumnFatherBirthPlace
-     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
-     *
-     * @return void
-     */
     public function testPlaceNoParentFamily(): void
     {
         $individual = $this->createMock(Individual::class);

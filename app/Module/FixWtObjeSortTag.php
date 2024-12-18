@@ -41,8 +41,6 @@ class FixWtObjeSortTag extends AbstractModule implements ModuleDataFixInterface
     private DataFixService $data_fix_service;
 
     /**
-     * FixMissingDeaths constructor.
-     *
      * @param DataFixService $data_fix_service
      */
     public function __construct(DataFixService $data_fix_service)
@@ -61,11 +59,6 @@ class FixWtObjeSortTag extends AbstractModule implements ModuleDataFixInterface
         return I18N::translate('Convert %s tags to GEDCOM 5.5.1', 'INDI:_WT_OBJE_SORT');
     }
 
-    /**
-     * A sentence describing what this module does.
-     *
-     * @return string
-     */
     public function description(): string
     {
         /* I18N: Description of a “Data fix” module */

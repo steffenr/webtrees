@@ -23,21 +23,15 @@ use Fig\Http\Message\RequestMethodInterface;
 use Fig\Http\Message\StatusCodeInterface;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\TestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 use Psr\Http\Message\UriFactoryInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 use function response;
 
-/**
- * Test the CheckCsrf middleware.
- *
- * @covers \Fisharebest\Webtrees\Http\Middleware\CheckCsrf
- */
+#[CoversClass(CheckCsrf::class)]
 class CheckCsrfTest extends TestCase
 {
-    /**
-     * @return void
-     */
     public function testMiddleware(): void
     {
         $handler = $this->createMock(RequestHandlerInterface::class);

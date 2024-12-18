@@ -40,8 +40,6 @@ class LoginPage implements RequestHandlerInterface
     private TreeService $tree_service;
 
     /**
-     * LoginPage constructor.
-     *
      * @param TreeService $tree_service
      */
     public function __construct(TreeService $tree_service)
@@ -65,7 +63,7 @@ class LoginPage implements RequestHandlerInterface
         }
 
         $url      = Validator::queryParams($request)->isLocalUrl()->string('url', route(HomePage::class));
-        $username = Validator::queryParams($request)->isLocalUrl()->string('username', '');
+        $username = Validator::queryParams($request)->string('username', '');
 
         // No tree?  perhaps we came here from a page without one.
         if ($tree === null) {

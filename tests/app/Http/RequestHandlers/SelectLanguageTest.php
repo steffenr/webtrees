@@ -23,15 +23,13 @@ use Fig\Http\Message\StatusCodeInterface;
 use Fisharebest\Webtrees\GuestUser;
 use Fisharebest\Webtrees\Services\UserService;
 use Fisharebest\Webtrees\TestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-/**
- * @covers \Fisharebest\Webtrees\Http\RequestHandlers\SelectLanguage
- */
+#[CoversClass(SelectLanguage::class)]
 class SelectLanguageTest extends TestCase
 {
-    /**
-     * @return void
-     */
+    protected static bool $uses_database = true;
+
     public function testSelectLanguageForGuest(): void
     {
         $user     = new GuestUser();
@@ -44,9 +42,6 @@ class SelectLanguageTest extends TestCase
         self::assertSame(StatusCodeInterface::STATUS_NO_CONTENT, $response->getStatusCode());
     }
 
-    /**
-     * @return void
-     */
     public function testSelectLanguageForUser(): void
     {
         $user_service = new UserService();

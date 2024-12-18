@@ -23,16 +23,13 @@ use DOMDocument;
 use Fisharebest\Webtrees\Fact;
 use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\TestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversTrait;
 
-/**
- * @covers \Fisharebest\Webtrees\Module\MapLinkBing
- * @covers \Fisharebest\Webtrees\Module\ModuleMapLinkTrait
- */
+#[CoversClass(MapLinkBing::class)]
+#[CoversTrait(ModuleMapLinkTrait::class)]
 class MapLinkGoogleTest extends TestCase
 {
-    /**
-     * @return void
-     */
     public function testNoCoordinates(): void
     {
         $module = new MapLinkGoogle();
@@ -46,9 +43,6 @@ class MapLinkGoogleTest extends TestCase
         static::assertSame('', $html);
     }
 
-    /**
-     * @return void
-     */
     public function testLink(): void
     {
         $module = new MapLinkGoogle();

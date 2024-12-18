@@ -25,19 +25,13 @@ use Fisharebest\Webtrees\Services\TimeoutService;
 use Fisharebest\Webtrees\Services\TreeService;
 use Fisharebest\Webtrees\Services\UpgradeService;
 use Fisharebest\Webtrees\TestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-/**
- * Test UpgradeController class.
- *
- * @covers \Fisharebest\Webtrees\Http\RequestHandlers\UpgradeWizardPage
- */
+#[CoversClass(UpgradeWizardPage::class)]
 class UpgradeWizardPageTest extends TestCase
 {
     protected static bool $uses_database = true;
 
-    /**
-     * @return void
-     */
     public function testWizard(): void
     {
         $timeout_service       = new TimeoutService();

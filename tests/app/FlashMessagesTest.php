@@ -19,17 +19,13 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees;
 
-/**
- * Test harness for the class FlashMessages
- *
- * @covers \Fisharebest\Webtrees\FlashMessages
- */
+use PHPUnit\Framework\Attributes\CoversClass;
+
+#[CoversClass(FlashMessages::class)]
 class FlashMessagesTest extends TestCase
 {
     /**
      * Test that the class exists
-     *
-     * @return void
      */
     public function testClassExists(): void
     {

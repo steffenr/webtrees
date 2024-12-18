@@ -19,12 +19,12 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Statistics\Google;
 
+use Fisharebest\Webtrees\DB;
 use Fisharebest\Webtrees\Family;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Statistics\Service\ColorService;
 use Fisharebest\Webtrees\Tree;
-use Illuminate\Database\Capsule\Manager as DB;
 
 use function count;
 use function htmlspecialchars_decode;
@@ -78,8 +78,8 @@ class ChartFamilyLargest
      * @return string
      */
     public function chartLargestFamilies(
-        string $color_from = null,
-        string $color_to = null,
+        string|null $color_from = null,
+        string|null $color_to = null,
         int $total = 10
     ): string {
         $color_from ??= 'ffffff';

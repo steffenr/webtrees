@@ -19,6 +19,7 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Statistics\Repository;
 
+use Fisharebest\Webtrees\DB;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Place;
 use Fisharebest\Webtrees\Statistics\Google\ChartDistribution;
@@ -26,7 +27,6 @@ use Fisharebest\Webtrees\Statistics\Repository\Interfaces\IndividualRepositoryIn
 use Fisharebest\Webtrees\Statistics\Repository\Interfaces\PlaceRepositoryInterface;
 use Fisharebest\Webtrees\Statistics\Service\CountryService;
 use Fisharebest\Webtrees\Tree;
-use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\JoinClause;
 
@@ -202,7 +202,7 @@ class PlaceRepository implements PlaceRepositoryInterface
             ->groupBy(['p_place'])
             ->orderByDesc(new Expression('COUNT(*)'))
             ->orderBy('p_place')
-            ->pluck(new Expression('COUNT(*)'), 'p_place')
+            ->pluck(new Expression('COUNT(*) AS total'), 'p_place')
             ->map(static fn (string $col): int => (int) $col)
             ->all();
 

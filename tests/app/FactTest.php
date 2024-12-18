@@ -19,21 +19,16 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees;
 
-/**
- * Test harness for the class Fact
- *
- * @covers \Fisharebest\Webtrees\Fact
- */
+use PHPUnit\Framework\Attributes\CoversClass;
+
+#[CoversClass(Fact::class)]
 class FactTest extends TestCase
 {
     protected static bool $uses_database = true;
 
-    /**
-     * @return void
-     */
     public function testAttribute(): void
     {
-        $individual = $this->createStub(Individual::class);
+        $individual = $this->createMock(Individual::class);
         $individual->method('tag')->willReturn('INDI');
 
         $fact = new Fact("1 BIRT\n2 ADDR address", $individual, '');
@@ -44,13 +39,11 @@ class FactTest extends TestCase
     }
 
     /**
-     * @return void
-     *
      * @see https://github.com/fisharebest/webtrees/issues/4417
      */
     public function testIssue4417(): void
     {
-        $individual = $this->createStub(Individual::class);
+        $individual = $this->createMock(Individual::class);
         $individual->method('tag')->willReturn('INDI');
 
         $fact = new Fact("1 BIRT\n2 PLACXYZ\n3 CONT place", $individual, '');
