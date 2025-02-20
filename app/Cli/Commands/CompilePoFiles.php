@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -34,7 +34,7 @@ use function glob;
 use function realpath;
 use function var_export;
 
-class CompilePoFiles extends Command
+final class CompilePoFiles extends Command
 {
     private const string PO_FILE_PATTERN = Webtrees::ROOT_DIR . 'resources/lang/*/*.po';
 

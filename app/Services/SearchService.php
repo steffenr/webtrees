@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -1065,9 +1065,9 @@ class SearchService
     /**
      * Apply search filters to a SQL query column.  Apply collation rules to MySQL.
      *
-     * @param Builder           $query
-     * @param Expression|string $column
-     * @param array<string>     $search_terms
+     * @param Builder                   $query
+     * @param Expression<string>|string $column
+     * @param array<string>             $search_terms
      */
     private function whereSearch(Builder $query, Expression|string $column, array $search_terms): void
     {
@@ -1079,9 +1079,9 @@ class SearchService
     /**
      * Apply soundex search filters to a SQL query column.
      *
-     * @param Builder           $query
-     * @param Expression|string $field
-     * @param string            $soundex
+     * @param Builder                   $query
+     * @param Expression<string>|string $field
+     * @param string                    $soundex
      */
     private function wherePhonetic(Builder $query, $field, string $soundex): void
     {

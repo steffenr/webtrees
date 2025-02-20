@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -27,10 +27,8 @@ use Fisharebest\Webtrees\Module\LanguageEnglishUnitedStates;
 use Fisharebest\Webtrees\Module\LanguageFrench;
 use Fisharebest\Webtrees\Module\LanguageSlovakian;
 use Fisharebest\Webtrees\Module\ModuleLanguageInterface;
-use Fisharebest\Webtrees\Module\ModuleLanguageTrait;
 use Fisharebest\Webtrees\Services\RelationshipService;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\CoversTrait;
 
 use function array_reverse;
 
@@ -39,7 +37,6 @@ use function array_reverse;
 #[CoversClass(LanguageEnglishGreatBritain::class)]
 #[CoversClass(LanguageEnglishUnitedStates::class)]
 #[CoversClass(LanguageFrench::class)]
-#[CoversTrait(ModuleLanguageTrait::class)]
 class RelationshipNamesTest extends TestCase
 {
     protected static bool $uses_database = true;

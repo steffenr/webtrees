@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -21,7 +21,6 @@ namespace Fisharebest\Webtrees\Services;
 
 use Fisharebest\Webtrees\Date;
 use Fisharebest\Webtrees\DB;
-use Fisharebest\Webtrees\Elements\UnknownElement;
 use Fisharebest\Webtrees\Exceptions\GedcomErrorException;
 use Fisharebest\Webtrees\Family;
 use Fisharebest\Webtrees\Gedcom;
@@ -45,6 +44,7 @@ use function array_chunk;
 use function array_intersect_key;
 use function array_map;
 use function array_unique;
+use function array_values;
 use function date;
 use function explode;
 use function max;
@@ -71,11 +71,6 @@ class GedcomImportService
 {
     /**
      * Tidy up a gedcom record on import, so that we can access it consistently/efficiently.
-     *
-     * @param string $rec
-     * @param Tree   $tree
-     *
-     * @return string
      */
     private function reformatRecord(string $rec, Tree $tree): string
     {
@@ -230,7 +225,6 @@ class GedcomImportService
      * @param Tree   $tree   import the record into this tree
      * @param bool   $update whether this is an updated record that has been accepted
      *
-     * @return void
      * @throws GedcomErrorException
      */
     public function importRecord(string $gedrec, Tree $tree, bool $update): void
@@ -275,10 +269,7 @@ class GedcomImportService
 
         // Add a _UID
         if ($tree->getPreference('GENERATE_UIDS') === '1' && !str_contains($gedrec, "\n1 _UID ")) {
-            $element = Registry::elementFactory()->make($type . ':_UID');
-            if (!$element instanceof UnknownElement) {
-                $gedrec .= "\n1 _UID " . $element->default($tree);
-            }
+            $gedrec .= "\n1 _UID " . Registry::idFactory()->pafUid();
         }
 
         // If the user has downloaded their GEDCOM data (containing media objects) and edited it
@@ -446,8 +437,6 @@ class GedcomImportService
 
     /**
      * Legacy Family Tree software generates _PLAC_DEFN records containing LAT/LONG values
-     *
-     * @param string $gedcom
      */
     private function importLegacyPlacDefn(string $gedcom): void
     {
@@ -484,9 +473,7 @@ class GedcomImportService
     }
 
     /**
-     * Legacy Family Tree software generates _PLAC records containing LAT/LONG values
-     *
-     * @param string $gedcom
+     * TNG generates _PLAC records containing LAT/LONG values
      */
     private function importTNGPlac(string $gedcom): void
     {
@@ -522,12 +509,6 @@ class GedcomImportService
 
     /**
      * Extract all level 2 places from the given record and insert them into the places table
-     *
-     * @param string $xref
-     * @param Tree   $tree
-     * @param string $gedrec
-     *
-     * @return void
      */
     public function updatePlaces(string $xref, Tree $tree, string $gedrec): void
     {
@@ -554,7 +535,7 @@ class GedcomImportService
         }
 
         // array_unique doesn't work with arrays of arrays
-        $rows = array_intersect_key($rows, array_unique(array_map('serialize', $rows)));
+        $rows = array_intersect_key($rows, array_unique(array_map(serialize(...), $rows)));
 
         // PDO has a limit of 65535 placeholders, and each row requires 3 placeholders.
         foreach (array_chunk($rows, 20000) as $chunk) {
@@ -564,12 +545,6 @@ class GedcomImportService
 
     /**
      * Extract all the dates from the given record and insert them into the database.
-     *
-     * @param string $xref
-     * @param int    $ged_id
-     * @param string $gedrec
-     *
-     * @return void
      */
     private function updateDates(string $xref, int $ged_id, string $gedrec): void
     {
@@ -609,19 +584,13 @@ class GedcomImportService
         }
 
         // array_unique doesn't work with arrays of arrays
-        $rows = array_intersect_key($rows, array_unique(array_map('serialize', $rows)));
+        $rows = array_intersect_key($rows, array_unique(array_map(serialize(...), $rows)));
 
-        DB::table('dates')->insert($rows);
+        DB::table('dates')->insert(array_values($rows));
     }
 
     /**
      * Extract all the links from the given record and insert them into the database
-     *
-     * @param string $xref
-     * @param int    $ged_id
-     * @param string $gedrec
-     *
-     * @return void
      */
     private function updateLinks(string $xref, int $ged_id, string $gedrec): void
     {
@@ -643,17 +612,11 @@ class GedcomImportService
             ];
         }
 
-        DB::table('link')->insert($rows);
+        DB::table('link')->insert(array_values($rows));
     }
 
     /**
      * Extract all the names from the given record and insert them into the database.
-     *
-     * @param string     $xref
-     * @param int        $ged_id
-     * @param Individual $record
-     *
-     * @return void
      */
     private function updateNames(string $xref, int $ged_id, Individual $record): void
     {
@@ -699,11 +662,6 @@ class GedcomImportService
 
     /**
      * Extract inline media data, and convert to media objects.
-     *
-     * @param Tree   $tree
-     * @param string $gedcom
-     *
-     * @return string
      */
     private function convertInlineMedia(Tree $tree, string $gedcom): string
     {
@@ -732,11 +690,6 @@ class GedcomImportService
      *
      * Legacy generates: +1 FORM / +1 FILE / +1 TITL / +1 _SCBK / +1 _PRIM / +1 _TYPE / +1 NOTE
      * RootsMagic generates: +1 FILE / +1 FORM / +1 TITL
-     *
-     * @param string $gedcom
-     * @param Tree   $tree
-     *
-     * @return string
      */
     private function createMediaObject(string $gedcom, Tree $tree): string
     {
@@ -830,19 +783,9 @@ class GedcomImportService
         return $xref;
     }
 
-    /**
-     * update a record in the database
-     *
-     * @param string $gedrec
-     * @param Tree   $tree
-     * @param bool   $delete
-     *
-     * @return void
-     * @throws GedcomErrorException
-     */
     public function updateRecord(string $gedrec, Tree $tree, bool $delete): void
     {
-        if (preg_match('/^0 @(' . Gedcom::REGEX_XREF . ')@ (' . Gedcom::REGEX_TAG . ')/', $gedrec, $match)) {
+        if (preg_match('/^0 @(' . Gedcom::REGEX_XREF . ')@ (' . Gedcom::REGEX_TAG . ')/', $gedrec, $match) === 1) {
             [, $gid, $type] = $match;
         } elseif (preg_match('/^0 (HEAD)(?:\n|$)/', $gedrec, $match)) {
             // The HEAD record has no XREF.  Any others?

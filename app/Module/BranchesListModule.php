@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -55,9 +55,6 @@ use function strtolower;
 use function usort;
 use function view;
 
-/**
- * Class BranchesListModule
- */
 class BranchesListModule extends AbstractModule implements ModuleListInterface, RequestHandlerInterface
 {
     use ModuleListTrait;
@@ -86,11 +83,6 @@ class BranchesListModule extends AbstractModule implements ModuleListInterface, 
             ->allows(RequestMethodInterface::METHOD_POST);
     }
 
-    /**
-     * How should this module be identified in the control panel, etc.?
-     *
-     * @return string
-     */
     public function title(): string
     {
         /* I18N: Name of a module/list */

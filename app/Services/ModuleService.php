@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -98,6 +98,7 @@ use Fisharebest\Webtrees\Module\InteractiveTreeModule;
 use Fisharebest\Webtrees\Module\LanguageAfrikaans;
 use Fisharebest\Webtrees\Module\LanguageAlbanian;
 use Fisharebest\Webtrees\Module\LanguageArabic;
+use Fisharebest\Webtrees\Module\LanguageArmenian;
 use Fisharebest\Webtrees\Module\LanguageBasque;
 use Fisharebest\Webtrees\Module\LanguageBosnian;
 use Fisharebest\Webtrees\Module\LanguageBulgarian;
@@ -415,6 +416,7 @@ class ModuleService
         'language-hi'             => LanguageHindi::class,
         'language-hr'             => LanguageCroatian::class,
         'language-hu'             => LanguageHungarian::class,
+        'language-hy'             => LanguageArmenian::class,
         'language-id'             => LanguageIndonesian::class,
         'language-is'             => LanguageIcelandic::class,
         'language-it'             => LanguageItalian::class,

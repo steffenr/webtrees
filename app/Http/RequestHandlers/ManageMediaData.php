@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -365,7 +365,7 @@ class ManageMediaData implements RequestHandlerInterface
                 $imgsize = getimagesizefromstring($data_filesystem->read($file));
                 $html .= '<dt>' . I18N::translate('Image dimensions') . '</dt>';
                 /* I18N: image dimensions, width × height */
-                $html .= '<dd>' . I18N::translate('%1$s × %2$s pixels', I18N::number($imgsize['0']), I18N::number($imgsize['1'])) . '</dd>';
+                $html .= '<dd>' . I18N::translate('%1$s × %2$s pixels', I18N::number($imgsize[0]), I18N::number($imgsize[1])) . '</dd>';
             } catch (FilesystemException | UnableToReadFile | Throwable) {
                 // Not an image, or not a valid image?
             }

@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -132,7 +132,7 @@ class MergeFactsAction implements RequestHandlerInterface
             ->where('gedcom_id', '=', $tree->id())
             ->whereIn('page_parameter', [$xref1, $xref2])
             ->groupBy(['page_name'])
-            ->pluck(new Expression('SUM(page_count) AS total'), 'page_name');
+            ->pluck(new Expression('SUM(page_count)'), 'page_name');
 
         foreach ($hits as $page_name => $page_count) {
             DB::table('hit_counter')

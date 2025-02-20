@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -28,8 +28,6 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-use function ini_get;
-
 /**
  * Edit the site preferences.
  */
@@ -37,21 +35,10 @@ class SitePreferencesPage implements RequestHandlerInterface
 {
     use ViewResponseTrait;
 
-    private ModuleService $module_service;
-
-    /**
-     * @param ModuleService $module_service
-     */
-    public function __construct(ModuleService $module_service)
+    public function __construct(private ModuleService $module_service)
     {
-        $this->module_service = $module_service;
     }
 
-    /**
-     * @param ServerRequestInterface $request
-     *
-     * @return ResponseInterface
-     */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $this->layout = 'layouts/administration';
@@ -60,14 +47,11 @@ class SitePreferencesPage implements RequestHandlerInterface
             ->findByInterface(ModuleThemeInterface::class, true, true)
             ->map($this->module_service->titleMapper());
 
-        $max_execution_time = (int) ini_get('max_execution_time');
-
         $title = I18N::translate('Website preferences');
 
         return $this->viewResponse('admin/site-preferences', [
             'all_themes'         => $all_themes,
             'data_folder'        => Registry::filesystem()->dataName(),
-            'max_execution_time' => $max_execution_time,
             'title'              => $title,
         ]);
     }

@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -19,6 +19,7 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees;
 
+use Closure;
 use Illuminate\Database\Capsule\Manager;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Expression;
@@ -41,14 +42,14 @@ class DB extends Manager
     private const array COLLATION_ASCII = [
         self::MYSQL      => 'ascii_bin',
         self::POSTGRES   => 'C',
-        self::SQLITE     => 'C',
+        self::SQLITE     => 'BINARY',
         self::SQL_SERVER => 'Latin1_General_Bin',
     ];
 
     private const array COLLATION_UTF8 = [
         self::MYSQL      => 'utf8mb4_unicode_ci',
         self::POSTGRES   => 'und-x-icu',
-        self::SQLITE     => 'nocase',
+        self::SQLITE     => 'NOCASE',
         self::SQL_SERVER => 'utf8_CI_AI',
     ];
 
@@ -167,6 +168,24 @@ class DB extends Manager
         return parent::connection()->getTablePrefix() . $identifier;
     }
 
+    /**
+     * SQL-Server needs to be told that we are going to insert into an identity column.
+     *
+     * @param Closure(): void $callback
+     */
+    public static function identityInsert(string $table, Closure $callback): void
+    {
+        if (self::driverName() === self::SQL_SERVER) {
+            self::exec('SET IDENTITY_INSERT [' . self::prefix(identifier: $table) . '] ON');
+        }
+
+        $callback();
+
+        if (self::driverName() === self::SQL_SERVER) {
+            self::exec('SET IDENTITY_INSERT [' . self::prefix(identifier: $table) . '] OFF');
+        }
+    }
+
     public static function rollBack(): void
     {
         parent::connection()->rollBack();
@@ -205,6 +224,9 @@ class DB extends Manager
         }
     }
 
+    /**
+     * @return Expression<string>
+     */
     public static function binaryColumn(string $column, string|null $alias = null): Expression
     {
         if (self::driverName() === self::MYSQL) {

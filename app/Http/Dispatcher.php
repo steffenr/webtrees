@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -50,8 +50,10 @@ readonly class Dispatcher
     /**
      * @param class-string|MiddlewareInterface $item
      */
-    private static function reduceMiddleware(RequestHandlerInterface $carry, string|MiddlewareInterface $item): RequestHandlerInterface
-    {
+    private static function reduceMiddleware(
+        RequestHandlerInterface $carry,
+        string|MiddlewareInterface $item,
+    ): RequestHandlerInterface {
         return new readonly class (carry: $carry, item: $item) implements RequestHandlerInterface {
             /**
              * @param class-string|MiddlewareInterface $item
@@ -66,7 +68,7 @@ readonly class Dispatcher
             {
                 $item = $this->item;
 
-                if (is_string($item)) {
+                if (is_string(value: $item)) {
                     $item = Registry::container()->get(id: $item);
                 }
 

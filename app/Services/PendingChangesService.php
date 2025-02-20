@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -23,6 +23,7 @@ use DateInterval;
 use DateTimeImmutable;
 use DateTimeZone;
 use Fisharebest\Webtrees\Auth;
+use Fisharebest\Webtrees\Contracts\TimestampInterface;
 use Fisharebest\Webtrees\Contracts\UserInterface;
 use Fisharebest\Webtrees\DB;
 use Fisharebest\Webtrees\Exceptions\GedcomErrorException;
@@ -80,10 +81,16 @@ class PendingChangesService
     }
 
     /**
-     * @param Tree $tree
-     * @param int  $n
-     *
-     * @return array<array<object>>
+     * @return array<array<object{
+     *     xref:string,
+     *     change_id:string,
+     *     old_gedcom:string|null,
+     *     new_gedcom:string|null,
+     *     change_time:TimestampInterface,
+     *     record:GedcomRecord,
+     *     user_name:string,
+     *     real_name:string
+     * }>>
      */
     public function pendingChanges(Tree $tree, int $n): array
     {

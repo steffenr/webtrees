@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -35,7 +35,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use function addcslashes;
 use function stream_get_contents;
 
-class TreeExport extends Command
+final class TreeExport extends Command
 {
     public function __construct(
         private readonly GedcomExportService $gedcom_export_service,
@@ -70,8 +70,8 @@ class TreeExport extends Command
         $io = new SymfonyStyle(input: $input, output: $output);
 
         $tree_name = $input->getArgument(name: 'tree_name');
-        $format   = $input->getOption(name: 'format');
-        $filename = $input->getOption(name: 'filename');
+        $format    = $input->getOption(name: 'format');
+        $filename  = $input->getOption(name: 'filename');
 
         $tree = $this->tree_service->all()[$tree_name] ?? null;
 

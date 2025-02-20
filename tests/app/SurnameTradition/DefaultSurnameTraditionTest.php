@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -30,17 +30,11 @@ class DefaultSurnameTraditionTest extends TestCase
 {
     private SurnameTraditionInterface $surname_tradition;
 
-    /**
-     * Test whether surnames are used
-     */
     public function testSurnames(): void
     {
         self::assertSame('//', $this->surname_tradition->defaultName());
     }
 
-    /**
-     * Test new child names
-     */
     public function testNewChildNames(): void
     {
         $father_fact = $this->createMock(Fact::class);
@@ -71,9 +65,6 @@ class DefaultSurnameTraditionTest extends TestCase
         );
     }
 
-    /**
-     * Test new parent names
-     */
     public function testNewParentNames(): void
     {
         $fact = $this->createMock(Fact::class);
@@ -98,9 +89,6 @@ class DefaultSurnameTraditionTest extends TestCase
         );
     }
 
-    /**
-     * Test new spouse names
-     */
     public function testNewSpouseNames(): void
     {
         $fact = $this->createMock(Fact::class);
@@ -125,9 +113,6 @@ class DefaultSurnameTraditionTest extends TestCase
         );
     }
 
-    /**
-     * Prepare the environment for these tests
-     */
     protected function setUp(): void
     {
         parent::setUp();

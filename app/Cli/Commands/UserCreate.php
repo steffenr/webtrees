@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -31,7 +31,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use function bin2hex;
 use function random_bytes;
 
-class UserCreate extends Command
+final class UserCreate extends Command
 {
     public function __construct(private readonly UserService $user_service)
     {
@@ -111,7 +111,7 @@ class UserCreate extends Command
             $io->info(message: 'Generated password: ' . $password);
         }
 
-        $user = $this->user_service->create(user_name: $username, real_name:$realname, email: $email, password: $password);
+        $user = $this->user_service->create(user_name: $username, real_name: $realname, email: $email, password: $password);
         $user->setPreference(setting_name: UserInterface::PREF_TIME_ZONE, setting_value: $timezone);
         $user->setPreference(setting_name: UserInterface::PREF_LANGUAGE, setting_value: $language);
         $user->setPreference(setting_name: UserInterface::PREF_IS_ACCOUNT_APPROVED, setting_value: '1');

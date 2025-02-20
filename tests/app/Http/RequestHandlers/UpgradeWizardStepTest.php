@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -26,6 +26,7 @@ use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Http\Exceptions\HttpServerErrorException;
 use Fisharebest\Webtrees\Services\GedcomExportService;
 use Fisharebest\Webtrees\Services\GedcomImportService;
+use Fisharebest\Webtrees\Services\PhpService;
 use Fisharebest\Webtrees\Services\TimeoutService;
 use Fisharebest\Webtrees\Services\TreeService;
 use Fisharebest\Webtrees\Services\UpgradeService;
@@ -45,7 +46,7 @@ class UpgradeWizardStepTest extends TestCase
         $handler = new UpgradeWizardStep(
             new GedcomExportService(new Psr17Factory(), new Psr17Factory()),
             new TreeService(new GedcomImportService()),
-            new UpgradeService(new TimeoutService())
+            new UpgradeService(new TimeoutService(php_service: new PhpService()))
         );
 
         $request = self::createRequest(RequestMethodInterface::METHOD_POST, ['step' => 'Invalid']);
@@ -108,7 +109,7 @@ class UpgradeWizardStepTest extends TestCase
         $handler = new UpgradeWizardStep(
             new GedcomExportService(new Psr17Factory(), new Psr17Factory()),
             new TreeService(new GedcomImportService()),
-            new UpgradeService(new TimeoutService())
+            new UpgradeService(new TimeoutService(php_service: new PhpService()))
         );
 
         $request  = self::createRequest(RequestMethodInterface::METHOD_POST, ['step' => 'Prepare']);
@@ -122,7 +123,7 @@ class UpgradeWizardStepTest extends TestCase
         $handler = new UpgradeWizardStep(
             new GedcomExportService(new Psr17Factory(), new Psr17Factory()),
             new TreeService(new GedcomImportService()),
-            new UpgradeService(new TimeoutService())
+            new UpgradeService(new TimeoutService(php_service: new PhpService()))
         );
 
         $request  = self::createRequest(RequestMethodInterface::METHOD_POST, ['step' => 'Pending']);
@@ -143,7 +144,7 @@ class UpgradeWizardStepTest extends TestCase
         $handler = new UpgradeWizardStep(
             new GedcomExportService(new Psr17Factory(), new Psr17Factory()),
             new TreeService(new GedcomImportService()),
-            new UpgradeService(new TimeoutService())
+            new UpgradeService(new TimeoutService(php_service: new PhpService()))
         );
 
         $request = self::createRequest(RequestMethodInterface::METHOD_POST, ['step' => 'Pending']);
@@ -162,7 +163,7 @@ class UpgradeWizardStepTest extends TestCase
         $handler = new UpgradeWizardStep(
             new GedcomExportService(new Psr17Factory(), new Psr17Factory()),
             $tree_service,
-            new UpgradeService(new TimeoutService())
+            new UpgradeService(new TimeoutService(php_service: new PhpService()))
         );
 
         $request  = self::createRequest()->withQueryParams(['step' => 'Export', 'tree' => $tree->name()]);

@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -50,7 +50,6 @@ use function route;
 use function str_contains;
 use function str_ends_with;
 use function str_pad;
-use function str_replace;
 use function str_starts_with;
 use function strtoupper;
 use function strtr;

@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -21,20 +21,17 @@ namespace Fisharebest\Webtrees\Http\Middleware;
 
 use Fig\Http\Message\StatusCodeInterface;
 use Fisharebest\Webtrees\Registry;
+use Fisharebest\Webtrees\Services\NetworkService;
 use Fisharebest\Webtrees\Validator;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
-use Iodev\Whois\Loaders\CurlLoader;
-use Iodev\Whois\Modules\Asn\AsnRouteInfo;
-use Iodev\Whois\Whois;
 use IPLib\Address\AddressInterface;
-use IPLib\Factory as IPFactory;
+use IPLib\Factory;
 use IPLib\Range\RangeInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Throwable;
 
 use function array_filter;
 use function array_map;
@@ -58,7 +55,6 @@ class BadBotBlocker implements MiddlewareInterface
     // Cache whois requests.  Try to avoid all caches expiring at the same time.
     private const int WHOIS_TTL_MIN = 28 * 86400;
     private const int WHOIS_TTL_MAX = 35 * 86400;
-    private const int WHOIS_TIMEOUT = 5;
 
     // Bad robots - SEO optimisers, advertisers, etc.  This list is shared with robots.txt.
     public const array BAD_ROBOTS = [
@@ -89,6 +85,7 @@ class BadBotBlocker implements MiddlewareInterface
         'Grapeshot',
         'Honolulu-bot', // Aggressive crawer, no info available
         'ia_archiver',
+        'ImagesiftBot',
         'internet-measurement', // Driftnet
         'IonCrawl',
         'Java', // Crawler library used by many bots
@@ -97,6 +94,7 @@ class BadBotBlocker implements MiddlewareInterface
         'MegaIndex.ru',
         'MJ12bot',
         'netEstate NE',
+        'OAI-SearchBot', // Collects training data for LLMs
         'Omgilibot', // Collects training data for LLMs
         'panscient',
         'PetalBot',
@@ -218,6 +216,10 @@ class BadBotBlocker implements MiddlewareInterface
         'twitter'  => ['AS13414'],
     ];
 
+    public function __construct(private readonly NetworkService $network_service)
+    {
+    }
+
     /**
      * @param ServerRequestInterface  $request
      * @param RequestHandlerInterface $handler
@@ -228,7 +230,7 @@ class BadBotBlocker implements MiddlewareInterface
     {
         $ua      = Validator::serverParams($request)->string('HTTP_USER_AGENT', '');
         $ip      = Validator::attributes($request)->string('client-ip');
-        $address = IPFactory::parseAddressString($ip);
+        $address = Factory::parseAddressString($ip);
         assert($address instanceof AddressInterface);
 
         foreach (self::BAD_ROBOTS as $robot) {
@@ -252,7 +254,7 @@ class BadBotBlocker implements MiddlewareInterface
         foreach (self::ROBOT_IPS as $robot => $valid_ip_ranges) {
             if (str_contains($ua, $robot)) {
                 foreach ($valid_ip_ranges as $ip_range) {
-                    $range = IPFactory::parseRangeString($ip_range);
+                    $range = Factory::parseRangeString($ip_range);
 
                     if ($range instanceof RangeInterface && $range->contains($address)) {
                         continue 2;
@@ -268,7 +270,7 @@ class BadBotBlocker implements MiddlewareInterface
                 $valid_ip_ranges = $this->fetchIpRangesForUrl($robot, $url);
 
                 foreach ($valid_ip_ranges as $ip_range) {
-                    $range = IPFactory::parseRangeString($ip_range);
+                    $range = Factory::parseRangeString($ip_range);
 
                     if ($range instanceof RangeInterface && $range->contains($address)) {
                         continue 2;
@@ -311,11 +313,7 @@ class BadBotBlocker implements MiddlewareInterface
     /**
      * Check that an IP address belongs to a robot operator using a forward/reverse DNS lookup.
      *
-     * @param string        $ip
-     * @param array<string> $valid_domains
-     * @param bool          $reverse_only
-     *
-     * @return bool
+     * @param list<string> $valid_domains
      */
     private function checkRobotDNS(string $ip, array $valid_domains, bool $reverse_only): bool
     {
@@ -335,36 +333,23 @@ class BadBotBlocker implements MiddlewareInterface
     }
 
     /**
-     * Perform a whois search for an ASN.
-     *
-     * @param string $asn The autonomous system number to query
-     *
      * @return array<RangeInterface>
      */
     private function fetchIpRangesForAsn(string $asn): array
     {
-        return Registry::cache()->file()->remember('whois-asn-' . $asn, static function () use ($asn): array {
-            $mapper = static fn (AsnRouteInfo $route_info): RangeInterface|null => IPFactory::parseRangeString($route_info->route ?: $route_info->route6);
+        return Registry::cache()->file()->remember('whois-asn-' . $asn, function () use ($asn): array {
+            $ranges = $this->network_service->findIpRangesForAsn($asn);
 
-            try {
-                $loader = new CurlLoader(self::WHOIS_TIMEOUT);
-                $whois  = new Whois($loader);
-                $info   = $whois->loadAsnInfo($asn);
-                $routes = $info->routes;
-                $ranges = array_map($mapper, $routes);
+            $mapper = static fn (string $range): RangeInterface|null => Factory::parseRangeString($range);
 
-                return array_filter($ranges);
-            } catch (Throwable) {
-                return [];
-            }
+            $ranges = array_map($mapper, $ranges);
+
+            return array_filter($ranges);
         }, random_int(self::WHOIS_TTL_MIN, self::WHOIS_TTL_MAX));
     }
 
     /**
      * Fetch a list of IP addresses from a remote file.
-     *
-     * @param string $ua
-     * @param string $url
      *
      * @return array<string>
      */

@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -78,7 +78,7 @@ class VerifyEmail implements RequestHandlerInterface
 
             foreach ($this->user_service->administrators() as $administrator) {
                 // switch language to administrator settings
-                I18N::init($administrator->getPreference(UserInterface::PREF_LANGUAGE));
+                I18N::init($administrator->getPreference(UserInterface::PREF_LANGUAGE, 'en-US'));
 
                 $base_url = Validator::attributes($request)->string('base_url');
 

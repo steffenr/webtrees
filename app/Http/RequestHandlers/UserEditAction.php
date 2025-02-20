@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2023 webtrees development team
+ * Copyright (C) 2025 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -94,7 +94,7 @@ class UserEditAction implements RequestHandlerInterface
 
         // We have just approved a user.  Tell them
         if ($approved && $edit_user->getPreference(UserInterface::PREF_IS_ACCOUNT_APPROVED) !== '1') {
-            I18N::init($edit_user->getPreference(UserInterface::PREF_LANGUAGE));
+            I18N::init($edit_user->getPreference(UserInterface::PREF_LANGUAGE, 'en-US'));
 
             $base_url = Validator::attributes($request)->string('base_url');
 
