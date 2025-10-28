@@ -115,7 +115,7 @@ class IndividualFactsTabModule extends AbstractModule implements ModuleTabInterf
             ->flatten();
 
         // Don't show family meta-data tags
-        $exclude_facts  = new Collection(['FAM:CHAN', 'FAM:_UID']);
+        $exclude_facts  = new Collection(['FAM:CHAN', 'FAM:_UID', 'FAM:UID', 'FAM:SUBM']);
         // Don't show tags that are shown in tabs or sidebars
         $exclude_facts = $exclude_facts->merge($sidebar_facts)->merge($tab_facts);
 
@@ -136,9 +136,9 @@ class IndividualFactsTabModule extends AbstractModule implements ModuleTabInterf
         // Facts of relatives take the form 1 EVEN / 2 TYPE Event of Individual
         // Ensure custom tags from there are recognised
         Registry::elementFactory()->registerTags([
-            'INDI:EVEN:CEME'      => new CustomElement('Cemetery'),
-            'INDI:EVEN:_GODP'     => new CustomElement('Godparent'),
-            'INDI:EVEN:FAMC'      => new XrefFamily(I18N::translate('Adoptive parents')),
+            'INDI:EVEN:CEME'      => new CustomElement(I18N::translate('Cemetery')),
+            'INDI:EVEN:_GODP'     => new CustomElement(I18N::translate('Godparent')),
+            'INDI:EVEN:FAMC'      => new XrefFamily(I18N::translate('Parents')), // Could come from BIRT or ADOP
             'INDI:EVEN:FAMC:ADOP' => new AdoptedByWhichParent(I18N::translate('Adoption')),
         ]);
 

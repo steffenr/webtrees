@@ -36,7 +36,7 @@ use Psr\Http\Message\ServerRequestInterface;
         <meta charset="UTF-8">
         <meta name="csrf" content="<?= e(csrf_token()) ?>">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="robots" content="<?= e($meta_robots ?? 'noindex') ?>">
+        <meta name="robots" content="<?= e($meta_robots ?? 'noindex,nofollow') ?>">
         <meta name="generator" content="<?= e(Webtrees::NAME) ?> <?= e(Webtrees::VERSION) ?>">
         <meta name="description" content="<?= $meta_description ?? '' ?>">
 
@@ -67,7 +67,7 @@ use Psr\Http\Message\ServerRequestInterface;
         <?= Registry::container()->get(ModuleService::class)->findByInterface(ModuleGlobalInterface::class)->map(static fn (ModuleGlobalInterface $module): string => $module->headContent())->implode('') ?>
     </head>
 
-    <body class="wt-global wt-theme-<?= e(Registry::container()->get(ModuleThemeInterface::class)->name()) ?> wt-route-<?= e(basename(strtr(Validator::attributes($request)->route()->name ?? '/', ['\\' => '/']))) ?>">
+    <body class="wt-global wt-theme-<?= e(Registry::container()->get(ModuleThemeInterface::class)->name()) ?> wt-route-<?= e(basename(strtr(Validator::attributes($request)->route()->name, ['\\' => '/']))) ?>">
         <header class="wt-header-wrapper d-print-none">
             <div class="container-lg wt-header-container">
                 <div class="row wt-header-content">

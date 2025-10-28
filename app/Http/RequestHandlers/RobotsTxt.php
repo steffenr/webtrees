@@ -52,20 +52,12 @@ class RobotsTxt implements RequestHandlerInterface
 
     private TreeService $tree_service;
 
-    /**
-     * @param ModuleService $module_service
-     */
     public function __construct(ModuleService $module_service, TreeService $tree_service)
     {
         $this->module_service = $module_service;
         $this->tree_service   = $tree_service;
     }
 
-    /**
-     * @param ServerRequestInterface $request
-     *
-     * @return ResponseInterface
-     */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $base_url = Validator::attributes($request)->string('base_url');

@@ -68,15 +68,9 @@ class SearchService
     // Do not attempt to show search results larger than this/
     protected const int MAX_SEARCH_RESULTS = 5000;
 
-    private TreeService $tree_service;
-
-    /**
-     * @param TreeService $tree_service
-     */
     public function __construct(
-        TreeService $tree_service
+        private readonly TreeService $tree_service,
     ) {
-        $this->tree_service = $tree_service;
     }
 
     /**
@@ -91,6 +85,9 @@ class SearchService
 
         $this->whereTrees($query, 'f_file', $trees);
         $this->whereSearch($query, 'f_gedcom', $search);
+
+        // Remove accents when searching using PHP.
+        $search = array_map(I18N::language()->normalize(...), $search);
 
         return $query
             ->get()
@@ -126,8 +123,7 @@ class SearchService
                     ->where('wife_name.n_type', '<>', '_MARNM');
             });
 
-        $prefix = DB::prefix();
-        $field  = new Expression('COALESCE(' . $prefix . "husb_name.n_full, '') || COALESCE(" . $prefix . "wife_name.n_full, '')");
+        $field  = new Expression('COALESCE(' . DB::prefix('husb_name') . ".n_full, '') || COALESCE(" . DB::prefix('wife_name') . ".n_full, '')");
 
         $this->whereTrees($query, 'f_file', $trees);
         $this->whereSearch($query, $field, $search);
@@ -174,6 +170,9 @@ class SearchService
 
         $this->whereTrees($query, 'i_file', $trees);
         $this->whereSearch($query, 'i_gedcom', $search);
+
+        // Remove accents when searching using PHP.
+        $search = array_map(I18N::language()->normalize(...), $search);
 
         return $query
             ->get()
@@ -1141,10 +1140,19 @@ class SearchService
     {
         return static function (GedcomRecord $record) use ($search_terms): bool {
             // Ignore non-genealogy fields
-            $gedcom = preg_replace('/\n\d (?:_UID|_WT_USER) .*/', '', $record->gedcom());
+            $regex = '/^([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|[0-9A-F]{36})$/i';
+
+            if (array_filter($search_terms, static fn (string $term): bool => preg_match($regex, $term) === 1) !== []) {
+                $gedcom = preg_replace('/\n\d _WT_USER .*/', '', $record->gedcom());
+            } else {
+                $gedcom = preg_replace('/\n\d (UID|_UID|_WT_USER) .*/', '', $record->gedcom());
+            }
 
             // Ignore matches in links
             $gedcom = preg_replace('/\n\d ' . Gedcom::REGEX_TAG . '( @' . Gedcom::REGEX_XREF . '@)?/', '', $gedcom);
+
+            // Remove accents when searching using PHP.
+            $gedcom = I18N::language()->normalize($gedcom);
 
             // Re-apply the filtering
             foreach ($search_terms as $search_term) {
